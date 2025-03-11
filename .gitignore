@@ -1,5 +1,10 @@
-# Sensitive files
+# Sensitive files and credentials
 *.json
-service-account-key.json
-integration-gateway/api/*.json
+*.key
+*.pem
+*.p12
 secrets/
+**/*.env
+**/*.env.*
+**/service-account*
+**/credentials*
