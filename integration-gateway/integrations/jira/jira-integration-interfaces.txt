@@ -1,0 +1,587 @@
+// src/interfaces/jira/JIRAIntegrationInterfaces.ts
+
+/**
+ * JIRA Issue priority levels
+ */
+export enum JIRAPriority {
+  HIGHEST = 'Highest',
+  HIGH = 'High',
+  MEDIUM = 'Medium',
+  LOW = 'Low',
+  LOWEST = 'Lowest'
+}
+
+/**
+ * Common JIRA issue types
+ */
+export enum JIRAIssueType {
+  BUG = 'Bug',
+  TASK = 'Task',
+  STORY = 'Story',
+  EPIC = 'Epic',
+  SUBTASK = 'Sub-task',
+  FEATURE = 'Feature',
+  IMPROVEMENT = 'Improvement'
+}
+
+/**
+ * JIRA issue status
+ */
+export enum JIRAStatus {
+  OPEN = 'Open',
+  IN_PROGRESS = 'In Progress',
+  RESOLVED = 'Resolved',
+  REOPENED = 'Reopened',
+  CLOSED = 'Closed',
+  TODO = 'To Do',
+  DONE = 'Done',
+  BLOCKED = 'Blocked',
+  IN_REVIEW = 'In Review'
+}
+
+/**
+ * JIRA tenant configuration for multi-tenant setup
+ */
+export interface JIRATenantConfig {
+  tenantId: string;
+  baseUrl: string;
+  username?: string;
+  apiToken?: string;
+  oauthToken?: string;
+  defaultProject?: string;
+  customFields?: Record<string, string>; // Maps logical names to custom field IDs
+  workflowMappings?: Record<string, string>; // Maps standard status to tenant-specific status
+  brandingOptions?: {
+    logo?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    logoAltText?: string;
+  };
+  webhookSecret?: string;
+  apiRateLimits?: {
+    maxRequestsPerMinute: number;
+    maxConcurrentRequests: number;
+  };
+}
+
+/**
+ * JIRA user interface
+ */
+export interface JIRAUser {
+  id: string;
+  key: string;
+  name: string;
+  displayName: string;
+  emailAddress: string;
+  active: boolean;
+  timeZone?: string;
+  avatarUrl?: string;
+  tenantId?: string; // Associated tenant identifier for multi-tenant systems
+}
+
+/**
+ * JIRA project interface
+ */
+export interface JIRAProject {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  lead: JIRAUser;
+  url: string;
+  tenantId: string; // The tenant this project belongs to
+  issueTypes: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    iconUrl?: string;
+  }>;
+}
+
+/**
+ * JIRA issue comment interface
+ */
+export interface JIRAComment {
+  id: string;
+  author: JIRAUser;
+  body: string;
+  created: string;
+  updated: string;
+}
+
+/**
+ * JIRA issue attachment interface
+ */
+export interface JIRAAttachment {
+  id: string;
+  filename: string;
+  author: JIRAUser;
+  created: string;
+  size: number;
+  mimeType: string;
+  content?: Blob;
+  url: string;
+}
+
+/**
+ * JIRA issue worklog interface
+ */
+export interface JIRAWorklog {
+  id: string;
+  author: JIRAUser;
+  comment?: string;
+  created: string;
+  updated: string;
+  started: string;
+  timeSpent: string;
+  timeSpentSeconds: number;
+}
+
+/**
+ * JIRA issue interface
+ */
+export interface JIRAIssue {
+  id: string;
+  key: string;
+  summary: string;
+  description?: string;
+  tenantId: string; // The tenant this issue belongs to
+  issueType: {
+    id: string;
+    name: string;
+  };
+  project: {
+    id: string;
+    key: string;
+    name: string;
+  };
+  status: {
+    id: string;
+    name: string;
+  };
+  priority?: {
+    id: string;
+    name: string;
+  };
+  assignee?: JIRAUser;
+  reporter: JIRAUser;
+  created: string;
+  updated: string;
+  dueDate?: string;
+  labels?: string[];
+  components?: Array<{
+    id: string;
+    name: string;
+  }>;
+  fixVersions?: Array<{
+    id: string;
+    name: string;
+    released: boolean;
+    releaseDate?: string;
+  }>;
+  comments?: JIRAComment[];
+  attachments?: JIRAAttachment[];
+  worklogs?: JIRAWorklog[];
+  subtasks?: string[]; // Array of issue keys
+  parent?: string; // Parent issue key
+  customFields?: Record<string, any>;
+  links?: Array<{
+    id: string;
+    type: {
+      id: string;
+      name: string;
+      inward: string;
+      outward: string;
+    };
+    inwardIssue?: string;
+    outwardIssue?: string;
+  }>;
+}
+
+/**
+ * JIRA issue search result
+ */
+export interface JIRASearchResult {
+  total: number;
+  startAt: number;
+  maxResults: number;
+  issues: JIRAIssue[];
+}
+
+/**
+ * JIRA issue creation options
+ */
+export interface JIRAIssueCreateOptions {
+  tenantId: string; // Required for multi-tenant operations
+  projectKey: string;
+  issueType: string | JIRAIssueType;
+  summary: string;
+  description?: string;
+  priority?: string | JIRAPriority;
+  assignee?: string;
+  labels?: string[];
+  components?: string[];
+  fixVersions?: string[];
+  dueDate?: string;
+  customFields?: Record<string, any>;
+}
+
+/**
+ * JIRA issue update options
+ */
+export interface JIRAIssueUpdateOptions {
+  tenantId: string; // Required for multi-tenant operations
+  summary?: string;
+  description?: string;
+  issueType?: string;
+  priority?: string | JIRAPriority;
+  assignee?: string;
+  labels?: string[];
+  components?: string[];
+  fixVersions?: string[];
+  dueDate?: string;
+  customFields?: Record<string, any>;
+}
+
+/**
+ * JIRA transition options
+ */
+export interface JIRATransitionOptions {
+  tenantId: string; // Required for multi-tenant operations
+  transition: {
+    id: string;
+  };
+  fields?: Record<string, any>;
+  update?: Record<string, any[]>;
+}
+
+/**
+ * JIRA integration service interface for multi-tenant systems
+ */
+export interface JIRAIntegrationService {
+  /**
+   * Register a new tenant in the system
+   */
+  registerTenant(config: JIRATenantConfig): Promise<boolean>;
+  
+  /**
+   * Update tenant configuration
+   */
+  updateTenantConfig(tenantId: string, config: Partial<JIRATenantConfig>): Promise<boolean>;
+  
+  /**
+   * Remove a tenant from the system
+   */
+  removeTenant(tenantId: string): Promise<boolean>;
+  
+  /**
+   * Get tenant configuration
+   */
+  getTenantConfig(tenantId: string): Promise<JIRATenantConfig | null>;
+  
+  /**
+   * List all tenant IDs
+   */
+  listTenants(): Promise<string[]>;
+  
+  /**
+   * Authenticate with JIRA server for a specific tenant
+   */
+  authenticate(tenantId: string): Promise<boolean>;
+  
+  /**
+   * Get current authenticated user for a tenant
+   */
+  getCurrentUser(tenantId: string): Promise<JIRAUser>;
+  
+  /**
+   * Get a list of projects for a tenant
+   */
+  getProjects(tenantId: string): Promise<JIRAProject[]>;
+  
+  /**
+   * Get a specific project by key for a tenant
+   */
+  getProject(tenantId: string, projectKey: string): Promise<JIRAProject>;
+  
+  /**
+   * Get issue by key for a tenant
+   */
+  getIssue(tenantId: string, issueKey: string, expand?: string[]): Promise<JIRAIssue>;
+  
+  /**
+   * Search for issues using JQL (JIRA Query Language) for a tenant
+   */
+  searchIssues(
+    tenantId: string,
+    jql: string,
+    options?: {
+      startAt?: number;
+      maxResults?: number;
+      fields?: string[];
+      expand?: string[];
+    }
+  ): Promise<JIRASearchResult>;
+  
+  /**
+   * Create a new issue for a tenant
+   */
+  createIssue(options: JIRAIssueCreateOptions): Promise<JIRAIssue>;
+  
+  /**
+   * Update an existing issue for a tenant
+   */
+  updateIssue(tenantId: string, issueKey: string, options: JIRAIssueUpdateOptions): Promise<JIRAIssue>;
+  
+  /**
+   * Delete an issue for a tenant
+   */
+  deleteIssue(tenantId: string, issueKey: string): Promise<boolean>;
+  
+  /**
+   * Assign an issue to a user for a tenant
+   */
+  assignIssue(tenantId: string, issueKey: string, username: string): Promise<boolean>;
+  
+  /**
+   * Add a comment to an issue for a tenant
+   */
+  addComment(tenantId: string, issueKey: string, comment: string): Promise<JIRAComment>;
+  
+  /**
+   * Get comments for an issue for a tenant
+   */
+  getComments(tenantId: string, issueKey: string): Promise<JIRAComment[]>;
+  
+  /**
+   * Add an attachment to an issue for a tenant
+   */
+  addAttachment(
+    tenantId: string,
+    issueKey: string,
+    file: {
+      filename: string;
+      content: Blob | Buffer;
+      contentType: string;
+    }
+  ): Promise<JIRAAttachment>;
+  
+  /**
+   * Get attachments for an issue for a tenant
+   */
+  getAttachments(tenantId: string, issueKey: string): Promise<JIRAAttachment[]>;
+  
+  /**
+   * Get available transitions for an issue for a tenant
+   */
+  getTransitions(tenantId: string, issueKey: string): Promise<Array<{
+    id: string;
+    name: string;
+    to: {
+      self: string;
+      id: string;
+      name: string;
+    };
+  }>>;
+  
+  /**
+   * Transition an issue to another status for a tenant
+   */
+  transitionIssue(
+    tenantId: string,
+    issueKey: string,
+    transitionId: string,
+    options?: {
+      fields?: Record<string, any>;
+      update?: Record<string, any[]>;
+    }
+  ): Promise<boolean>;
+  
+  /**
+   * Add a worklog entry to an issue for a tenant
+   */
+  addWorklog(
+    tenantId: string,
+    issueKey: string,
+    options: {
+      timeSpent: string;
+      comment?: string;
+      started?: string;
+    }
+  ): Promise<JIRAWorklog>;
+  
+  /**
+   * Get worklogs for an issue for a tenant
+   */
+  getWorklogs(tenantId: string, issueKey: string): Promise<JIRAWorklog[]>;
+  
+  /**
+   * Create an issue link for a tenant
+   */
+  createIssueLink(
+    tenantId: string,
+    options: {
+      type: string;
+      inwardIssue: string;
+      outwardIssue: string;
+      comment?: {
+        body: string;
+      };
+    }
+  ): Promise<boolean>;
+  
+  /**
+   * Get issue links for an issue for a tenant
+   */
+  getIssueLinks(tenantId: string, issueKey: string): Promise<Array<{
+    id: string;
+    type: {
+      id: string;
+      name: string;
+      inward: string;
+      outward: string;
+    };
+    inwardIssue?: {
+      id: string;
+      key: string;
+      summary: string;
+    };
+    outwardIssue?: {
+      id: string;
+      key: string;
+      summary: string;
+    };
+  }>>;
+  
+  /**
+   * Import issues in bulk from CSV or JSON for a tenant
+   */
+  bulkImportIssues(
+    tenantId: string,
+    projectKey: string,
+    issues: Array<Omit<JIRAIssueCreateOptions, 'tenantId' | 'projectKey'>>
+  ): Promise<{
+    total: number;
+    successful: number;
+    failed: number;
+    errors: Array<{
+      index: number;
+      error: string;
+      issueData: any;
+    }>;
+    createdIssues: string[];
+  }>;
+  
+  /**
+   * Map standard workflow statuses to tenant-specific workflow statuses
+   */
+  mapWorkflowStatus(
+    tenantId: string,
+    standardStatus: string,
+    tenantSpecificStatus: string
+  ): Promise<boolean>;
+  
+  /**
+   * Set up webhook to listen for JIRA events for a tenant
+   */
+  setupWebhook(
+    tenantId: string,
+    options: {
+      url: string;
+      events: string[];
+      filters?: Record<string, any>;
+      excludeIssueDetails?: boolean;
+    }
+  ): Promise<{
+    id: string;
+    url: string;
+    events: string[];
+  }>;
+}
+
+/**
+ * Abstract base class for JIRA integration services with multi-tenant support
+ */
+export abstract class BaseJIRAIntegrationService implements JIRAIntegrationService {
+  protected tenantConfigs: Map<string, JIRATenantConfig>;
+  protected tenantConnections: Map<string, any>; // Store API clients or connection objects per tenant
+  
+  constructor() {
+    this.tenantConfigs = new Map();
+    this.tenantConnections = new Map();
+  }
+  
+  abstract registerTenant(config: JIRATenantConfig): Promise<boolean>;
+  abstract updateTenantConfig(tenantId: string, config: Partial<JIRATenantConfig>): Promise<boolean>;
+  abstract removeTenant(tenantId: string): Promise<boolean>;
+  
+  getTenantConfig(tenantId: string): Promise<JIRATenantConfig | null> {
+    const config = this.tenantConfigs.get(tenantId);
+    return Promise.resolve(config || null);
+  }
+  
+  listTenants(): Promise<string[]> {
+    return Promise.resolve(Array.from(this.tenantConfigs.keys()));
+  }
+  
+  protected validateTenantId(tenantId: string): void {
+    if (!this.tenantConfigs.has(tenantId)) {
+      throw new Error(`Tenant with ID ${tenantId} is not registered`);
+    }
+  }
+  
+  abstract authenticate(tenantId: string): Promise<boolean>;
+  abstract getCurrentUser(tenantId: string): Promise<JIRAUser>;
+  abstract getProjects(tenantId: string): Promise<JIRAProject[]>;
+  abstract getProject(tenantId: string, projectKey: string): Promise<JIRAProject>;
+  abstract getIssue(tenantId: string, issueKey: string, expand?: string[]): Promise<JIRAIssue>;
+  abstract searchIssues(tenantId: string, jql: string, options?: any): Promise<JIRASearchResult>;
+  abstract createIssue(options: JIRAIssueCreateOptions): Promise<JIRAIssue>;
+  abstract updateIssue(tenantId: string, issueKey: string, options: JIRAIssueUpdateOptions): Promise<JIRAIssue>;
+  abstract deleteIssue(tenantId: string, issueKey: string): Promise<boolean>;
+  abstract assignIssue(tenantId: string, issueKey: string, username: string): Promise<boolean>;
+  abstract addComment(tenantId: string, issueKey: string, comment: string): Promise<JIRAComment>;
+  abstract getComments(tenantId: string, issueKey: string): Promise<JIRAComment[]>;
+  abstract addAttachment(tenantId: string, issueKey: string, file: any): Promise<JIRAAttachment>;
+  abstract getAttachments(tenantId: string, issueKey: string): Promise<JIRAAttachment[]>;
+  abstract getTransitions(tenantId: string, issueKey: string): Promise<any[]>;
+  abstract transitionIssue(tenantId: string, issueKey: string, transitionId: string, options?: any): Promise<boolean>;
+  abstract addWorklog(tenantId: string, issueKey: string, options: any): Promise<JIRAWorklog>;
+  abstract getWorklogs(tenantId: string, issueKey: string): Promise<JIRAWorklog[]>;
+  abstract createIssueLink(tenantId: string, options: any): Promise<boolean>;
+  abstract getIssueLinks(tenantId: string, issueKey: string): Promise<any[]>;
+  abstract bulkImportIssues(tenantId: string, projectKey: string, issues: any[]): Promise<any>;
+  abstract mapWorkflowStatus(tenantId: string, standardStatus: string, tenantSpecificStatus: string): Promise<boolean>;
+  abstract setupWebhook(tenantId: string, options: any): Promise<any>;
+  
+  /**
+   * Utility to translate between standard status and tenant-specific status
+   */
+  protected translateStatus(tenantId: string, standardStatus: string): string {
+    const config = this.tenantConfigs.get(tenantId);
+    if (!config || !config.workflowMappings) {
+      return standardStatus; // No mapping, use as-is
+    }
+    
+    return config.workflowMappings[standardStatus] || standardStatus;
+  }
+  
+  /**
+   * Map custom field logical name to actual field ID for a tenant
+   */
+  protected getCustomFieldId(tenantId: string, logicalName: string): string | null {
+    const config = this.tenantConfigs.get(tenantId);
+    if (!config || !config.customFields) {
+      return null;
+    }
+    
+    return config.customFields[logicalName] || null;
+  }
+}
+
+export default {
+  JIRAPriority,
+  JIRAIssueType,
+  JIRAStatus,
+  BaseJIRAIntegrationService
+};

@@ -1,0 +1,530 @@
+/**
+ * AIXTIV SYMPHONY API Integration Module
+ * 
+ * This module serves as the main entry point for the API, integrating all components
+ * of the system (Dream Commander, Q4D-Lenz, Co-Pilots) into a unified API.
+ */
+
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const express = require('express');
+const cors = require('cors');
+
+// Initialize Firebase if not already initialized
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+// Import utility functions
+const {
+  getDocumentById,
+  updateDocument,
+  createDocument,
+  handleHttpError,
+  createHttpError,
+  authenticateUser,
+  requireAdmin
+} = require('./utils');
+
+// Import other modules
+const { BlockchainAuthorizationService } = require('./blockchain-authorization');
+const { LLMProviderIntegration, Q4DLenzCoordinator, DreamCommanderCoordinator } = require('./middleware-layer');
+const { Q4DLenzAgentAdapter } = require('./agent-adapter');
+
+// Create Express app for the main API
+const app = express();
+app.use(cors({ origin: true }));
+app.use(express.json());
+
+// Initialize services
+const llmIntegration = new LLMProviderIntegration();
+const q4dLenzCoordinator = new Q4DLenzCoordinator(llmIntegration);
+const dreamCommanderCoordinator = new DreamCommanderCoordinator(llmIntegration);
+const blockchainService = new BlockchainAuthorizationService();
+
+/**
+ * Health check endpoint
+ * GET /api/health
+ */
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'operational',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+/**
+ * API documentation endpoint
+ * GET /api/docs
+ */
+app.get('/docs', (req, res) => {
+  res.status(200).json({
+    name: 'AIXTIV SYMPHONY API',
+    version: '1.0.0',
+    description: 'API for high-performing professionals and high-functioning individuals to achieve maximum potential in their life and career goals.',
+    endpoints: [
+      { method: 'GET', path: '/api/health', description: 'Health check endpoint' },
+      { method: 'GET', path: '/api/docs', description: 'API documentation' },
+      { method: 'POST', path: '/api/dream-commander/prompts', description: 'Generate a new prompt' },
+      { method: 'GET', path: '/api/dream-commander/prompts/:ownerSubscriberId', description: 'Get prompts for an owner' },
+      { method: 'POST', path: '/api/q4d-lenz/interpret', description: 'Interpret a prompt with Q4D-Lenz' },
+      { method: 'POST', path: '/api/co-pilots/execute', description: 'Execute an activity with a Co-Pilot' },
+      { method: 'POST', path: '/api/authorization/generate-qr', description: 'Generate QR code for authorization' },
+      { method: 'POST', path: '/api/authorization/verify-qr', description: 'Verify QR code authorization' }
+    ]
+  });
+});
+
+/**
+ * Dream Commander Routes
+ */
+
+/**
+ * Generate a new prompt
+ * POST /api/dream-commander/prompts
+ */
+app.post('/dream-commander/prompts', authenticateUser, async (req, res) => {
+  try {
+    const { ownerSubscriberId, context } = req.body;
+    
+    if (!ownerSubscriberId) {
+      throw createHttpError('Owner-subscriber ID is required', 400);
+    }
+    
+    const prompt = await dreamCommanderCoordinator.generatePrompt(ownerSubscriberId, context);
+    
+    res.status(201).json(prompt);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Get prompts for an owner-subscriber
+ * GET /api/dream-commander/prompts/:ownerSubscriberId
+ */
+app.get('/dream-commander/prompts/:ownerSubscriberId', authenticateUser, async (req, res) => {
+  try {
+    const { ownerSubscriberId } = req.params;
+    const { status, limit, offset } = req.query;
+    
+    const prompts = await dreamCommanderCoordinator.getPromptsForOwner(ownerSubscriberId, {
+      status,
+      limit,
+      offset
+    });
+    
+    res.status(200).json({
+      ownerSubscriberId,
+      prompts,
+      count: prompts.length
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Get a specific prompt
+ * GET /api/dream-commander/prompts/:ownerSubscriberId/:promptId
+ */
+app.get('/dream-commander/prompts/:ownerSubscriberId/:promptId', authenticateUser, async (req, res) => {
+  try {
+    const { ownerSubscriberId, promptId } = req.params;
+    
+    // Get the prompt
+    const prompt = await getDocumentById('dreamCommanderPrompts', promptId);
+    
+    if (!prompt) {
+      throw createHttpError(`Prompt with ID ${promptId} not found`, 404);
+    }
+    
+    // Validate owner
+    if (prompt.ownerSubscriberId !== ownerSubscriberId) {
+      throw createHttpError('Unauthorized access to prompt', 403);
+    }
+    
+    res.status(200).json(prompt);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Q4D-Lenz Routes
+ */
+
+/**
+ * Initialize a Q4D-Lenz agent
+ * POST /api/q4d-lenz/initialize
+ */
+app.post('/q4d-lenz/initialize', authenticateUser, async (req, res) => {
+  try {
+    const { agentId, ownerSubscriberId, lenzType, linkedInIntegration } = req.body;
+    
+    if (!ownerSubscriberId) {
+      throw createHttpError('Owner-subscriber ID is required', 400);
+    }
+    
+    // Initialize the agent
+    const agent = await q4dLenzCoordinator.initializeAgent({
+      agentId,
+      ownerSubscriberId,
+      lenzType,
+      linkedInIntegration
+    });
+    
+    res.status(201).json(agent);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Interpret a prompt with Q4D-Lenz
+ * POST /api/q4d-lenz/interpret
+ */
+app.post('/q4d-lenz/interpret', authenticateUser, async (req, res) => {
+  try {
+    const { promptId, agentId } = req.body;
+    
+    if (!promptId || !agentId) {
+      throw createHttpError('Prompt ID and agent ID are required', 400);
+    }
+    
+    // Get the prompt
+    const prompt = await getDocumentById('dreamCommanderPrompts', promptId);
+    
+    if (!prompt) {
+      throw createHttpError(`Prompt with ID ${promptId} not found`, 404);
+    }
+    
+    // Interpret the prompt
+    const interpretation = await q4dLenzCoordinator.interpretPrompt(prompt, agentId);
+    
+    // Generate activities
+    const activities = await q4dLenzCoordinator.generateActivities(interpretation.interpretationId);
+    
+    res.status(200).json({
+      promptId,
+      interpretationId: interpretation.interpretationId,
+      agentId: interpretation.agentId,
+      activities: activities.map(activity => ({
+        id: activity.id,
+        title: activity.title,
+        type: activity.type,
+        status: activity.status
+      })),
+      interpretation: interpretation.interpretation
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Get an interpretation
+ * GET /api/q4d-lenz/interpretations/:interpretationId
+ */
+app.get('/q4d-lenz/interpretations/:interpretationId', authenticateUser, async (req, res) => {
+  try {
+    const { interpretationId } = req.params;
+    
+    // Get the interpretation
+    const interpretation = await getDocumentById('lenzInterpretations', interpretationId);
+    
+    if (!interpretation) {
+      throw createHttpError(`Interpretation with ID ${interpretationId} not found`, 404);
+    }
+    
+    res.status(200).json(interpretation);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Co-Pilot Routes
+ */
+
+/**
+ * Execute an activity with a Co-Pilot
+ * POST /api/co-pilots/execute
+ */
+app.post('/co-pilots/execute', authenticateUser, async (req, res) => {
+  try {
+    const { activityId, agentId } = req.body;
+    
+    if (!activityId) {
+      throw createHttpError('Activity ID is required', 400);
+    }
+    
+    // Get the activity
+    const activity = await getDocumentById('activities', activityId);
+    
+    if (!activity) {
+      throw createHttpError(`Activity with ID ${activityId} not found`, 404);
+    }
+    
+    // Initialize Q4D-Lenz Agent Adapter
+    const agentAdapter = new Q4DLenzAgentAdapter({
+      agentId: agentId || activity.agentId,
+      ownerSubscriberId: activity.ownerSubscriberId,
+      lenzType: 'professional'
+    });
+    
+    // Ensure agent is initialized
+    await agentAdapter.initialize();
+    
+    // Execute the activity
+    const executionResult = await agentAdapter.executeActivity(activityId);
+    
+    res.status(200).json({
+      activityId,
+      deliverableId: executionResult.deliverableId,
+      status: executionResult.status,
+      content: executionResult.content.substring(0, 200) + '...' // Preview only
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Get a deliverable
+ * GET /api/co-pilots/deliverables/:deliverableId
+ */
+app.get('/co-pilots/deliverables/:deliverableId', authenticateUser, async (req, res) => {
+  try {
+    const { deliverableId } = req.params;
+    
+    // Get the deliverable
+    const deliverable = await getDocumentById('deliverables', deliverableId);
+    
+    if (!deliverable) {
+      throw createHttpError(`Deliverable with ID ${deliverableId} not found`, 404);
+    }
+    
+    res.status(200).json(deliverable);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Submit feedback for a deliverable
+ * POST /api/co-pilots/deliverables/:deliverableId/feedback
+ */
+app.post('/co-pilots/deliverables/:deliverableId/feedback', authenticateUser, async (req, res) => {
+  try {
+    const { deliverableId } = req.params;
+    const { ownerSubscriberId, feedback, rating } = req.body;
+    
+    if (!ownerSubscriberId || !feedback) {
+      throw createHttpError('Owner-subscriber ID and feedback are required', 400);
+    }
+    
+    // Get the deliverable
+    const deliverable = await getDocumentById('deliverables', deliverableId);
+    
+    if (!deliverable) {
+      throw createHttpError(`Deliverable with ID ${deliverableId} not found`, 404);
+    }
+    
+    // Validate owner
+    if (deliverable.ownerSubscriberId !== ownerSubscriberId) {
+      throw createHttpError('Unauthorized feedback submission', 403);
+    }
+    
+    // Initialize Q4D-Lenz Agent Adapter
+    const agentAdapter = new Q4DLenzAgentAdapter({
+      agentId: deliverable.agentId,
+      ownerSubscriberId: ownerSubscriberId,
+      lenzType: 'professional'
+    });
+    
+    // Process feedback and learn
+    const learningResult = await agentAdapter.learnFromFeedback(deliverableId, {
+      text: feedback,
+      rating: rating || null
+    });
+    
+    res.status(200).json({
+      deliverableId,
+      feedbackId: learningResult.feedbackId,
+      agentUpdated: learningResult.agentUpdated,
+      insights: learningResult.insights ? {
+        strengths: learningResult.insights.strengths,
+        areasForImprovement: learningResult.insights.areasForImprovement,
+        learningPriority: learningResult.insights.learningPriority
+      } : null
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Authorization Routes
+ */
+
+/**
+ * Generate QR code for authorization
+ * POST /api/authorization/generate-qr
+ */
+app.post('/authorization/generate-qr', authenticateUser, async (req, res) => {
+  try {
+    const { deliverableId, ownerSubscriberId } = req.body;
+    
+    if (!deliverableId || !ownerSubscriberId) {
+      throw createHttpError('Deliverable ID and owner-subscriber ID are required', 400);
+    }
+    
+    const qrResult = await blockchainService.generateAuthorizationQR(deliverableId, ownerSubscriberId);
+    
+    res.status(200).json({
+      authorizationId: qrResult.authorizationId,
+      qrCodeImage: qrResult.qrCodeImage,
+      expiresAt: qrResult.expiresAt
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Verify QR code authorization
+ * POST /api/authorization/verify-qr
+ */
+app.post('/authorization/verify-qr', authenticateUser, async (req, res) => {
+  try {
+    const { qrData, ownerSubscriberId } = req.body;
+    
+    if (!qrData || !ownerSubscriberId) {
+      throw createHttpError('QR data and owner-subscriber ID are required', 400);
+    }
+    
+    const result = await blockchainService.processAuthorization(qrData, ownerSubscriberId);
+    
+    res.status(200).json(result);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Owner-Subscriber Routes
+ */
+
+/**
+ * Register a new owner-subscriber
+ * POST /api/owner-subscribers/register
+ */
+app.post('/owner-subscribers/register', async (req, res) => {
+  try {
+    const { email, name, career, goals } = req.body;
+    
+    if (!email || !name) {
+      throw createHttpError('Email and name are required', 400);
+    }
+    
+    // Check if owner already exists
+    const existingOwner = await admin.firestore().collection('ownerSubscribers')
+      .where('email', '==', email)
+      .limit(1)
+      .get()
+      .then(snapshot => snapshot.empty ? null : { id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+    
+    if (existingOwner) {
+      throw createHttpError(`Owner-subscriber with email ${email} already exists`, 409);
+    }
+    
+    // Create new owner-subscriber
+    const ownerData = {
+      email,
+      name,
+      career: career || '',
+      goals: goals || [],
+      status: 'active',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    const ownerSubscriberId = await createDocument('ownerSubscribers', null, ownerData);
+    
+    res.status(201).json({
+      ownerSubscriberId,
+      email,
+      name,
+      status: 'active'
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Get owner-subscriber profile
+ * GET /api/owner-subscribers/:ownerSubscriberId
+ */
+app.get('/owner-subscribers/:ownerSubscriberId', authenticateUser, async (req, res) => {
+  try {
+    const { ownerSubscriberId } = req.params;
+    
+    // Get the owner-subscriber
+    const owner = await getDocumentById('ownerSubscribers', ownerSubscriberId);
+    
+    if (!owner) {
+      throw createHttpError(`Owner-subscriber with ID ${ownerSubscriberId} not found`, 404);
+    }
+    
+    res.status(200).json(owner);
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+/**
+ * Update owner-subscriber profile
+ * PUT /api/owner-subscribers/:ownerSubscriberId
+ */
+app.put('/owner-subscribers/:ownerSubscriberId', authenticateUser, async (req, res) => {
+  try {
+    const { ownerSubscriberId } = req.params;
+    const { name, career, goals } = req.body;
+    
+    // Get the owner-subscriber
+    const owner = await getDocumentById('ownerSubscribers', ownerSubscriberId);
+    
+    if (!owner) {
+      throw createHttpError(`Owner-subscriber with ID ${ownerSubscriberId} not found`, 404);
+    }
+    
+    // Update the owner-subscriber
+    const updateData = {};
+    
+    if (name) updateData.name = name;
+    if (career) updateData.career = career;
+    if (goals) updateData.goals = goals;
+    
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    
+    await updateDocument('ownerSubscribers', ownerSubscriberId, updateData);
+    
+    res.status(200).json({
+      ownerSubscriberId,
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    handleHttpError(error, res);
+  }
+});
+
+// Export the API
+const apiIntegration = functions.region('us-west1').https.onRequest(app);
+
+module.exports = {
+  apiIntegration
+};

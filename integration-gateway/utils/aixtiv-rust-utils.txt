@@ -1,0 +1,2238 @@
+        /// Register an agent
+        pub async fn register<A: Agent + 'static>(&self, agent: A) -> AIXTIVResult<()> {
+            let agent_id = agent.get_id().to_string();
+            
+            let mut agents = self.agents.write().await;
+            agents.insert(agent_id.clone(), Box::new(agent));
+            
+            Ok(())
+        }
+        
+        /// Unregister an agent
+        pub async fn unregister(&self, agent_id: &str) -> AIXTIVResult<()> {
+            let mut agents = self.agents.write().await;
+            
+            if agents.remove(agent_id).is_none() {
+                return Err(AIXTIVError::NotFound(format!("Agent not found: {}", agent_id)));
+            }
+            
+            Ok(())
+        }
+        
+        /// Get an agent by ID
+        pub async fn get_agent(&self, agent_id: &str) -> AIXTIVResult<Box<dyn Agent>> {
+            let agents = self.agents.read().await;
+            
+            if let Some(agent) = agents.get(agent_id) {
+                // Clone is not available for Box<dyn Agent> so we just return an error
+                return Err(AIXTIVError::System("Agent cloning not supported".to_string()));
+            }
+            
+            Err(AIXTIVError::NotFound(format!("Agent not found: {}", agent_id)))
+        }
+        
+        /// Process a message with a specific agent
+        pub async fn process_message(&self, agent_id: &str, message: &AgentMessage) -> AIXTIVResult<AgentResponse> {
+            let agents = self.agents.read().await;
+            
+            if let Some(agent) = agents.get(agent_id) {
+                return agent.process_message(message).await;
+            }
+            
+            Err(AIXTIVError::NotFound(format!("Agent not found: {}", agent_id)))
+        }
+        
+        /// Run health checks on all agents
+        pub async fn health_check_all(&self) -> HashMap<String, bool> {
+            let agents = self.agents.read().await;
+            let mut results = HashMap::new();
+            
+            for (agent_id, agent) in agents.iter() {
+                match agent.health_check().await {
+                    Ok(healthy) => { results.insert(agent_id.clone(), healthy); },
+                    Err(_) => { results.insert(agent_id.clone(), false); },
+                }
+            }
+            
+            results
+        }
+    }
+    
+    /// Agent orchestrator for managing agent interactions
+    pub struct AgentOrchestrator {
+        registry: Arc<AgentRegistry>,
+        workflows: Arc<RwLock<HashMap<String, AgentWorkflow>>>,
+    }
+    
+    impl AgentOrchestrator {
+        /// Create a new agent orchestrator
+        pub fn new(registry: Arc<AgentRegistry>) -> Self {
+            Self {
+                registry,
+                workflows: Arc::new(RwLock::new(HashMap::new())),
+            }
+        }
+        
+        /// Register a workflow
+        pub async fn register_workflow(&self, workflow: AgentWorkflow) -> AIXTIVResult<()> {
+            let mut workflows = self.workflows.write().await;
+            workflows.insert(workflow.id.clone(), workflow);
+            Ok(())
+        }
+        
+        /// Execute a workflow
+        pub async fn execute_workflow(&self, workflow_id: &str, input: &AgentMessage) -> AIXTIVResult<Vec<AgentResponse>> {
+            let workflows = self.workflows.read().await;
+            
+            if let Some(workflow) = workflows.get(workflow_id) {
+                return self.execute_workflow_steps(&workflow, input).await;
+            }
+            
+            Err(AIXTIVError::NotFound(format!("Workflow not found: {}", workflow_id)))
+        }
+        
+        /// Execute workflow steps
+        async fn execute_workflow_steps(&self, workflow: &AgentWorkflow, input: &AgentMessage) -> AIXTIVResult<Vec<AgentResponse>> {
+            let mut responses = Vec::new();
+            let mut current_message = input.clone();
+            
+            for step in &workflow.steps {
+                match step {
+                    WorkflowStep::AgentTask { agent_id, transform_input, transform_output } => {
+                        // Apply input transformation if specified
+                        let task_input = if let Some(transform) = transform_input {
+                            let mut message = current_message.clone();
+                            message.content = transform(&current_message.content)?;
+                            message
+                        } else {
+                            current_message.clone()
+                        };
+                        
+                        // Process the message with the agent
+                        let response = self.registry.process_message(agent_id, &task_input).await?;
+                        
+                        // Apply output transformation if specified
+                        let task_output = if let Some(transform) = transform_output {
+                            let mut transformed_response = response.clone();
+                            transformed_response.content = transform(&response.content)?;
+                            transformed_response
+                        } else {
+                            response
+                        };
+                        
+                        // Prepare for next step
+                        current_message = AgentMessage {
+                            id: Uuid::new_v4().to_string(),
+                            sender: agent_id.clone(),
+                            content: task_output.content.clone(),
+                            context: task_output.metadata.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
+                            timestamp: Utc::now(),
+                        };
+                        
+                        responses.push(task_output);
+                    },
+                    WorkflowStep::Conditional { condition, if_true, if_false } => {
+                        let condition_result = condition(&current_message)?;
+                        
+                        let branch = if condition_result { if_true } else { if_false };
+                        
+                        if let Some(steps) = branch {
+                            let mut sub_workflow = workflow.clone();
+                            sub_workflow.steps = steps.clone();
+                            
+                            let sub_responses = self.execute_workflow_steps(&sub_workflow, &current_message).await?;
+                            
+                            if !sub_responses.is_empty() {
+                                // Update current message with last response
+                                let last_response = sub_responses.last().unwrap();
+                                current_message = AgentMessage {
+                                    id: Uuid::new_v4().to_string(),
+                                    sender: last_response.id.clone(),
+                                    content: last_response.content.clone(),
+                                    context: last_response.metadata.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
+                                    timestamp: Utc::now(),
+                                };
+                                
+                                responses.extend(sub_responses);
+                            }
+                        }
+                    },
+                    WorkflowStep::Parallel { tasks } => {
+                        let parallel_responses = concurrency::parallel_execute(
+                            tasks.clone(),
+                            |task| async move {
+                                match task {
+                                    ParallelTask::AgentTask { agent_id, transform_input, transform_output } => {
+                                        // Apply input transformation if specified
+                                        let task_input = if let Some(transform) = transform_input {
+                                            let mut message = current_message.clone();
+                                            message.content = transform(&current_message.content)?;
+                                            message
+                                        } else {
+                                            current_message.clone()
+                                        };
+                                        
+                                        // Process the message with the agent
+                                        let response = self.registry.process_message(&agent_id, &task_input).await?;
+                                        
+                                        // Apply output transformation if specified
+                                        let task_output = if let Some(transform) = transform_output {
+                                            let mut transformed_response = response.clone();
+                                            transformed_response.content = transform(&response.content)?;
+                                            transformed_response
+                                        } else {
+                                            response
+                                        };
+                                        
+                                        Ok(task_output)
+                                    }
+                                }
+                            },
+                            workflow.max_concurrency,
+                        ).await;
+                        
+                        // Collect successful responses
+                        let mut successful_responses = Vec::new();
+                        for result in parallel_responses {
+                            match result {
+                                Ok(response) => successful_responses.push(response),
+                                Err(e) => return Err(e),
+                            }
+                        }
+                        
+                        // If there are responses, use the first one to continue the workflow
+                        if !successful_responses.is_empty() {
+                            let first_response = &successful_responses[0];
+                            current_message = AgentMessage {
+                                id: Uuid::new_v4().to_string(),
+                                sender: first_response.id.clone(),
+                                content: first_response.content.clone(),
+                                context: first_response.metadata.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
+                                timestamp: Utc::now(),
+                            };
+                            
+                            responses.extend(successful_responses);
+                        }
+                    },
+                }
+            }
+            
+            Ok(responses)
+        }
+    }
+    
+    /// Agent workflow
+    #[derive(Clone)]
+    pub struct AgentWorkflow {
+        pub id: String,
+        pub name: String,
+        pub description: String,
+        pub steps: Vec<WorkflowStep>,
+        pub max_concurrency: usize,
+    }
+    
+    /// Workflow step
+    #[derive(Clone)]
+    pub enum WorkflowStep {
+        AgentTask {
+            agent_id: String,
+            transform_input: Option<Box<dyn Fn(&str) -> AIXTIVResult<String> + Send + Sync>>,
+            transform_output: Option<Box<dyn Fn(&str) -> AIXTIVResult<String> + Send + Sync>>,
+        },
+        Conditional {
+            condition: Box<dyn Fn(&AgentMessage) -> AIXTIVResult<bool> + Send + Sync>,
+            if_true: Option<Vec<WorkflowStep>>,
+            if_false: Option<Vec<WorkflowStep>>,
+        },
+        Parallel {
+            tasks: Vec<ParallelTask>,
+        },
+    }
+    
+    /// Parallel task
+    #[derive(Clone)]
+    pub enum ParallelTask {
+        AgentTask {
+            agent_id: String,
+            transform_input: Option<Box<dyn Fn(&str) -> AIXTIVResult<String> + Send + Sync>>,
+            transform_output: Option<Box<dyn Fn(&str) -> AIXTIVResult<String> + Send + Sync>>,
+        },
+    }
+    
+    /// LLM-based agent
+    pub struct LLMAgent {
+        id: String,
+        agent_type: String,
+        llm_client: Arc<llm::LLMClient>,
+        system_prompt: String,
+        model: String,
+        provider: llm::LLMProvider,
+        circuit_breaker: self_healing::CircuitBreaker,
+    }
+    
+    impl LLMAgent {
+        /// Create a new LLM agent
+        pub fn new(
+            id: String,
+            agent_type: String,
+            llm_client: Arc<llm::LLMClient>,
+            system_prompt: String,
+            model: String,
+            provider: llm::LLMProvider,
+        ) -> Self {
+            Self {
+                id,
+                agent_type,
+                llm_client,
+                system_prompt,
+                model,
+                provider,
+                circuit_breaker: self_healing::CircuitBreaker::new(5, 60000, 3),
+            }
+        }
+    }
+    
+    impl Agent for LLMAgent {
+        fn get_id(&self) -> &str {
+            &self.id
+        }
+        
+        fn get_type(&self) -> &str {
+            &self.agent_type
+        }
+        
+        fn process_message(&self, message: &AgentMessage) -> BoxFuture<AIXTIVResult<AgentResponse>> {
+            let client = self.llm_client.clone();
+            let system_prompt = self.system_prompt.clone();
+            let model = self.model.clone();
+            let provider = self.provider.clone();
+            let message = message.clone();
+            let id = self.id.clone();
+            let circuit_breaker = &self.circuit_breaker;
+            
+            Box::pin(async move {
+                self_healing::with_circuit_breaker(circuit_breaker, || async {
+                    // Create completion request
+                    let request = llm::CompletionRequest {
+                        model,
+                        provider,
+                        prompt: message.content,
+                        system_message: Some(system_prompt),
+                        max_tokens: 2000,
+                        temperature: 0.7,
+                        stop_sequences: vec![],
+                        top_p: Some(0.95),
+                        frequency_penalty: Some(0.0),
+                        presence_penalty: Some(0.0),
+                    };
+                    
+                    // Generate completion
+                    let completion = client.generate_completion(request).await?;
+                    
+                    // Create response
+                    let response = AgentResponse {
+                        id: Uuid::new_v4().to_string(),
+                        in_response_to: message.id,
+                        content: completion.text,
+                        metadata: {
+                            let mut map = HashMap::new();
+                            map.insert("model".to_string(), serde_json::to_value(completion.model).unwrap());
+                            map.insert("provider".to_string(), serde_json::to_value(format!("{:?}", completion.provider)).unwrap());
+                            map.insert("latency_ms".to_string(), serde_json::to_value(completion.latency_ms).unwrap());
+                            map.insert("usage".to_string(), serde_json::to_value(completion.usage).unwrap());
+                            map.insert("agent_id".to_string(), serde_json::to_value(id).unwrap());
+                            map
+                        },
+                        timestamp: Utc::now(),
+                    };
+                    
+                    Ok(response)
+                }).await
+            })
+        }
+        
+        fn health_check(&self) -> BoxFuture<AIXTIVResult<bool>> {
+            let client = self.llm_client.clone();
+            let model = self.model.clone();
+            let provider = self.provider.clone();
+            
+            Box::pin(async move {
+                // Simple ping request to check if LLM service is responsive
+                let request = llm::CompletionRequest {
+                    model,
+                    provider,
+                    prompt: "Respond with 'HEALTHY' if you can read this message.".to_string(),
+                    system_message: Some("You are a health check service. Respond with exactly one word.".to_string()),
+                    max_tokens: 10,
+                    temperature: 0.0,
+                    stop_sequences: vec![],
+                    top_p: Some(1.0),
+                    frequency_penalty: Some(0.0),
+                    presence_penalty: Some(0.0),
+                };
+                
+                match client.generate_completion(request).await {
+                    Ok(completion) => {
+                        // Check if response contains expected health check response
+                        Ok(completion.text.trim().contains("HEALTHY"))
+                    },
+                    Err(_) => Ok(false),
+                }
+            })
+        }
+    }
+}
+
+/// AIXTIV integration utilities for connecting to other AIXTIV services
+pub mod integration {
+    use super::*;
+    
+    /// AIXTIV service type
+    #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+    pub enum ServiceType {
+        DreamCommander,
+        Q4DLenz,
+        BidSuite,
+        BidSeeker,
+        BidRank,
+        BidBuilder,
+        GiftShop,
+        Blockchain,
+        AgentRegistry,
+        FlightManager,
+        UserManager,
+        LinkedInIntegration,
+        ContentGenerator,
+    }
+    
+    /// AIXTIV service client
+    pub struct ServiceClient {
+        service_type: ServiceType,
+        base_url: String,
+        api_key: Option<String>,
+        auth_token: RwLock<Option<String>>,
+        http_client: reqwest::Client,
+        circuit_breaker: self_healing::CircuitBreaker,
+    }
+    
+    impl ServiceClient {
+        /// Create a new service client
+        pub fn new(service_type: ServiceType, base_url: &str, api_key: Option<String>) -> Self {
+            Self {
+                service_type,
+                base_url: base_url.to_string(),
+                api_key,
+                auth_token: RwLock::new(None),
+                http_client: reqwest::Client::new(),
+                circuit_breaker: self_healing::CircuitBreaker::new(5, 60000, 3),
+            }
+        }
+        
+        /// Call a service endpoint
+        pub async fn call<T: Serialize, R: for<'de> Deserialize<'de>>(
+            &self,
+            method: &str,
+            endpoint: &str,
+            params: &T,
+        ) -> AIXTIVResult<R> {
+            self_healing::with_circuit_breaker(&self.circuit_breaker, || async {
+                let url = format!("{}/{}", self.base_url, endpoint);
+                
+                // Prepare headers
+                let mut headers = reqwest::header::HeaderMap::new();
+                
+                if let Some(api_key) = &self.api_key {
+                    headers.insert(
+                        "X-API-Key",
+                        reqwest::header::HeaderValue::from_str(api_key)
+                            .map_err(|e| AIXTIVError::Validation(format!("Invalid API key: {}", e)))?,
+                    );
+                }
+                
+                if let Some(token) = self.auth_token.read().await.as_ref() {
+                    headers.insert(
+                        "Authorization",
+                        reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token))
+                            .map_err(|e| AIXTIVError::Validation(format!("Invalid auth token: {}", e)))?,
+                    );
+                }
+                
+                // Make request
+                let response = match method.to_uppercase().as_str() {
+                    "GET" => {
+                        self.http_client
+                            .get(&url)
+                            .headers(headers)
+                            .query(params)
+                            .send()
+                            .await
+                    },
+                    "POST" => {
+                        self.http_client
+                            .post(&url)
+                            .headers(headers)
+                            .json(params)
+                            .send()
+                            .await
+                    },
+                    "PUT" => {
+                        self.http_client
+                            .put(&url)
+                            .headers(headers)
+                            .json(params)
+                            .send()
+                            .await
+                    },
+                    "DELETE" => {
+                        self.http_client
+                            .delete(&url)
+                            .headers(headers)
+                            .json(params)
+                            .send()
+                            .await
+                    },
+                    _ => return Err(AIXTIVError::Validation(format!("Unsupported HTTP method: {}", method))),
+                }.map_err(|e| AIXTIVError::ExternalService(format!("Request failed: {}", e)))?;
+                
+                // Check status code
+                if !response.status().is_success() {
+                    let status = response.status();
+                    let error_text = response.text().await
+                        .unwrap_or_else(|_| "Unknown error".to_string());
+                    
+                    return Err(match status.as_u16() {
+                        401 => AIXTIVError::Authentication(format!("Authentication failed: {}", error_text)),
+                        403 => AIXTIVError::Authorization(format!("Authorization failed: {}", error_text)),
+                        404 => AIXTIVError::NotFound(format!("Resource not found: {}", error_text)),
+                        429 => AIXTIVError::RateLimit(format!("Rate limit exceeded: {}", error_text)),
+                        _ => AIXTIVError::ExternalService(format!("Service error ({}): {}", status, error_text)),
+                    });
+                }
+                
+                // Parse response
+                response.json::<R>().await
+                    .map_err(|e| AIXTIVError::Format(format!("Failed to parse response: {}", e)))
+            }).await
+        }
+        
+        /// Set authentication token
+        pub async fn set_auth_token(&self, token: &str) {
+            let mut auth_token = self.auth_token.write().await;
+            *auth_token = Some(token.to_string());
+        }
+        
+        /// Clear authentication token
+        pub async fn clear_auth_token(&self) {
+            let mut auth_token = self.auth_token.write().await;
+            *auth_token = None;
+        }
+        
+        /// Health check
+        pub async fn health_check(&self) -> AIXTIVResult<bool> {
+            let params: HashMap<String, String> = HashMap::new();
+            
+            match self.call::<_, serde_json::Value>("GET", "health", &params).await {
+                Ok(_) => Ok(true),
+                Err(_) => Ok(false),
+            }
+        }
+    }
+    
+    /// AIXTIV service registry
+    pub struct ServiceRegistry {
+        clients: RwLock<HashMap<ServiceType, Arc<ServiceClient>>>,
+    }
+    
+    impl ServiceRegistry {
+        /// Create a new service registry
+        pub fn new() -> Self {
+            Self {
+                clients: RwLock::new(HashMap::new()),
+            }
+        }
+        
+        /// Register a service client
+        pub async fn register_service(&self, service_type: ServiceType, client: ServiceClient) {
+            let mut clients = self.clients.write().await;
+            clients.insert(service_type, Arc::new(client));
+        }
+        
+        /// Get a service client
+        pub async fn get_service(&self, service_type: ServiceType) -> AIXTIVResult<Arc<ServiceClient>> {
+            let clients = self.clients.read().await;
+            
+            clients.get(&service_type)
+                .cloned()
+                .ok_or_else(|| AIXTIVError::NotFound(format!("Service not registered: {:?}", service_type)))
+        }
+        
+        /// Health check all services
+        pub async fn health_check_all(&self) -> HashMap<ServiceType, bool> {
+            let clients = self.clients.read().await;
+            let mut results = HashMap::new();
+            
+            for (service_type, client) in clients.iter() {
+                match client.health_check().await {
+                    Ok(healthy) => { results.insert(service_type.clone(), healthy); },
+                    Err(_) => { results.insert(service_type.clone(), false); },
+                }
+            }
+            
+            results
+        }
+    }
+}
+
+/// AIXTIV block utilities
+/// Provides functionality for working with blockchain and verification systems
+pub mod block {
+    use super::*;
+    
+    /// Block result structure
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct BlockResult {
+        pub id: String,
+        pub hash: String,
+        pub timestamp: u64,
+        pub data: Vec<u8>,
+        pub metadata: Option<BlockMetadata>,
+    }
+    
+    /// Block metadata
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct BlockMetadata {
+        pub author: String,
+        pub version: String,
+        pub transactions_count: u32,
+    }
+    
+    /// Convert results to a map for efficient lookup
+    pub fn convert_results_to_map(results: Vec<BlockResult>) -> HashMap<String, BlockResult> {
+        let mut map = HashMap::with_capacity(results.len());
+        
+        for result in results {
+            map.insert(result.id.clone(), result);
+        }
+        
+        map
+    }
+    
+    /// Convert results to a map with custom options
+    pub fn convert_results_to_map_with_options<F, T>(
+        results: Vec<BlockResult>,
+        validator: Option<F>,
+        transformer: Option<T>
+    ) -> HashMap<String, BlockResult>
+    where
+        F: Fn(&BlockResult) -> bool,
+        T: Fn(BlockResult) -> BlockResult
+    {
+        let mut map = HashMap::with_capacity(results.len());
+        
+        for result in results {
+            // Skip invalid results if validator is provided
+            if let Some(ref validate) = validator {
+                if !validate(&result) {
+                    continue;
+                }
+            }
+            
+            // Apply transformation if transformer is provided
+            let result = if let Some(ref transform) = transformer {
+                transform(result)
+            } else {
+                result
+            };
+            
+            map.insert(result.id.clone(), result);
+        }
+        
+        map
+    }
+    
+    /// Group results by a specific property
+    pub fn group_results_by<F, K>(results: &[BlockResult], key_fn: F) -> HashMap<K, Vec<BlockResult>>
+    where
+        F: Fn(&BlockResult) -> K,
+        K: std::hash::Hash + Eq,
+    {
+        let mut groups = HashMap::new();
+        
+        for result in results {
+            let key = key_fn(result);
+            groups.entry(key)
+                .or_insert_with(Vec::new)
+                .push(result.clone());
+        }
+        
+        groups
+    }
+    
+    /// Block verification client
+    pub struct BlockVerificationClient {
+        api_endpoint: String,
+        client: reqwest::Client,
+        api_key: Option<String>,
+    }
+    
+    impl BlockVerificationClient {
+        /// Create a new block verification client
+        pub fn new(api_endpoint: &str, api_key: Option<String>) -> Self {
+            Self {
+                api_endpoint: api_endpoint.to_string(),
+                client: reqwest::Client::new(),
+                api_key,
+            }
+        }
+        
+        /// Verify a block
+        pub async fn verify_block(&self, block_id: &str) -> AIXTIVResult<bool> {
+            let url = format!("{}/verify/{}", self.api_endpoint, block_id);
+            
+            let mut request = self.client.get(&url);
+            
+            if let Some(api_key) = &self.api_key {
+                request = request.header("X-API-Key", api_key);
+            }
+            
+            let response = request.send().await
+                .map_err(|e| AIXTIVError::ExternalService(format!("Verification request failed: {}", e)))?;
+            
+            if !response.status().is_success() {
+                return Err(AIXTIVError::ExternalService(format!(
+                    "Verification failed with status: {}", response.status()
+                )));
+            }
+            
+            let result: serde_json::Value = response.json().await
+                .map_err(|e| AIXTIVError::Format(format!("Failed to parse verification result: {}", e)))?;
+            
+            // Extract verification result
+            result.get("verified")
+                .and_then(|v| v.as_bool())
+                .ok_or_else(|| AIXTIVError::Format("Invalid verification response format".to_string()))
+        }
+        
+        /// Submit a block for verification
+        pub async fn submit_block(&self, block: &BlockResult) -> AIXTIVResult<String> {
+            let url = format!("{}/submit", self.api_endpoint);
+            
+            let mut request = self.client.post(&url);
+            
+            if let Some(api_key) = &self.api_key {
+                request = request.header("X-API-Key", api_key);
+            }
+            
+            let response = request
+                .json(block)
+                .send().await
+                .map_err(|e| AIXTIVError::ExternalService(format!("Block submission failed: {}", e)))?;
+            
+            if !response.status().is_success() {
+                return Err(AIXTIVError::ExternalService(format!(
+                    "Block submission failed with status: {}", response.status()
+                )));
+            }
+            
+            let result: serde_json::Value = response.json().await
+                .map_err(|e| AIXTIVError::Format(format!("Failed to parse submission result: {}", e)))?;
+            
+            // Extract transaction ID
+            result.get("transactionId")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string())
+                .ok_or_else(|| AIXTIVError::Format("Invalid submission response format".to_string()))
+        }
+    }
+}
+
+// Expose important modules and types for direct usage
+pub use self::crypto::*;
+pub use self::json::*;
+pub use self::string::*;
+pub use self::network::*;
+pub use self::concurrency::*;
+pub use self::self_healing::*;
+pub use self::llm::*;
+pub use self::agent::*;
+pub use self::integration::*;
+pub use self::block::*;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_hash_sha256() {
+        let input = "AIXTIV test string";
+        let hash = crypto::hash_sha256(input);
+        assert_eq!(hash.len(), 64); // SHA-256 hash is 64 characters in hex
+    }
+    
+    #[test]
+    fn test_json_path_navigation() {
+        let json_str = r#"{"a": {"b": {"c": 123}, "d": [1, 2, 3]}}"#;
+        let value: serde_json::Value = serde_json::from_str(json_str).unwrap();
+        
+        assert_eq!(json::get_path(&value, "a.b.c").unwrap().as_i64().unwrap(), 123);
+        assert_eq!(json::get_path(&value, "a.d.1").unwrap().as_i64().unwrap(), 2);
+        assert!(json::get_path(&value, "a.e").is_none());
+    }
+    
+    #[tokio::test]
+    async fn test_ttl_cache() {
+        let cache = TTLCache::<String, i32>::new(1); // 1 second TTL
+        
+        await cache.set("key1".to_string(), 42).await;
+        assert_eq!(cache.get("key1").await, Some(42));
+        
+        // Wait for expiration
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        
+        assert_eq!(cache.get("key1").await, None);
+    }
+    
+    #[test]
+    fn test_string_truncate() {
+        assert_eq!(string::truncate_with_ellipsis("short", 10), "short");
+        assert_eq!(string::truncate_with_ellipsis("too long string", 10), "too lo...");
+    }
+    
+    #[test]
+    fn test_block_convert_results_to_map() {
+        let results = vec![
+            BlockResult {
+                id: "2".to_string(),
+                hash: "hash2".to_string(),
+                timestamp: 456,
+                data: vec![4, 5, 6],
+                metadata: None,
+            },
+        ];
+        
+        let map = block::convert_results_to_map(results.clone());
+        assert_eq!(map.len(), 2);
+        assert_eq!(map.get("1").unwrap().hash, "hash1");
+        assert_eq!(map.get("2").unwrap().hash, "hash2");
+    }
+    
+    #[test]
+    fn test_block_group_results_by() {
+        let results = vec![
+            BlockResult {
+                id: "1".to_string(),
+                hash: "hash1".to_string(),
+                timestamp: 100,
+                data: vec![1, 2, 3],
+                metadata: None,
+            },
+            BlockResult {
+                id: "2".to_string(),
+                hash: "hash2".to_string(),
+                timestamp: 100,
+                data: vec![4, 5, 6],
+                metadata: None,
+            },
+            BlockResult {
+                id: "3".to_string(),
+                hash: "hash3".to_string(),
+                timestamp: 200,
+                data: vec![7, 8, 9],
+                metadata: None,
+            },
+        ];
+        
+        let groups = block::group_results_by(&results, |r| r.timestamp);
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups.get(&100).unwrap().len(), 2);
+        assert_eq!(groups.get(&200).unwrap().len(), 1);
+    }
+    
+    #[test]
+    fn test_circuit_breaker() {
+        let circuit_breaker = self_healing::CircuitBreaker::new(2, 100, 1);
+        
+        // State should start as closed
+        assert_eq!(circuit_breaker.get_state().block_on(), self_healing::CircuitState::Closed);
+        
+        // Record failures
+        circuit_breaker.record_failure().block_on();
+        assert_eq!(circuit_breaker.get_state().block_on(), self_healing::CircuitState::Closed);
+        
+        circuit_breaker.record_failure().block_on();
+        assert_eq!(circuit_breaker.get_state().block_on(), self_healing::CircuitState::Open);
+        
+        // Wait for timeout
+        std::thread::sleep(Duration::from_millis(150));
+        
+        // Should be half-open now
+        assert!(circuit_breaker.check().block_on());
+        assert_eq!(circuit_breaker.get_state().block_on(), self_healing::CircuitState::HalfOpen);
+        
+        // Record success to transition back to closed
+        circuit_breaker.record_success().block_on();
+        assert_eq!(circuit_breaker.get_state().block_on(), self_healing::CircuitState::Closed);
+    }
+}
+
+/// A trait that provides a synchronous blocking wrapper for async functions
+/// used in tests
+trait BlockingExt<T> {
+    fn block_on(self) -> T;
+}
+
+impl<T, F: std::future::Future<Output = T>> BlockingExt<T> for F {
+    fn block_on(self) -> T {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(self)
+    }
+}1".to_string(),
+                hash: "hash1".to_string(),
+                timestamp: 123,
+                data: vec![1, 2, 3],
+                metadata: None,
+            },
+            BlockResult {
+                id: "                Value::Array(arr) => {
+                    // Try to parse part as array index
+                    if let Ok(index) = part.parse::<usize>() {
+                        if index < arr.len() {
+                            current = &arr[index];
+                        } else {
+                            return None;
+                        }
+                    } else {
+                        return None;
+                    }
+                },
+                _ => return None,
+            }
+        }
+        
+        Some(current)
+    }
+    
+    /// Set a value at a specific path in a JSON object
+    pub fn set_path(json: &mut Value, path: &str, value: Value) -> Result<(), AIXTIVError> {
+        let parts: Vec<&str> = path.split('.').collect();
+        if parts.is_empty() {
+            return Err(AIXTIVError::Validation("Path cannot be empty".to_string()));
+        }
+        
+        let mut current = json;
+        
+        // Navigate to the parent of the final element
+        for (i, part) in parts.iter().enumerate() {
+            if i == parts.len() - 1 {
+                // Last part - set the value
+                match current {
+                    Value::Object(map) => {
+                        map.insert(part.to_string(), value);
+                        return Ok(());
+                    },
+                    Value::Array(arr) => {
+                        if let Ok(index) = part.parse::<usize>() {
+                            if index < arr.len() {
+                                arr[index] = value;
+                                return Ok(());
+                            } else {
+                                return Err(AIXTIVError::Validation(format!("Array index out of bounds: {}", index)));
+                            }
+                        } else {
+                            return Err(AIXTIVError::Validation(format!("Invalid array index: {}", part)));
+                        }
+                    },
+                    _ => return Err(AIXTIVError::Validation("Cannot set value on non-object, non-array value".to_string())),
+                }
+            }
+            
+            // Navigate to next level
+            match current {
+                Value::Object(map) => {
+                    // Create missing objects
+                    if !map.contains_key(*part) {
+                        map.insert(part.to_string(), Value::Object(serde_json::Map::new()));
+                    }
+                    current = map.get_mut(*part).unwrap();
+                },
+                Value::Array(arr) => {
+                    if let Ok(index) = part.parse::<usize>() {
+                        if index < arr.len() {
+                            current = &mut arr[index];
+                        } else {
+                            return Err(AIXTIVError::Validation(format!("Array index out of bounds: {}", index)));
+                        }
+                    } else {
+                        return Err(AIXTIVError::Validation(format!("Invalid array index: {}", part)));
+                    }
+                },
+                _ => return Err(AIXTIVError::Validation("Cannot navigate through non-object, non-array value".to_string())),
+            }
+        }
+        
+        // Should never reach here
+        Ok(())
+    }
+    
+    /// Merge two JSON objects
+    pub fn merge(base: &mut Value, overlay: &Value) -> Result<(), AIXTIVError> {
+        if !base.is_object() || !overlay.is_object() {
+            return Err(AIXTIVError::Validation("Both values must be objects".to_string()));
+        }
+        
+        if let (Value::Object(base_map), Value::Object(overlay_map)) = (base, overlay) {
+            for (key, value) in overlay_map {
+                match (base_map.get_mut(key), value) {
+                    // If both are objects, recursively merge
+                    (Some(base_value), overlay_value) if base_value.is_object() && overlay_value.is_object() => {
+                        merge(base_value, overlay_value)?;
+                    },
+                    // Otherwise, overwrite or insert
+                    _ => {
+                        base_map.insert(key.clone(), value.clone());
+                    }
+                }
+            }
+        }
+        
+        Ok(())
+    }
+    
+    /// Remove null values from a JSON object
+    pub fn remove_nulls(json: &mut Value) {
+        match json {
+            Value::Object(map) => {
+                let keys: Vec<String> = map.keys().cloned().collect();
+                for key in keys {
+                    if let Some(value) = map.get_mut(&key) {
+                        if value.is_null() {
+                            map.remove(&key);
+                        } else {
+                            remove_nulls(value);
+                        }
+                    }
+                }
+            },
+            Value::Array(arr) => {
+                for value in arr.iter_mut() {
+                    remove_nulls(value);
+                }
+                arr.retain(|v| !v.is_null());
+            },
+            _ => {},
+        }
+    }
+}
+
+/// String utilities
+pub mod string {
+    use super::*;
+    
+    /// Truncate a string to a maximum length, adding an ellipsis if truncated
+    pub fn truncate_with_ellipsis(s: &str, max_len: usize) -> String {
+        if s.len() <= max_len {
+            s.to_string()
+        } else {
+            format!("{}...", &s[..max_len-3])
+        }
+    }
+    
+    /// Sanitize a string for safe logging or display
+    pub fn sanitize(s: &str) -> String {
+        // Replace sensitive patterns
+        let patterns = [
+            ("password=", "password=*****"),
+            ("secret=", "secret=*****"),
+            ("token=", "token=*****"),
+            ("key=", "key=*****"),
+        ];
+        
+        let mut result = s.to_string();
+        for (pattern, replacement) in patterns.iter() {
+            result = result.replace(pattern, replacement);
+        }
+        
+        // Remove control characters
+        result.chars()
+            .filter(|&c| !c.is_control() || c == '\n' || c == '\t')
+            .collect()
+    }
+    
+    /// Format a string with named parameters
+    pub fn format_named(template: &str, params: &HashMap<String, String>) -> String {
+        let mut result = template.to_string();
+        for (key, value) in params {
+            let placeholder = format!("{{{}}}", key);
+            result = result.replace(&placeholder, value);
+        }
+        result
+    }
+    
+    /// Split a string and return a vector of trimmed non-empty parts
+    pub fn split_and_trim(s: &str, delimiter: &str) -> Vec<String> {
+        s.split(delimiter)
+            .map(|part| part.trim().to_string())
+            .filter(|part| !part.is_empty())
+            .collect()
+    }
+}
+
+/// Network utilities
+pub mod network {
+    use super::*;
+    use reqwest::{Client, Response, StatusCode};
+    use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+    
+    /// HTTP request configuration
+    #[derive(Clone, Debug)]
+    pub struct RequestConfig {
+        pub url: String,
+        pub method: String,
+        pub headers: HashMap<String, String>,
+        pub query_params: HashMap<String, String>,
+        pub body: Option<String>,
+        pub timeout_ms: u64,
+        pub retry_config: Option<RetryConfig>,
+    }
+    
+    /// Execute an HTTP request with timeout and error handling
+    pub async fn execute_request(config: RequestConfig) -> AIXTIVResult<Response> {
+        let client = Client::new();
+        
+        // Build request
+        let method = match config.method.to_uppercase().as_str() {
+            "GET" => reqwest::Method::GET,
+            "POST" => reqwest::Method::POST,
+            "PUT" => reqwest::Method::PUT,
+            "DELETE" => reqwest::Method::DELETE,
+            "PATCH" => reqwest::Method::PATCH,
+            "HEAD" => reqwest::Method::HEAD,
+            "OPTIONS" => reqwest::Method::OPTIONS,
+            _ => return Err(AIXTIVError::Validation(format!("Unsupported HTTP method: {}", config.method))),
+        };
+        
+        let mut request_builder = client.request(method, &config.url);
+        
+        // Add headers
+        let mut headers = HeaderMap::new();
+        for (key, value) in &config.headers {
+            let header_name = HeaderName::from_bytes(key.as_bytes())
+                .map_err(|e| AIXTIVError::Validation(format!("Invalid header name: {}", e)))?;
+            
+            let header_value = HeaderValue::from_str(value)
+                .map_err(|e| AIXTIVError::Validation(format!("Invalid header value: {}", e)))?;
+            
+            headers.insert(header_name, header_value);
+        }
+        request_builder = request_builder.headers(headers);
+        
+        // Add query parameters
+        request_builder = request_builder.query(&config.query_params);
+        
+        // Add body if present
+        if let Some(body) = &config.body {
+            request_builder = request_builder.body(body.clone());
+        }
+        
+        // Set timeout
+        request_builder = request_builder.timeout(Duration::from_millis(config.timeout_ms));
+        
+        // Execute request with retry if configured
+        let response = if let Some(retry_config) = &config.retry_config {
+            with_retry(
+                || async {
+                    let request = request_builder.try_clone()
+                        .ok_or_else(|| AIXTIVError::System("Failed to clone request".to_string()))?;
+                    
+                    match timeout(Duration::from_millis(config.timeout_ms), request.send()).await {
+                        Ok(Ok(response)) => Ok(response),
+                        Ok(Err(e)) => Err(AIXTIVError::ExternalService(format!("Request failed: {}", e))),
+                        Err(_) => Err(AIXTIVError::Timeout(format!("Request timed out after {}ms", config.timeout_ms))),
+                    }
+                },
+                retry_config,
+            ).await
+        } else {
+            // No retry, just execute once
+            match timeout(Duration::from_millis(config.timeout_ms), request_builder.send()).await {
+                Ok(Ok(response)) => Ok(response),
+                Ok(Err(e)) => Err(AIXTIVError::ExternalService(format!("Request failed: {}", e))),
+                Err(_) => Err(AIXTIVError::Timeout(format!("Request timed out after {}ms", config.timeout_ms))),
+            }
+        }?;
+        
+        // Check status code
+        let status = response.status();
+        if status.is_client_error() || status.is_server_error() {
+            let code = status.as_u16();
+            let message = match status {
+                StatusCode::UNAUTHORIZED => "Unauthorized, check authentication".to_string(),
+                StatusCode::FORBIDDEN => "Forbidden, check authorization".to_string(),
+                StatusCode::NOT_FOUND => "Resource not found".to_string(),
+                StatusCode::TOO_MANY_REQUESTS => "Rate limit exceeded".to_string(),
+                StatusCode::INTERNAL_SERVER_ERROR => "Internal server error".to_string(),
+                StatusCode::BAD_GATEWAY => "Bad gateway".to_string(),
+                StatusCode::SERVICE_UNAVAILABLE => "Service unavailable".to_string(),
+                _ => format!("Request failed with status code: {}", code),
+            };
+            
+            return Err(match status {
+                StatusCode::UNAUTHORIZED => AIXTIVError::Authentication(message),
+                StatusCode::FORBIDDEN => AIXTIVError::Authorization(message),
+                StatusCode::NOT_FOUND => AIXTIVError::NotFound(message),
+                StatusCode::TOO_MANY_REQUESTS => AIXTIVError::RateLimit(message),
+                _ => AIXTIVError::ExternalService(message),
+            });
+        }
+        
+        Ok(response)
+    }
+}
+
+/// Concurrency utilities
+pub mod concurrency {
+    use super::*;
+    use tokio::task::JoinSet;
+    
+    /// Execute tasks in parallel with limit
+    pub async fn parallel_execute<T, F, Fut>(
+        tasks: Vec<T>,
+        f: F,
+        max_concurrency: usize,
+    ) -> Vec<AIXTIVResult<T::Output>>
+    where
+        T: Send + 'static,
+        F: Fn(T) -> Fut + Clone + Send + 'static,
+        Fut: Future<Output = AIXTIVResult<T::Output>> + Send,
+        T::Output: Send + 'static,
+    {
+        let mut results = Vec::with_capacity(tasks.len());
+        
+        let semaphore = Arc::new(Semaphore::new(max_concurrency));
+        
+        stream::iter(tasks)
+            .map(|task| {
+                let f = f.clone();
+                let semaphore = semaphore.clone();
+                
+                async move {
+                    let permit = semaphore.acquire().await;
+                    let result = f(task).await;
+                    drop(permit);
+                    result
+                }
+            })
+            .buffer_unordered(max_concurrency)
+            .collect_into(&mut results)
+            .await;
+        
+        results
+    }
+    
+    /// Execute tasks in parallel and collect all results
+    pub async fn execute_all<T, F, Fut>(
+        tasks: Vec<T>,
+        f: F,
+    ) -> AIXTIVResult<Vec<T::Output>>
+    where
+        T: Send + 'static,
+        F: Fn(T) -> Fut + Clone + Send + 'static,
+        Fut: Future<Output = AIXTIVResult<T::Output>> + Send,
+        T::Output: Send + 'static,
+    {
+        let mut join_set = JoinSet::new();
+        
+        for task in tasks {
+            let f = f.clone();
+            join_set.spawn(async move { f(task).await });
+        }
+        
+        let mut results = Vec::new();
+        while let Some(result) = join_set.join_next().await {
+            match result {
+                Ok(Ok(value)) => results.push(value),
+                Ok(Err(e)) => return Err(e),
+                Err(e) => return Err(AIXTIVError::System(format!("Task join error: {}", e))),
+            }
+        }
+        
+        Ok(results)
+    }
+}
+
+/// Self-healing utilities
+pub mod self_healing {
+    use super::*;
+    use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+    
+    /// Circuit breaker states
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+    pub enum CircuitState {
+        Closed,
+        Open,
+        HalfOpen,
+    }
+    
+    /// Circuit breaker for protecting against cascading failures
+    pub struct CircuitBreaker {
+        state: Arc<tokio::sync::RwLock<CircuitState>>,
+        failure_threshold: usize,
+        reset_timeout: Duration,
+        half_open_max: usize,
+        failure_count: Arc<AtomicUsize>,
+        last_failure: Arc<AtomicU64>,
+        successful_probes: Arc<AtomicUsize>,
+    }
+    
+    impl CircuitBreaker {
+        /// Create a new circuit breaker
+        pub fn new(failure_threshold: usize, reset_timeout_ms: u64, half_open_max: usize) -> Self {
+            Self {
+                state: Arc::new(tokio::sync::RwLock::new(CircuitState::Closed)),
+                failure_threshold,
+                reset_timeout: Duration::from_millis(reset_timeout_ms),
+                half_open_max,
+                failure_count: Arc::new(AtomicUsize::new(0)),
+                last_failure: Arc::new(AtomicU64::new(0)),
+                successful_probes: Arc::new(AtomicUsize::new(0)),
+            }
+        }
+        
+        /// Check if the circuit breaker allows execution
+        pub async fn check(&self) -> bool {
+            let state = *self.state.read().await;
+            
+            match state {
+                CircuitState::Closed => true,
+                CircuitState::Open => {
+                    // Check if reset timeout has elapsed
+                    let now = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_millis() as u64;
+                    
+                    let last_failure = self.last_failure.load(Ordering::SeqCst);
+                    let elapsed = now - last_failure;
+                    
+                    if elapsed >= self.reset_timeout.as_millis() as u64 {
+                        // Transition to half-open state
+                        let mut state = self.state.write().await;
+                        *state = CircuitState::HalfOpen;
+                        self.successful_probes.store(0, Ordering::SeqCst);
+                        true
+                    } else {
+                        false
+                    }
+                },
+                CircuitState::HalfOpen => {
+                    // Allow limited number of test requests
+                    let current_probes = self.successful_probes.load(Ordering::SeqCst);
+                    current_probes < self.half_open_max
+                }
+            }
+        }
+        
+        /// Record a successful operation
+        pub async fn record_success(&self) {
+            let state = *self.state.read().await;
+            
+            match state {
+                CircuitState::Closed => {
+                    // Reset failure count
+                    self.failure_count.store(0, Ordering::SeqCst);
+                },
+                CircuitState::HalfOpen => {
+                    // Increment successful probes
+                    let current = self.successful_probes.fetch_add(1, Ordering::SeqCst);
+                    
+                    // Check if threshold reached to transition back to closed
+                    if current + 1 >= self.half_open_max {
+                        let mut state = self.state.write().await;
+                        *state = CircuitState::Closed;
+                        self.failure_count.store(0, Ordering::SeqCst);
+                    }
+                },
+                CircuitState::Open => {
+                    // This shouldn't happen, but handle just in case
+                    let mut state = self.state.write().await;
+                    *state = CircuitState::HalfOpen;
+                    self.successful_probes.store(1, Ordering::SeqCst);
+                }
+            }
+        }
+        
+        /// Record a failed operation
+        pub async fn record_failure(&self) {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_millis() as u64;
+            
+            self.last_failure.store(now, Ordering::SeqCst);
+            
+            let state = *self.state.read().await;
+            
+            match state {
+                CircuitState::Closed => {
+                    // Increment failure count
+                    let current = self.failure_count.fetch_add(1, Ordering::SeqCst);
+                    
+                    // Check if threshold reached
+                    if current + 1 >= self.failure_threshold {
+                        let mut state = self.state.write().await;
+                        *state = CircuitState::Open;
+                    }
+                },
+                CircuitState::HalfOpen => {
+                    // Any failure in half-open goes back to open
+                    let mut state = self.state.write().await;
+                    *state = CircuitState::Open;
+                    self.successful_probes.store(0, Ordering::SeqCst);
+                },
+                CircuitState::Open => {
+                    // Already open, just update last failure time
+                }
+            }
+        }
+        
+        /// Get the current state
+        pub async fn get_state(&self) -> CircuitState {
+            *self.state.read().await
+        }
+        
+        /// Reset the circuit breaker to closed state
+        pub async fn reset(&self) {
+            let mut state = self.state.write().await;
+            *state = CircuitState::Closed;
+            self.failure_count.store(0, Ordering::SeqCst);
+            self.successful_probes.store(0, Ordering::SeqCst);
+        }
+    }
+    
+    /// Execute a function with circuit breaker protection
+    pub async fn with_circuit_breaker<F, Fut, T>(
+        circuit_breaker: &CircuitBreaker,
+        f: F,
+    ) -> AIXTIVResult<T>
+    where
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = AIXTIVResult<T>>,
+    {
+        if !circuit_breaker.check().await {
+            return Err(AIXTIVError::System("Circuit breaker is open".to_string()));
+        }
+        
+        match f().await {
+            Ok(result) => {
+                circuit_breaker.record_success().await;
+                Ok(result)
+            },
+            Err(e) => {
+                circuit_breaker.record_failure().await;
+                Err(e)
+            }
+        }
+    }
+    
+    /// Health check handler trait
+    pub trait HealthCheckHandler: Send + Sync {
+        fn check(&self) -> AIXTIVResult<bool>;
+        fn get_name(&self) -> &str;
+    }
+    
+    /// Health monitor for running periodic health checks
+    pub struct HealthMonitor {
+        handlers: Vec<Box<dyn HealthCheckHandler>>,
+        check_interval: Duration,
+        on_failure: Box<dyn Fn(&str) -> AIXTIVResult<()> + Send + Sync>,
+    }
+    
+    impl HealthMonitor {
+        /// Create a new health monitor
+        pub fn new<F>(check_interval_ms: u64, on_failure: F) -> Self
+        where
+            F: Fn(&str) -> AIXTIVResult<()> + Send + Sync + 'static,
+        {
+            Self {
+                handlers: Vec::new(),
+                check_interval: Duration::from_millis(check_interval_ms),
+                on_failure: Box::new(on_failure),
+            }
+        }
+        
+        /// Add a health check handler
+        pub fn add_handler<H: HealthCheckHandler + 'static>(&mut self, handler: H) {
+            self.handlers.push(Box::new(handler));
+        }
+        
+        /// Start the health monitor
+        pub async fn start(self) -> AIXTIVResult<()> {
+            let handlers = Arc::new(self.handlers);
+            let on_failure = Arc::new(self.on_failure);
+            let check_interval = self.check_interval;
+            
+            tokio::spawn(async move {
+                let mut interval = tokio::time::interval(check_interval);
+                
+                loop {
+                    interval.tick().await;
+                    
+                    for handler in handlers.iter() {
+                        match handler.check() {
+                            Ok(true) => {
+                                // Health check passed
+                            },
+                            Ok(false) => {
+                                // Health check failed
+                                if let Err(e) = (on_failure)(handler.get_name()) {
+                                    eprintln!("Error in on_failure handler: {}", e);
+                                }
+                            },
+                            Err(e) => {
+                                // Error running health check
+                                eprintln!("Error running health check for {}: {}", handler.get_name(), e);
+                                if let Err(e) = (on_failure)(handler.get_name()) {
+                                    eprintln!("Error in on_failure handler: {}", e);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            Ok(())
+        }
+    }
+}
+
+/// LLM utilities specific to AIXTIV architecture
+pub mod llm {
+    use super::*;
+    
+    /// LLM provider
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum LLMProvider {
+        OpenAI,
+        Anthropic,
+        VertexAI,
+        HuggingFace,
+        Local,
+        AzureOpenAI,
+    }
+    
+    /// LLM completion request
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct CompletionRequest {
+        pub model: String,
+        pub provider: LLMProvider,
+        pub prompt: String,
+        pub system_message: Option<String>,
+        pub max_tokens: usize,
+        pub temperature: f32,
+        pub stop_sequences: Vec<String>,
+        pub top_p: Option<f32>,
+        pub frequency_penalty: Option<f32>,
+        pub presence_penalty: Option<f32>,
+    }
+    
+    /// LLM completion response
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct CompletionResponse {
+        pub text: String,
+        pub finish_reason: String,
+        pub usage: TokenUsage,
+        pub cached: bool,
+        pub provider: LLMProvider,
+        pub model: String,
+        pub latency_ms: u64,
+    }
+    
+    /// Token usage statistics
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct TokenUsage {
+        pub prompt_tokens: usize,
+        pub completion_tokens: usize,
+        pub total_tokens: usize,
+    }
+    
+    /// LLM client for interacting with various providers
+    pub struct LLMClient {
+        clients: HashMap<LLMProvider, Box<dyn LLMAdapter>>,
+        cache: TTLCache<String, CompletionResponse>,
+        primary_provider: LLMProvider,
+        fallback_order: Vec<LLMProvider>,
+    }
+    
+    impl LLMClient {
+        /// Create a new LLM client with the specified providers
+        pub fn new(primary_provider: LLMProvider, fallback_order: Vec<LLMProvider>, cache_ttl_seconds: u64) -> Self {
+            Self {
+                clients: HashMap::new(),
+                cache: TTLCache::new(cache_ttl_seconds),
+                primary_provider,
+                fallback_order,
+            }
+        }
+        
+        /// Register an LLM provider adapter
+        pub fn register_provider<A: LLMAdapter + 'static>(&mut self, provider: LLMProvider, adapter: A) {
+            self.clients.insert(provider, Box::new(adapter));
+        }
+        
+        /// Generate a completion with fallback support
+        pub async fn generate_completion(&self, request: CompletionRequest) -> AIXTIVResult<CompletionResponse> {
+            // Check cache first
+            let cache_key = self.generate_cache_key(&request);
+            if let Some(cached_response) = self.cache.get(&cache_key).await {
+                return Ok(cached_response);
+            }
+            
+            // Try primary provider first
+            let provider = if self.clients.contains_key(&request.provider) {
+                request.provider.clone()
+            } else {
+                self.primary_provider.clone()
+            };
+            
+            // List of providers to try in order
+            let mut providers_to_try = vec![provider.clone()];
+            for fallback in &self.fallback_order {
+                if fallback != &provider && self.clients.contains_key(fallback) {
+                    providers_to_try.push(fallback.clone());
+                }
+            }
+            
+            // Try each provider until successful
+            let mut last_error = None;
+            
+            for provider in providers_to_try {
+                if let Some(client) = self.clients.get(&provider) {
+                    let start_time = Instant::now();
+                    match client.generate_completion(&request).await {
+                        Ok(mut response) => {
+                            // Update response metadata
+                            response.provider = provider;
+                            response.model = request.model.clone();
+                            response.latency_ms = start_time.elapsed().as_millis() as u64;
+                            response.cached = false;
+                            
+                            // Cache the successful response
+                            let response_clone = response.clone();
+                            self.cache.set(cache_key, response_clone).await;
+                            
+                            return Ok(response);
+                        },
+                        Err(e) => {
+                            last_error = Some(e);
+                        }
+                    }
+                }
+            }
+            
+            // All providers failed
+            Err(last_error.unwrap_or_else(|| 
+                AIXTIVError::LLM("All LLM providers failed to generate completion".to_string())
+            ))
+        }
+        
+        /// Generate a cache key for a request
+        fn generate_cache_key(&self, request: &CompletionRequest) -> String {
+            // Include elements that should make the cache hit deterministic
+            let key_parts = vec![
+                request.model.clone(),
+                request.prompt.clone(),
+                request.system_message.clone().unwrap_or_default(),
+                request.max_tokens.to_string(),
+                // Do not include temperature or top_p since they affect randomness
+                format!("stop={:?}", request.stop_sequences),
+            ];
+            
+            crypto::hash_sha256(&key_parts.join("|"))
+        }
+    }
+    
+    /// Trait for LLM provider adapters
+    pub trait LLMAdapter: Send + Sync {
+        fn generate_completion(&self, request: &CompletionRequest) -> BoxFuture<AIXTIVResult<CompletionResponse>>;
+    }
+    
+    // Use Box<dyn Future> for async trait methods
+    pub type BoxFuture<T> = std::pin::Pin<Box<dyn Future<Output = T> + Send>>;
+}
+
+/// Agent orchestration utilities
+pub mod agent {
+    use super::*;
+    
+    /// Agent interface definition
+    pub trait Agent: Send + Sync {
+        /// Get the agent's unique identifier
+        fn get_id(&self) -> &str;
+        
+        /// Get the agent's type
+        fn get_type(&self) -> &str;
+        
+        /// Process a message
+        fn process_message(&self, message: &AgentMessage) -> BoxFuture<AIXTIVResult<AgentResponse>>;
+        
+        /// Check agent health
+        fn health_check(&self) -> BoxFuture<AIXTIVResult<bool>>;
+    }
+    
+    /// Agent message
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct AgentMessage {
+        pub id: String,
+        pub sender: String,
+        pub content: String,
+        pub context: HashMap<String, serde_json::Value>,
+        pub timestamp: DateTime<Utc>,
+    }
+    
+    /// Agent response
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct AgentResponse {
+        pub id: String,
+        pub in_response_to: String,
+        pub content: String,
+        pub metadata: HashMap<String, serde_json::Value>,
+        pub timestamp: DateTime<Utc>,
+    }
+    
+    /// Agent registry for managing agents
+    pub struct AgentRegistry {
+        agents: Arc<RwLock<HashMap<String, Box<dyn Agent>>>>,
+    }
+    
+    impl AgentRegistry {
+        /// Create a new agent registry
+        pub fn new() -> Self {
+            Self {
+                agents: Arc::new(RwLock::new(HashMap::new())),
+            }
+        }
+        
+        /// Register an agent
+        pub async fn register<A: Agent + 'static>(&self, agent: A) -> AIXT//! AIXTIV Rust Utilities
+//! 
+//! This module provides common utility functions for AIXTIV services and components.
+//! It includes cryptographic operations, data validation, concurrency helpers,
+//! error handling, and interoperability with external systems.
+
+use std::collections::{HashMap, HashSet};
+use std::fmt;
+use std::future::Future;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
+
+use chrono::{DateTime, Utc};
+use futures::stream::{self, StreamExt};
+use ring::digest::{Context, SHA256};
+use ring::hmac;
+use serde::{Deserialize, Serialize};
+use tokio::sync::{Semaphore, RwLock};
+use tokio::time::timeout;
+use uuid::Uuid;
+
+/// AIXTIV module error type for standardized error handling across the system
+#[derive(Debug)]
+pub enum AIXTIVError {
+    /// Authentication errors
+    Authentication(String),
+    /// Authorization errors
+    Authorization(String),
+    /// Input validation errors
+    Validation(String),
+    /// Service integration errors
+    Integration(String),
+    /// Database errors
+    Database(String),
+    /// System errors
+    System(String),
+    /// Timeout errors
+    Timeout(String),
+    /// Rate limiting errors
+    RateLimit(String),
+    /// Data format errors
+    Format(String),
+    /// Not found errors
+    NotFound(String),
+    /// External service errors
+    ExternalService(String),
+    /// LLM-specific errors
+    LLM(String),
+}
+
+impl fmt::Display for AIXTIVError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AIXTIVError::Authentication(msg) => write!(f, "Authentication error: {}", msg),
+            AIXTIVError::Authorization(msg) => write!(f, "Authorization error: {}", msg),
+            AIXTIVError::Validation(msg) => write!(f, "Validation error: {}", msg),
+            AIXTIVError::Integration(msg) => write!(f, "Integration error: {}", msg),
+            AIXTIVError::Database(msg) => write!(f, "Database error: {}", msg),
+            AIXTIVError::System(msg) => write!(f, "System error: {}", msg),
+            AIXTIVError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
+            AIXTIVError::RateLimit(msg) => write!(f, "Rate limit error: {}", msg),
+            AIXTIVError::Format(msg) => write!(f, "Format error: {}", msg),
+            AIXTIVError::NotFound(msg) => write!(f, "Not found error: {}", msg),
+            AIXTIVError::ExternalService(msg) => write!(f, "External service error: {}", msg),
+            AIXTIVError::LLM(msg) => write!(f, "LLM error: {}", msg),
+        }
+    }
+}
+
+impl std::error::Error for AIXTIVError {}
+
+/// Result type alias for AIXTIV module functions
+pub type AIXTIVResult<T> = Result<T, AIXTIVError>;
+
+/// Configuration struct for authentication
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct AuthConfig {
+    /// Type of authentication (e.g., "oauth2", "api_key", "jwt")
+    pub auth_type: String,
+    /// Client ID for OAuth flows
+    pub client_id: Option<String>,
+    /// Client secret for OAuth flows
+    pub client_secret: Option<String>,
+    /// Token URL for OAuth flows
+    pub token_url: Option<String>,
+    /// Auth URL for OAuth flows
+    pub auth_url: Option<String>,
+    /// API key for API key authentication
+    pub api_key: Option<String>,
+    /// JWT secret for JWT authentication
+    pub jwt_secret: Option<String>,
+    /// Additional auth parameters
+    pub params: HashMap<String, String>,
+}
+
+/// Configuration for rate limiting
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RateLimitConfig {
+    /// Maximum number of requests
+    pub max_requests: usize,
+    /// Time window in seconds
+    pub time_window_secs: u64,
+    /// Behavior when limit reached ("block", "queue", "error")
+    pub behavior: String,
+}
+
+/// Structure for tracking rate limits
+#[derive(Clone, Debug)]
+pub struct RateLimiter {
+    max_requests: usize,
+    time_window: Duration,
+    behavior: String,
+    requests: Arc<Mutex<Vec<Instant>>>,
+    semaphore: Arc<Semaphore>,
+}
+
+impl RateLimiter {
+    /// Create a new rate limiter
+    pub fn new(config: RateLimitConfig) -> Self {
+        RateLimiter {
+            max_requests: config.max_requests,
+            time_window: Duration::from_secs(config.time_window_secs),
+            behavior: config.behavior,
+            requests: Arc::new(Mutex::new(Vec::with_capacity(config.max_requests))),
+            semaphore: Arc::new(Semaphore::new(config.max_requests)),
+        }
+    }
+
+    /// Check if a request is allowed under the rate limit
+    pub fn check_limit(&self) -> bool {
+        let now = Instant::now();
+        let mut requests = self.requests.lock().unwrap();
+        
+        // Remove expired timestamps
+        requests.retain(|time| now.duration_since(*time) < self.time_window);
+        
+        // Check if under limit
+        requests.len() < self.max_requests
+    }
+
+    /// Acquire permission to make a request (blocks if needed)
+    pub async fn acquire(&self) -> AIXTIVResult<RateLimitGuard> {
+        if self.behavior == "error" && !self.check_limit() {
+            return Err(AIXTIVError::RateLimit("Rate limit exceeded".to_string()));
+        }
+        
+        let permit = self.semaphore.clone().acquire_owned().await
+            .map_err(|e| AIXTIVError::System(format!("Failed to acquire rate limit permit: {}", e)))?;
+        
+        // Record this request
+        let now = Instant::now();
+        let mut requests = self.requests.lock().unwrap();
+        requests.push(now);
+        
+        Ok(RateLimitGuard {
+            _permit: permit,
+            limiter: self.clone(),
+            time: now,
+        })
+    }
+
+    /// Clean up expired requests
+    fn cleanup_requests(&self) {
+        let now = Instant::now();
+        let mut requests = self.requests.lock().unwrap();
+        requests.retain(|time| now.duration_since(*time) < self.time_window);
+    }
+}
+
+/// Guard for automatically releasing rate limit permits
+pub struct RateLimitGuard {
+    _permit: tokio::sync::OwnedSemaphorePermit,
+    limiter: RateLimiter,
+    time: Instant,
+}
+
+impl Drop for RateLimitGuard {
+    fn drop(&mut self) {
+        // Clean up expired requests when a guard is dropped
+        self.limiter.cleanup_requests();
+    }
+}
+
+/// Retry configuration
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RetryConfig {
+    /// Maximum number of retry attempts
+    pub max_attempts: usize,
+    /// Initial backoff duration in milliseconds
+    pub initial_backoff_ms: u64,
+    /// Maximum backoff duration in milliseconds
+    pub max_backoff_ms: u64,
+    /// Backoff factor for exponential backoff
+    pub backoff_factor: f64,
+    /// Whether to add jitter to backoff
+    pub add_jitter: bool,
+    /// Retriable error codes or messages
+    pub retriable_errors: Vec<String>,
+}
+
+/// Execute a function with retry logic
+pub async fn with_retry<F, Fut, T>(
+    f: F,
+    config: &RetryConfig,
+) -> AIXTIVResult<T>
+where
+    F: Fn() -> Fut,
+    Fut: Future<Output = AIXTIVResult<T>>,
+{
+    let mut attempts = 0;
+    let mut backoff_ms = config.initial_backoff_ms;
+    
+    loop {
+        attempts += 1;
+        
+        match f().await {
+            Ok(result) => return Ok(result),
+            Err(err) => {
+                // Check if max attempts reached
+                if attempts >= config.max_attempts {
+                    return Err(err);
+                }
+                
+                // Check if error is retriable
+                let is_retriable = match &err {
+                    AIXTIVError::Timeout(_) => true,
+                    AIXTIVError::RateLimit(_) => true,
+                    AIXTIVError::ExternalService(msg) => {
+                        config.retriable_errors.iter().any(|e| msg.contains(e))
+                    }
+                    AIXTIVError::Database(msg) if msg.contains("deadlock") || msg.contains("timeout") => true,
+                    _ => false,
+                };
+                
+                if !is_retriable {
+                    return Err(err);
+                }
+                
+                // Calculate backoff with optional jitter
+                let jitter_factor = if config.add_jitter {
+                    let mut rng = rand::thread_rng();
+                    use rand::Rng;
+                    rng.gen_range(0.75..1.25)
+                } else {
+                    1.0
+                };
+                
+                let backoff_with_jitter = (backoff_ms as f64 * jitter_factor) as u64;
+                tokio::time::sleep(Duration::from_millis(backoff_with_jitter)).await;
+                
+                // Increase backoff for next attempt
+                backoff_ms = std::cmp::min(
+                    (backoff_ms as f64 * config.backoff_factor) as u64,
+                    config.max_backoff_ms,
+                );
+            }
+        }
+    }
+}
+
+/// Cache entry with expiration
+struct CacheEntry<T> {
+    value: T,
+    expires_at: DateTime<Utc>,
+}
+
+/// Simple time-based cache for expensive operations
+pub struct TTLCache<K, V> {
+    entries: Arc<RwLock<HashMap<K, CacheEntry<V>>>>,
+    ttl: Duration,
+}
+
+impl<K, V> TTLCache<K, V>
+where
+    K: Clone + Eq + std::hash::Hash + Send + Sync + 'static,
+    V: Clone + Send + Sync + 'static,
+{
+    /// Create a new cache with the specified TTL
+    pub fn new(ttl_seconds: u64) -> Self {
+        let cache = Self {
+            entries: Arc::new(RwLock::new(HashMap::new())),
+            ttl: Duration::from_secs(ttl_seconds),
+        };
+        
+        // Spawn background cleanup task
+        let entries_clone = cache.entries.clone();
+        let ttl = cache.ttl;
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(60));
+            loop {
+                interval.tick().await;
+                Self::cleanup(&entries_clone, ttl).await;
+            }
+        });
+        
+        cache
+    }
+    
+    /// Get a value from the cache
+    pub async fn get(&self, key: &K) -> Option<V> {
+        let entries = self.entries.read().await;
+        if let Some(entry) = entries.get(key) {
+            if entry.expires_at > Utc::now() {
+                return Some(entry.value.clone());
+            }
+        }
+        None
+    }
+    
+    /// Set a value in the cache
+    pub async fn set(&self, key: K, value: V) {
+        let mut entries = self.entries.write().await;
+        entries.insert(key, CacheEntry {
+            value,
+            expires_at: Utc::now() + chrono::Duration::from_std(self.ttl).unwrap(),
+        });
+    }
+    
+    /// Get a value from the cache or compute it
+    pub async fn get_or_compute<F, Fut>(&self, key: K, compute_fn: F) -> AIXTIVResult<V>
+    where
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = AIXTIVResult<V>>,
+    {
+        // Try to get from cache first
+        if let Some(cached) = self.get(&key).await {
+            return Ok(cached);
+        }
+        
+        // Not in cache, compute value
+        let value = compute_fn().await?;
+        
+        // Cache the result
+        self.set(key, value.clone()).await;
+        
+        Ok(value)
+    }
+    
+    /// Remove expired entries from the cache
+    async fn cleanup(entries: &RwLock<HashMap<K, CacheEntry<V>>>, ttl: Duration) {
+        let now = Utc::now();
+        let mut entries = entries.write().await;
+        entries.retain(|_, entry| entry.expires_at > now);
+    }
+}
+
+/// Lock-free log for high-performance logging in critical sections
+pub struct FastLog {
+    buffer: crossbeam_channel::Sender<String>,
+}
+
+impl FastLog {
+    /// Create a new fast log with a processing thread
+    pub fn new() -> Self {
+        let (sender, receiver) = crossbeam_channel::bounded(10000);
+        
+        // Spawn background thread to process log messages
+        std::thread::spawn(move || {
+            while let Ok(message) = receiver.recv() {
+                // In a real implementation, this would write to a file or send to a logging service
+                // For now, just print to stdout
+                println!("{}", message);
+            }
+        });
+        
+        Self {
+            buffer: sender,
+        }
+    }
+    
+    /// Log a message without blocking
+    pub fn log(&self, message: impl Into<String>) {
+        let _ = self.buffer.try_send(message.into());
+    }
+}
+
+impl Default for FastLog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Cryptographic utilities
+pub mod crypto {
+    use super::*;
+    
+    /// Hash a string using SHA-256
+    pub fn hash_sha256(input: &str) -> String {
+        let mut context = Context::new(&SHA256);
+        context.update(input.as_bytes());
+        let digest = context.finish();
+        
+        // Convert to hex string
+        let result = digest.as_ref()
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect::<String>();
+        
+        result
+    }
+    
+    /// Generate an HMAC signature
+    pub fn generate_hmac(key: &[u8], message: &str) -> AIXTIVResult<String> {
+        let key = hmac::Key::new(hmac::HMAC_SHA256, key);
+        let signature = hmac::sign(&key, message.as_bytes());
+        
+        // Convert to hex string
+        let result = signature.as_ref()
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect::<String>();
+        
+        Ok(result)
+    }
+    
+    /// Verify an HMAC signature
+    pub fn verify_hmac(key: &[u8], message: &str, signature_hex: &str) -> AIXTIVResult<bool> {
+        let key = hmac::Key::new(hmac::HMAC_SHA256, key);
+        
+        // Convert hex signature to bytes
+        let signature_bytes = hex_to_bytes(signature_hex)
+            .map_err(|e| AIXTIVError::Format(format!("Invalid signature format: {}", e)))?;
+        
+        let signature = hmac::Signature::from_bytes(&signature_bytes)
+            .map_err(|_| AIXTIVError::Format("Invalid signature length".to_string()))?;
+        
+        // Verify signature
+        let result = hmac::verify(&key, message.as_bytes(), &signature).is_ok();
+        
+        Ok(result)
+    }
+    
+    /// Convert hex string to bytes
+    fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, String> {
+        if hex.len() % 2 != 0 {
+            return Err("Hex string must have even length".to_string());
+        }
+        
+        let mut bytes = Vec::with_capacity(hex.len() / 2);
+        
+        for i in (0..hex.len()).step_by(2) {
+            let byte_str = &hex[i..i + 2];
+            let byte = u8::from_str_radix(byte_str, 16)
+                .map_err(|e| format!("Invalid hex character: {}", e))?;
+            bytes.push(byte);
+        }
+        
+        Ok(bytes)
+    }
+    
+    /// Generate a secure random token
+    pub fn generate_token(length: usize) -> String {
+        use rand::{Rng, thread_rng};
+        const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        
+        let mut rng = thread_rng();
+        
+        (0..length)
+            .map(|_| {
+                let idx = rng.gen_range(0..CHARSET.len());
+                CHARSET[idx] as char
+            })
+            .collect()
+    }
+    
+    /// Generate a UUID v4
+    pub fn generate_uuid() -> String {
+        Uuid::new_v4().to_string()
+    }
+}
+
+/// JSON utilities
+pub mod json {
+    use super::*;
+    use serde_json::{Value, Error as JsonError};
+    
+    /// Parse JSON string to a Value
+    pub fn parse(json_str: &str) -> Result<Value, AIXTIVError> {
+        serde_json::from_str(json_str)
+            .map_err(|e| AIXTIVError::Format(format!("JSON parse error: {}", e)))
+    }
+    
+    /// Convert Value to pretty-printed JSON string
+    pub fn to_pretty_string(value: &Value) -> Result<String, AIXTIVError> {
+        serde_json::to_string_pretty(value)
+            .map_err(|e| AIXTIVError::Format(format!("JSON stringify error: {}", e)))
+    }
+    
+    /// Get a value at a specific path in a JSON object
+    pub fn get_path<'a>(json: &'a Value, path: &str) -> Option<&'a Value> {
+        let parts: Vec<&str> = path.split('.').collect();
+        let mut current = json;
+        
+        for part in parts {
+            match current {
+                Value::Object(map) => {
+                    // Handle array access with [index] notation
+                    if part.ends_with(']') && part.contains('[') {
+                        let (key, index_str) = part.split_at(part.find('[').unwrap());
+                        if let Some(obj) = map.get(key) {
+                            if let Value::Array(arr) = obj {
+                                // Extract index from [index]
+                                let index_str = &index_str[1..index_str.len()-1];
+                                if let Ok(index) = index_str.parse::<usize>() {
+                                    if index < arr.len() {
+                                        current = &arr[index];
+                                        continue;
+                                    }
+                                }
+                                return None;
+                            }
+                        }
+                        return None;
+                    } else {
+                        // Regular object property access
+                        if let Some(next) = map.get(part) {
+                            current = next;
+                        } else {
+                            return None;
+                        }
+                    }
+                },
+                Value::Array(

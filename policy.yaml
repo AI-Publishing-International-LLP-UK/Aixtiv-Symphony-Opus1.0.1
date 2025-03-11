@@ -1,0 +1,8 @@
+bindings:
+- members:
+  - serviceAccount:drlucyautomation@api-for-warp-drive.iam.gserviceaccount.com
+  - user:pr@coaching2100.com
+  - domain:coaching2100.com
+  role: roles/run.invoker
+etag: BwYv_tt0kmY=
+version: 1

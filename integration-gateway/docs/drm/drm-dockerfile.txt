@@ -1,0 +1,88 @@
+# Multi-stage Dockerfile for Dr. Memoria Content Generation Engine
+
+# Stage 1: Base Python Image
+FROM python:3.10-slim-bullseye AS base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV PIP_NO_CACHE_DIR 1
+
+# Set working directory
+WORKDIR /app
+
+# Stage 2: Build Dependencies
+FROM base AS builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    libpq-dev
+
+# Copy requirements files
+COPY requirements.txt requirements-dev.txt ./
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install -r requirements-dev.txt
+
+# Stage 3: Production Image
+FROM base AS production
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy application code
+COPY . /app
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+# Expose application port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s \
+  CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=5)" || exit 1
+
+# Command to run the application
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "dr_memoria.main:app"]
+
+# Stage 4: Development Image
+FROM base AS development
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    git
+
+# Copy application code
+COPY . /app
+
+# Install development dependencies
+RUN pip install -r requirements-dev.txt
+
+# Expose development port
+EXPOSE 8000
+
+# Development entry point
+CMD ["python", "-m", "uvicorn", "dr_memoria.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

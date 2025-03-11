@@ -1,0 +1,125 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aixtiv-symphony
+  labels:
+    app: aixtiv-symphony
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: aixtiv-symphony
+  template:
+    metadata:
+      labels:
+        app: aixtiv-symphony
+    spec:
+      containers:
+      - name: aixtiv-symphony
+        image: gcr.io/api-for-warp-drive/aixtiv-symphony:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2
+            memory: 2Gi
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: aixtiv-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: aixtiv-secrets
+              key: JWT_SECRET
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 45
+          periodSeconds: 20
+
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: aixtiv-symphony
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: aixtiv-symphony
+
+---
+# hpa.yaml (Horizontal Pod Autoscaler)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: aixtiv-symphony-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: aixtiv-symphony
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+# network-policy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aixtiv-symphony-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: aixtiv-symphony
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          allow-access: "true"
+    ports:
+    - port: 3000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          allow-database-access: "true"
+    ports:
+    - port: 5432  # PostgreSQL standard port

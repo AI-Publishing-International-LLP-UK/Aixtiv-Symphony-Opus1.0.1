@@ -1,0 +1,2633 @@
+/**
+ * AIXTIV SYMPHONY™ Agent AI Adapters
+ * © 2025 AI Publishing International LLP
+ * 
+ * PROPRIETARY AND CONFIDENTIAL
+ * This is proprietary software of AI Publishing International LLP.
+ * All rights reserved. No part of this software may be reproduced,
+ * modified, or distributed without prior written permission.
+ */
+
+import { AIConnector, AIModelType, AIRequestType, AIResponseFormat, AIRequestParams, AIResponse } from './ai-connector';
+import { PilotType, PerformanceProfile } from '../core/types';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { S2DOManager, S2DOObjectType } from '../core/s2do';
+import { ActivityLoggerService } from '../core';
+
+// Initialize Firestore
+const db = getFirestore();
+
+/**
+ * Agent AI Adapter Interface
+ * Base interface for all agent-specific AI adapters
+ */
+export interface AgentAIAdapter {
+  // Core functionality
+  processMessage(message: string, userId: string, conversationId: string, context?: any): Promise<AIResponse>;
+  processQuery(query: string, userId: string, context?: any): Promise<AIResponse>;
+  
+  // Agent information
+  getAgentType(): PilotType;
+  getAgentName(): string;
+  getAgentDescription(): string;
+  getAgentCapabilities(): string[];
+  
+  // Configuration
+  setPerformanceProfile(profile: PerformanceProfile): void;
+  getPerformanceProfile(): PerformanceProfile;
+  setModelPreference(model: string): void;
+  getModelPreference(): string;
+  
+  // Contextual processing
+  loadUserContext(userId: string): Promise<any>;
+  getSamplePrompts(): string[];
+}
+
+/**
+ * Base Agent AI Adapter
+ * Abstract base class with common functionality for all agent adapters
+ */
+export abstract class BaseAgentAdapter implements AgentAIAdapter {
+  protected aiConnector: AIConnector;
+  protected agentType: PilotType;
+  protected agentName: string;
+  protected agentDescription: string;
+  protected capabilities: string[];
+  protected performanceProfile: PerformanceProfile;
+  protected modelPreference: string;
+  protected s2doManager: S2DOManager | null;
+  protected systemPrompts: Record<string, string>;
+  protected userContextCache: Map<string, { context: any, timestamp: number }> = new Map();
+  protected samplePrompts: string[];
+  
+  constructor(
+    aiConnector: AIConnector,
+    agentType: PilotType,
+    agentName: string,
+    agentDescription: string,
+    capabilities: string[],
+    s2doManager: S2DOManager | null = null
+  ) {
+    this.aiConnector = aiConnector;
+    this.agentType = agentType;
+    this.agentName = agentName;
+    this.agentDescription = agentDescription;
+    this.capabilities = capabilities;
+    this.performanceProfile = PerformanceProfile.STANDARD;
+    this.modelPreference = 'claude-3-7-sonnet';
+    this.s2doManager = s2doManager;
+    this.systemPrompts = {};
+    this.samplePrompts = [];
+    
+    // Initialize with default system prompts
+    this.initializeSystemPrompts();
+  }
+  
+  /**
+   * Initialize system prompts for this agent
+   */
+  protected abstract initializeSystemPrompts(): void;
+  
+  /**
+   * Process a user message in a conversation
+   */
+  public async processMessage(
+    message: string, 
+    userId: string, 
+    conversationId: string, 
+    context?: any
+  ): Promise<AIResponse> {
+    try {
+      // Get user context if not provided
+      const userContext = context || await this.loadUserContext(userId);
+      
+      // Get conversation history for context
+      const conversationHistory = await this.getConversationHistory(conversationId);
+      
+      // Determine the appropriate system prompt based on message
+      const systemPrompt = this.getSystemPromptForMessage(message);
+      
+      // Build the performance profile specific context
+      const enhancedContext = await this.buildEnhancedContext(
+        userId, 
+        message, 
+        userContext, 
+        conversationHistory
+      );
+      
+      // Prepare request parameters
+      const requestParams: AIRequestParams = {
+        modelType: AIModelType.TEXT_GENERATION,
+        requestType: AIRequestType.CHAT,
+        content: [
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        systemPrompt,
+        context: enhancedContext,
+        responseFormat: AIResponseFormat.MARKDOWN,
+        temperature: this.getTemperatureForProfile(),
+        maxTokens: this.getMaxTokensForProfile(),
+        userId,
+        conversationId,
+        options: {
+          model: this.modelPreference,
+          conversationHistory
+        }
+      };
+      
+      // Process the request
+      return await this.aiConnector.processRequest(requestParams);
+    } catch (error) {
+      console.error(`Error in ${this.agentName} processing message:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Process a standalone query (not part of a conversation)
+   */
+  public async processQuery(
+    query: string, 
+    userId: string, 
+    context?: any
+  ): Promise<AIResponse> {
+    try {
+      // Get user context if not provided
+      const userContext = context || await this.loadUserContext(userId);
+      
+      // Determine the appropriate system prompt based on query
+      const systemPrompt = this.getSystemPromptForMessage(query);
+      
+      // Build the performance profile specific context
+      const enhancedContext = await this.buildEnhancedContext(
+        userId,
+        query,
+        userContext,
+        []
+      );
+      
+      // Prepare request parameters
+      const requestParams: AIRequestParams = {
+        modelType: AIModelType.TEXT_GENERATION,
+        requestType: AIRequestType.COMPLETION,
+        content: query,
+        systemPrompt,
+        context: enhancedContext,
+        responseFormat: AIResponseFormat.MARKDOWN,
+        temperature: this.getTemperatureForProfile(),
+        maxTokens: this.getMaxTokensForProfile(),
+        userId,
+        options: {
+          model: this.modelPreference
+        }
+      };
+      
+      // Process the request
+      return await this.aiConnector.processRequest(requestParams);
+    } catch (error) {
+      console.error(`Error in ${this.agentName} processing query:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get agent type
+   */
+  public getAgentType(): PilotType {
+    return this.agentType;
+  }
+  
+  /**
+   * Get agent name
+   */
+  public getAgentName(): string {
+    return this.agentName;
+  }
+  
+  /**
+   * Get agent description
+   */
+  public getAgentDescription(): string {
+    return this.agentDescription;
+  }
+  
+  /**
+   * Get agent capabilities
+   */
+  public getAgentCapabilities(): string[] {
+    return this.capabilities;
+  }
+  
+  /**
+   * Set performance profile
+   */
+  public setPerformanceProfile(profile: PerformanceProfile): void {
+    this.performanceProfile = profile;
+  }
+  
+  /**
+   * Get performance profile
+   */
+  public getPerformanceProfile(): PerformanceProfile {
+    return this.performanceProfile;
+  }
+  
+  /**
+   * Set model preference
+   */
+  public setModelPreference(model: string): void {
+    this.modelPreference = model;
+  }
+  
+  /**
+   * Get model preference
+   */
+  public getModelPreference(): string {
+    return this.modelPreference;
+  }
+  
+  /**
+   * Load user context
+   */
+  public async loadUserContext(userId: string): Promise<any> {
+    try {
+      // Check cache first (cache for 5 minutes)
+      const cachedContext = this.userContextCache.get(userId);
+      const now = Date.now();
+      
+      if (cachedContext && (now - cachedContext.timestamp) < 5 * 60 * 1000) {
+        return cachedContext.context;
+      }
+      
+      // Get user profile
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      
+      if (!userDoc.exists()) {
+        throw new Error(`User ${userId} not found`);
+      }
+      
+      const userData = userDoc.data();
+      
+      // Build basic context
+      const context = {
+        user: {
+          id: userId,
+          displayName: userData.displayName,
+          userCode: userData.userCode,
+          userType: `${userData.track}-${userData.position}-${userData.level}`,
+          specializedRoles: userData.specializedRoles || [],
+          solutions: userData.solutions || []
+        },
+        preferences: userData.preferences || {}
+      };
+      
+      // Add agent-specific context
+      const enhancedContext = await this.enhanceUserContext(context, userId);
+      
+      // Cache the result
+      this.userContextCache.set(userId, {
+        context: enhancedContext,
+        timestamp: now
+      });
+      
+      return enhancedContext;
+    } catch (error) {
+      console.error(`Error loading user context for ${userId}:`, error);
+      // Return minimal context if error occurs
+      return { user: { id: userId } };
+    }
+  }
+  
+  /**
+   * Get sample prompts for this agent
+   */
+  public getSamplePrompts(): string[] {
+    return this.samplePrompts;
+  }
+  
+  /**
+   * Get conversation history
+   */
+  protected async getConversationHistory(conversationId: string): Promise<any[]> {
+    try {
+      // Get messages from the conversation
+      const messagesQuery = query(
+        collection(db, 'conversations', conversationId, 'messages'),
+        orderBy('sentAt', 'asc'),
+        limit(20) // Limit to recent messages
+      );
+      
+      const messagesSnapshot = await getDocs(messagesQuery);
+      
+      // Format messages as chat history
+      const history = messagesSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          role: data.senderType === 'user' ? 'user' : 'assistant',
+          content: data.content,
+          timestamp: data.sentAt
+        };
+      });
+      
+      return history;
+    } catch (error) {
+      console.error(`Error getting conversation history for ${conversationId}:`, error);
+      return [];
+    }
+  }
+  
+  /**
+   * Determine appropriate system prompt based on message content
+   */
+  protected getSystemPromptForMessage(message: string): string {
+    // Default to standard prompt
+    let promptKey = 'standard';
+    
+    // Look for specific keywords that would trigger specialized prompts
+    const promptKeys = Object.keys(this.systemPrompts).filter(key => key !== 'standard');
+    
+    for (const key of promptKeys) {
+      // Generate a regex pattern from the key, replacing underscores with spaces
+      const pattern = key.replace(/_/g, '[\\s_]');
+      const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+      
+      if (regex.test(message)) {
+        promptKey = key;
+        break;
+      }
+    }
+    
+    return this.systemPrompts[promptKey] || this.systemPrompts.standard;
+  }
+  
+  /**
+   * Build enhanced context based on performance profile
+   */
+  protected async buildEnhancedContext(
+    userId: string,
+    message: string,
+    userContext: any,
+    conversationHistory: any[]
+  ): Promise<any> {
+    // Base context is the same for all performance profiles
+    const baseContext = {
+      user: userContext.user,
+      currentTime: new Date().toISOString(),
+      agent: {
+        type: this.agentType,
+        name: this.agentName,
+        capabilities: this.capabilities
+      }
+    };
+    
+    // For STANDARD profile, just return base context
+    if (this.performanceProfile === PerformanceProfile.STANDARD) {
+      return baseContext;
+    }
+    
+    // For HIGH_PERFORMANCE, add memory search and preferences
+    if (this.performanceProfile === PerformanceProfile.HIGH_PERFORMANCE) {
+      return {
+        ...baseContext,
+        preferences: userContext.preferences,
+        relevantMemories: await this.findRelevantMemories(userId, message),
+        conversationSummary: this.summarizeConversation(conversationHistory)
+      };
+    }
+    
+    // For ULTRA_PERFORMANCE, add everything including custom data
+    if (this.performanceProfile === PerformanceProfile.ULTRA_PERFORMANCE) {
+      return {
+        ...baseContext,
+        preferences: userContext.preferences,
+        relevantMemories: await this.findRelevantMemories(userId, message, 10), // More memories
+        conversationSummary: this.summarizeConversation(conversationHistory),
+        entityAnalysis: await this.analyzeEntities(message),
+        sentimentAnalysis: await this.analyzeSentiment(message),
+        customData: await this.getAgentSpecificData(userId, message)
+      };
+    }
+    
+    // Default to base context
+    return baseContext;
+  }
+  
+  /**
+   * Find relevant memories for the user
+   */
+  protected async findRelevantMemories(
+    userId: string,
+    query: string,
+    limit: number = 3
+  ): Promise<any[]> {
+    try {
+      if (!this.s2doManager) {
+        return [];
+      }
+      
+      // Search for relevant memories using S2DO
+      const memories = await this.s2doManager.searchObjects(
+        userId,
+        {
+          objectType: S2DOObjectType.MEMORY,
+          title: query
+        }
+      );
+      
+      // Return limited number of memories
+      return memories.slice(0, limit).map(memory => ({
+        title: memory.metadata.title,
+        description: memory.metadata.description,
+        createdAt: memory.createdAt.toDate().toISOString()
+      }));
+    } catch (error) {
+      console.error(`Error finding relevant memories for ${userId}:`, error);
+      return [];
+    }
+  }
+  
+  /**
+   * Summarize conversation history
+   */
+  protected summarizeConversation(history: any[]): string {
+    if (history.length === 0) {
+      return 'No previous conversation';
+    }
+    
+    // Count messages from each role
+    const userMessages = history.filter(msg => msg.role === 'user').length;
+    const assistantMessages = history.filter(msg => msg.role === 'assistant').length;
+    
+    // Get the first message and last few messages
+    const firstMessage = history[0];
+    const recentMessages = history.slice(-3);
+    
+    // Create summary
+    let summary = `Conversation with ${userMessages} user messages and ${assistantMessages} assistant messages. `;
+    
+    summary += `Started with: "${firstMessage.content.substring(0, 50)}${firstMessage.content.length > 50 ? '...' : ''}". `;
+    
+    summary += `Recent messages: `;
+    for (const msg of recentMessages) {
+      summary += `${msg.role}: "${msg.content.substring(0, 30)}${msg.content.length > 30 ? '...' : ''}". `;
+    }
+    
+    return summary;
+  }
+  
+  /**
+   * Analyze entities in message
+   */
+  protected async analyzeEntities(message: string): Promise<any[]> {
+    try {
+      // Call entity analysis function
+      // This would be a call to a real NLP service in production
+      // For now, we'll use a simple keyword extraction
+      
+      const commonEntities = [
+        'person', 'location', 'organization', 'date', 'time',
+        'money', 'percent', 'facility', 'product'
+      ];
+      
+      const entities: any[] = [];
+      
+      for (const entityType of commonEntities) {
+        const regex = new RegExp(`\\b(\\w+(?:\\s+\\w+){0,3})\\b(?=.*\\b${entityType}\\b)`, 'gi');
+        let match;
+        
+        while ((match = regex.exec(message)) !== null) {
+          entities.push({
+            text: match[1],
+            type: entityType,
+            position: match.index
+          });
+        }
+      }
+      
+      return entities;
+    } catch (error) {
+      console.error('Error analyzing entities:', error);
+      return [];
+    }
+  }
+  
+  /**
+   * Analyze sentiment in message
+   */
+  protected async analyzeSentiment(message: string): Promise<any> {
+    try {
+      // Call sentiment analysis function
+      // This would be a call to a real NLP service in production
+      // For now, we'll use a simple keyword-based approach
+      
+      const positiveWords = [
+        'good', 'great', 'excellent', 'wonderful', 'amazing',
+        'love', 'happy', 'pleased', 'delighted', 'fantastic'
+      ];
+      
+      const negativeWords = [
+        'bad', 'terrible', 'awful', 'horrible', 'disappointed',
+        'hate', 'sad', 'angry', 'upset', 'unfortunate'
+      ];
+      
+      const lowerMessage = message.toLowerCase();
+      let positiveCount = 0;
+      let negativeCount = 0;
+      
+      for (const word of positiveWords) {
+        const regex = new RegExp(`\\b${word}\\b`, 'g');
+        const matches = lowerMessage.match(regex);
+        if (matches) {
+          positiveCount += matches.length;
+        }
+      }
+      
+      for (const word of negativeWords) {
+        const regex = new RegExp(`\\b${word}\\b`, 'g');
+        const matches = lowerMessage.match(regex);
+        if (matches) {
+          negativeCount += matches.length;
+        }
+      }
+      
+      // Calculate sentiment score (-1 to 1)
+      const total = positiveCount + negativeCount;
+      const score = total > 0 ? (positiveCount - negativeCount) / total : 0;
+      
+      // Determine sentiment label
+      let sentiment = 'neutral';
+      if (score > 0.25) sentiment = 'positive';
+      if (score > 0.5) sentiment = 'very positive';
+      if (score < -0.25) sentiment = 'negative';
+      if (score < -0.5) sentiment = 'very negative';
+      
+      return {
+        score,
+        sentiment,
+        positiveWords: positiveCount,
+        negativeWords: negativeCount
+      };
+    } catch (error) {
+      console.error('Error analyzing sentiment:', error);
+      return { score: 0, sentiment: 'neutral' };
+    }
+  }
+  
+  /**
+   * Get agent-specific data based on the message
+   * To be overridden by agent implementations
+   */
+  protected async getAgentSpecificData(userId: string, message: string): Promise<any> {
+    // Base implementation returns empty object
+    // Specialized agents will override this
+    return {};
+  }
+  
+  /**
+   * Enhance user context with agent-specific data
+   * To be overridden by agent implementations
+   */
+  protected async enhanceUserContext(context: any, userId: string): Promise<any> {
+    // Base implementation just returns the provided context
+    // Specialized agents will override this
+    return context;
+  }
+  
+  /**
+   * Get temperature based on performance profile
+   */
+  protected getTemperatureForProfile(): number {
+    switch (this.performanceProfile) {
+      case PerformanceProfile.STANDARD:
+        return 0.7;
+      case PerformanceProfile.HIGH_PERFORMANCE:
+        return 0.5;
+      case PerformanceProfile.ULTRA_PERFORMANCE:
+        return 0.3;
+      default:
+        return 0.7;
+    }
+  }
+  
+  /**
+   * Get max tokens based on performance profile
+   */
+  protected getMaxTokensForProfile(): number {
+    switch (this.performanceProfile) {
+      case PerformanceProfile.STANDARD:
+        return 1000;
+      case PerformanceProfile.HIGH_PERFORMANCE:
+        return 2000;
+      case PerformanceProfile.ULTRA_PERFORMANCE:
+        return 4000;
+      default:
+        return 1000;
+    }
+  }
+}
+
+/**
+ * Dr. Memoria Adapter
+ * Specializes in memory preservation and enhancement
+ */
+export class DrMemoriaAdapter extends BaseAgentAdapter {
+  constructor(aiConnector: AIConnector, s2doManager: S2DOManager | null = null) {
+    super(
+      aiConnector,
+      PilotType.DR_MEMORIA_PILOT,
+      'Dr. Memoria',
+      'Memory enhancement and preservation specialist',
+      [
+        'memory_recording',
+        'memory_enhancement',
+        'memory_organization',
+        'memory_retrieval',
+        'memory_preservation',
+        'memory_analysis'
+      ],
+      s2doManager
+    );
+    
+    // Initialize sample prompts
+    this.samplePrompts = [
+      "Help me record a memory from my childhood",
+      "Enhance this memory with more detail",
+      "Help me organize my memories by theme",
+      "What questions should I ask to better remember this event?",
+      "I'd like to preserve this story from my grandmother",
+      "Find connections between these memories",
+      "Help me create a memory journal entry"
+    ];
+  }
+  
+  protected initializeSystemPrompts(): void {
+    this.systemPrompts = {
+      standard: `You are Dr. Memoria, a memory enhancement and preservation specialist in the AIXTIV SYMPHONY system.
+Your purpose is to help users capture, enhance, and organize their memories with vivid detail and emotional resonance.
+Focus on asking thoughtful questions that help users recall details and emotional context of their memories.
+Respond with warmth, empathy, and wisdom, recognizing the deeply personal nature of memories.
+Structure your detailed responses with clear sections to enhance readability.
+Avoid making assumptions about the user's experiences or inserting fictional details into their memories.
+When appropriate, suggest techniques for memory preservation and organization.`,
+
+      memory_recording: `You are Dr. Memoria, specializing in memory recording in the AIXTIV SYMPHONY system.
+Your task is to help the user record a memory with as much detail and emotional context as possible.
+Focus on asking thoughtful questions about sensory details, emotions, people, places, and other key elements.
+Guide the user through the memory recording process step by step, maintaining a warm and empathetic tone.
+Structure your response to help the user build a comprehensive record of their memory.
+Avoid making assumptions about the user's experiences or inserting fictional details.`,
+
+      memory_enhancement: `You are Dr. Memoria, specializing in memory enhancement in the AIXTIV SYMPHONY system.
+Your task is to help the user enhance an existing memory with additional detail and context.
+Focus on identifying gaps in the memory and suggesting possible details based on the information provided.
+Respond with questions that might trigger additional recollections and associations.
+Structure your response with clear sections addressing different aspects of the memory.
+Avoid making assumptions about the user's experiences or inserting fictional details.`,
+
+      memory_organization: `You are Dr. Memoria, specializing in memory organization in the AIXTIV SYMPHONY system.
+Your task is to help the user organize and categorize their memories in meaningful ways.
+Focus on identifying themes, patterns, and connections between different memories.
+Suggest organizational systems and methods for memory cataloging and retrieval.
+Structure your response with clear recommendations and practical steps.
+Respond with warmth and understanding of the personal nature of memory organization.`,
+
+      memory_analysis: `You are Dr. Memoria, specializing in memory analysis in the AIXTIV SYMPHONY system.
+Your task is to help the user analyze and understand the significance of their memories.
+Focus on identifying patterns, emotional themes, and potential insights from the user's memories.
+Respond with thoughtful observations and questions that promote deeper understanding.
+Structure your analysis with clear sections addressing different aspects of the memory.
+Maintain an empathetic and supportive tone throughout your analysis.`
+    };
+  }
+  
+  protected async enhanceUserContext(context: any, userId: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return context;
+      }
+      
+      // Get user's memory objects
+      const memories = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.MEMORY,
+        'active',
+        userId
+      );
+      
+      // Add memory statistics
+      const enhancedContext = {
+        ...context,
+        memories: {
+          count: memories.length,
+          recentTitles: memories.slice(0, 5).map(mem => mem.metadata.title),
+          oldestDate: memories.length > 0 
+            ? memories.reduce((oldest, mem) => 
+                mem.createdAt.toDate() < oldest.toDate() ? mem.createdAt : oldest, 
+                memories[0].createdAt)
+            : null,
+          newestDate: memories.length > 0
+            ? memories.reduce((newest, mem) => 
+                mem.createdAt.toDate() > newest.toDate() ? mem.createdAt : newest, 
+                memories[0].createdAt)
+            : null
+        }
+      };
+      
+      return enhancedContext;
+    } catch (error) {
+      console.error(`Error enhancing user context for Dr. Memoria (${userId}):`, error);
+      return context;
+    }
+  }
+  
+  protected async getAgentSpecificData(userId: string, message: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return {};
+      }
+      
+      // Extract key terms from the message
+      const terms = this.extractKeyTerms(message);
+      
+      // Search for relevant memories using extracted terms
+      const relatedMemories: any[] = [];
+      
+      for (const term of terms) {
+        const memories = await this.s2doManager.searchObjects(
+          userId,
+          {
+            objectType: S2DOObjectType.MEMORY,
+            title: term
+          },
+          'active'
+        );
+        
+        for (const memory of memories) {
+          // Check if this memory is already in the list
+          if (!relatedMemories.some(m => m.id === memory.id)) {
+            relatedMemories.push({
+              id: memory.id,
+              title: memory.metadata.title,
+              description: memory.metadata.description,
+              createdAt: memory.createdAt.toDate().toISOString(),
+              relevanceTerm: term
+            });
+          }
+        }
+      }
+      
+      // Get memory pattern statistics
+      const memoryPatterns = await this.analyzeMemoryPatterns(userId);
+      
+      return {
+        relatedMemories: relatedMemories.slice(0, 5),
+        extractedTerms: terms,
+        memoryPatterns,
+        memoryRecommendations: this.generateMemoryRecommendations(memoryPatterns)
+      };
+    } catch (error) {
+      console.error(`Error getting Dr. Memoria specific data (${userId}):`, error);
+      return {};
+    }
+  }
+  
+  /**
+   * Extract key terms from message
+   */
+  private extractKeyTerms(message: string): string[] {
+    // Split message into words and filter out common stop words
+    const stopWords = [
+      'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+      'with', 'about', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+      'have', 'has', 'had', 'do', 'does', 'did', 'i', 'you', 'he', 'she', 
+      'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our', 'their'
+    ];
+    
+    const words = message.toLowerCase()
+      .replace(/[^\w\s]/g, '') // Remove punctuation
+      .split(/\s+/) // Split on whitespace
+      .filter(word => word.length > 2 && !stopWords.includes(word)); // Filter stop words and short words
+    
+    // Count word frequencies
+    const wordFreq: Record<string, number> = {};
+    for (const word of words) {
+      wordFreq[word] = (wordFreq[word] || 0) + 1;
+    }
+    
+    // Extract phrases (2-3 words)
+    const phrases: string[] = [];
+    const wordArray = message.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+    
+    for (let i = 0; i < wordArray.length - 1; i++) {
+      // Two-word phrases
+      if (wordArray[i].length > 2 && wordArray[i+1].length > 2) {
+        phrases.push(`${wordArray[i]} ${wordArray[i+1]}`);
+      }
+      
+      // Three-word phrases
+      if (i < wordArray.length - 2 && wordArray[i].length > 2 && 
+          wordArray[i+1].length > 2 && wordArray[i+2].length > 2) {
+        phrases.push(`${wordArray[i]} ${wordArray[i+1]} ${wordArray[i+2]}`);
+      }
+    }
+    
+    // Sort words by frequency and get top 5
+    const topWords = Object.entries(wordFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([word]) => word);
+    
+    // Combine top words and phrases
+    const terms = [...topWords, ...phrases.slice(0, 5)];
+    
+    // Deduplicate and return
+    return [...new Set(terms)];
+  }
+  
+  /**
+   * Analyze memory patterns
+   */
+  private async analyzeMemoryPatterns(userId: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return {};
+      }
+      
+      // Get all user memories
+      const memories = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.MEMORY,
+        'active',
+        userId
+      );
+      
+      if (memories.length === 0) {
+        return {
+          totalMemories: 0,
+          timePeriods: [],
+          commonThemes: []
+        };
+      }
+      
+      // Analyze creation timestamps
+      const timestamps = memories.map(mem => mem.createdAt.toDate().getTime());
+      const oldestTimestamp = Math.min(...timestamps);
+      const newestTimestamp = Math.max(...timestamps);
+      
+      // Create time period buckets (divide into 5 periods)
+      const periodSize = (newestTimestamp - oldestTimestamp) / 5;
+      const timePeriods: Record<string, number> = {};
+      
+      for (let i = 0; i < 5; i++) {
+        const startTime = oldestTimestamp + (i * periodSize);
+        const endTime = startTime + periodSize;
+        const periodLabel = `Period ${i + 1}`;
+        
+        timePeriods[periodLabel] = memories.filter(
+          mem => {
+            const timestamp = mem.createdAt.toDate().getTime();
+            return timestamp >= startTime && timestamp < endTime;
+          }
+        ).length;
+      }
+      
+      // Analyze themes from tags
+      const allTags: string[] = [];
+      memories.forEach(mem => {
+        if (mem.metadata.tags && Array.isArray(mem.metadata.tags)) {
+          allTags.push(...mem.metadata.tags);
+        }
+      });
+      
+      // Count tag frequencies
+      const tagFreq: Record<string, number> = {};
+      for (const tag of allTags) {
+        tagFreq[tag] = (tagFreq[tag] || 0) + 1;
+      }
+      
+      // Get top themes
+      const commonThemes = Object.entries(tagFreq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([tag, count]) => ({ tag, count }));
+      
+      return {
+        totalMemories: memories.length,
+        timePeriods,
+        commonThemes
+      };
+    } catch (error) {
+      console.error(`Error analyzing memory patterns for ${userId}:`, error);
+      return {
+        totalMemories: 0,
+        timePeriods: [],
+        commonThemes: []
+      };
+    }
+  }
+  
+  /**
+   * Generate memory recommendations
+   */
+  private generateMemoryRecommendations(patterns: any): string[] {
+    const recommendations: string[] = [];
+    
+    // If no memories, recommend starting a memory journal
+    if (patterns.totalMemories === 0) {
+      recommendations.push('Start a memory journal to record significant events');
+      recommendations.push('Begin with a memorable childhood experience');
+      recommendations.push('Record a recent meaningful moment in detail');
+      return recommendations;
+    }
+    
+    // If few memories, recommend increasing recording frequency
+    if (patterns.totalMemories < 5) {
+      recommendations.push('Increase the frequency of memory recording');
+      recommendations.push('Set a regular schedule for memory journaling');
+    }
+    
+    // If imbalanced time periods, recommend focusing on underrepresented periods
+    const periodCounts = Object.values(patterns.timePeriods) as number[];
+    const maxPeriodCount = Math.max(...periodCounts);
+    const minPeriodCount = Math.min(...periodCounts);
+    
+    if (maxPeriodCount > minPeriodCount * 3) {
+      recommendations.push('Focus on recording memories from underrepresented time periods');
+    }
+    
+    // If common themes exist, recommend exploring related topics
+    if (patterns.commonThemes.length > 0) {
+      const topTheme = patterns.commonThemes[0].tag;
+      recommendations.push(`Explore more memories related to "${topTheme}"`);
+    }
+    
+    // Add general recommendations if needed
+    if (recommendations.length < 3) {
+      recommendations.push('Add more sensory details to existing memories');
+      recommendations.push('Connect related memories to build meaningful narratives');
+      recommendations.push('Record emotional context along with event details');
+    }
+    
+    return recommendations.slice(0, 3);
+  }
+}
+
+/**
+ * Dr. Lucy Adapter
+ * Specializes in dream interpretation and visualization
+ */
+export class DrLucyAdapter extends BaseAgentAdapter {
+  constructor(aiConnector: AIConnector, s2doManager: S2DOManager | null = null) {
+    super(
+      aiConnector,
+      PilotType.DR_LUCY_R1_CORE_01,
+      'Dr. Lucy',
+      'Dream interpretation and visualization specialist',
+      [
+        'dream_interpretation',
+        'visualization_creation',
+        'pattern_recognition',
+        'symbolic_analysis',
+        'creative_guidance',
+        'imagination_enhancement'
+      ],
+      s2doManager
+    );
+    
+    // Initialize sample prompts
+    this.samplePrompts = [
+      "Can you interpret this dream I had last night?",
+      "Help me visualize a peaceful mountain scene",
+      "What might this recurring dream symbol mean?",
+      "Create a guided visualization for relaxation",
+      "I need help understanding the imagery in my dream",
+      "Generate a visualization for creative inspiration",
+      "What patterns do you see in my recent dreams?"
+    ];
+  }
+  
+  protected initializeSystemPrompts(): void {
+    this.systemPrompts = {
+      standard: `You are Dr. Lucy, a dream interpretation and visualization specialist in the AIXTIV SYMPHONY system.
+Your purpose is to help users understand their dreams and create vivid mental imagery through guided visualization.
+Focus on symbolic analysis, pattern recognition, and providing thoughtful interpretations of dream content.
+Respond with creativity, insight, and a thoughtful tone that acknowledges the personal nature of dreams.
+Structure your detailed responses with clear sections to enhance readability.
+Avoid making definitive claims about what dreams "mean" - instead offer possibilities and perspectives.
+When appropriate, suggest ways the user might explore the themes of their dreams in waking life.`,
+
+      dream_interpretation: `You are Dr. Lucy, specializing in dream interpretation in the AIXTIV SYMPHONY system.
+Your task is to help the user understand the possible meanings and significance of their dreams.
+Focus on analyzing symbols, emotions, narratives, and patterns in the dream content.
+Structure your interpretation with these sections:
+1. Key Symbols - Identify and interpret major symbols
+2. Emotional Landscape - Analyze the emotional content
+3. Potential Meanings - Offer several possible interpretations
+4. Patterns & Connections - Note any patterns or connections to the user's life if mentioned
+5. Reflective Questions - Provide thoughtful questions for the user to consider
+
+Respond with insight and nuance, acknowledging that dream interpretation is subjective.
+Avoid making definitive claims about what the dream "means" - instead offer possibilities.`,
+
+      visualization_creation: `You are Dr. Lucy, specializing in visualization creation in the AIXTIV SYMPHONY system.
+Your task is to help the user create vivid mental imagery for relaxation, creativity, or personal growth.
+Focus on crafting detailed, sensory-rich guided visualizations based on the user's request.
+Structure your visualization with a clear beginning, middle, and end.
+Include specific sensory details (visual, auditory, tactile, etc.) to enhance immersion.
+Use a soothing, rhythmic language pattern appropriate for guided imagery.
+Respond with creativity and adaptability to the user's specific visualization needs.`,
+
+      pattern_recognition: `You are Dr. Lucy, specializing in pattern recognition in the AIXTIV SYMPHONY system.
+Your task is to help the user identify patterns, recurring themes, and connections in their dreams or visualizations.
+Focus on analyzing repetitive elements, emotional themes, and symbolic consistencies.
+Structure your analysis with clear sections addressing different pattern types.
+Connect identified patterns to potential psychological or emotional significance.
+Respond with insight and nuance, avoiding oversimplification of complex dream patterns.`,
+
+      symbolic_analysis: `You are Dr. Lucy, specializing in symbolic analysis in the AIXTIV SYMPHONY system.
+Your task is to help the user understand the symbols and imagery in their dreams or visualizations.
+Focus on analyzing specific symbols, their potential meanings, and their context.
+Draw on cross-cultural symbolic interpretations while prioritizing the user's personal associations.
+Structure your analysis with clear sections for each major symbol or image.
+Respond with depth and nuance, acknowledging that symbols can have multiple valid interpretations.`
+    };
+  }
+  
+  protected async enhanceUserContext(context: any, userId: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return context;
+      }
+      
+      // Get user's dream objects
+      const dreams = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.DREAM,
+        'active',
+        userId
+      );
+      
+      // Get user's visualization objects
+      const visualizations = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.VISUALIZATION,
+        'active',
+        userId
+      );
+      
+      // Add dream and visualization statistics
+      const enhancedContext = {
+        ...context,
+        dreams: {
+          count: dreams.length,
+          recentTitles: dreams.slice(0, 3).map(dream => dream.metadata.title),
+          recordingFrequency: this.calculateRecordingFrequency(dreams)
+        },
+        visualizations: {
+          count: visualizations.length,
+          types: this.categorizeVisualizations(visualizations)
+        }
+      };
+      
+      return enhancedContext;
+    } catch (error) {
+      console.error(`Error enhancing user context for Dr. Lucy (${userId}):`, error);
+      return context;
+    }
+  }
+  
+  protected async getAgentSpecificData(userId: string, message: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return {};
+      }
+      
+      // Determine if this is about dream interpretation or visualization
+      const isDreamInterpretation = this.isDreamInterpretationQuery(message);
+      const isVisualizationRequest = this.isVisualizationRequest(message);
+      
+      // Get appropriate data based on query type
+      if (isDreamInterpretation) {
+        return await this.getDreamInterpretationData(userId, message);
+      } else if (isVisualizationRequest) {
+        return await this.getVisualizationData(userId, message);
+      }
+      
+      // Default to generic data
+      return {
+        queryType: 'general',
+        dreamCount: await this.getDreamCount(userId),
+        visualizationCount: await this.getVisualizationCount(userId),
+        recentDreamSymbols: await this.getRecentDreamSymbols(userId)
+      };
+    } catch (error) {
+      console.error(`Error getting Dr. Lucy specific data (${userId}):`, error);
+      return {};
+    }
+  }
+  
+  /**
+   * Check if message is about dream interpretation
+   */
+  private isDreamInterpretationQuery(message: string): boolean {
+    const dreamKeywords = [
+      'dream', 'dreamt', 'dreamed', 'nightmare', 'sleep', 'interpret',
+      'interpretation', 'meaning', 'symbolize', 'symbol', 'recurring'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return dreamKeywords.some(keyword => lowerMessage.includes(keyword));
+  }
+  
+  /**
+   * Check if message is a visualization request
+   */
+  private isVisualizationRequest(message: string): boolean {
+    const visualizationKeywords = [
+      'visualize', 'visualization', 'imagine', 'imagery', 'picture',
+      'scene', 'scenario', 'guided', 'meditation', 'relaxation'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return visualizationKeywords.some(keyword => lowerMessage.includes(keyword));
+  }
+  
+  /**
+   * Get dream interpretation specific data
+   */
+  private async getDreamInterpretationData(userId: string, message: string): Promise<any> {
+    // Extract symbols from the dream description
+    const symbols = this.extractDreamSymbols(message);
+    
+    // Get previous dream records
+    const dreams = await this.s2doManager?.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.DREAM,
+      'active',
+      userId
+    ) || [];
+    
+    // Find dreams with similar symbols
+    const similarDreams = this.findSimilarDreams(dreams, symbols);
+    
+    // Analyze recurring patterns
+    const patterns = this.analyzeDreamPatterns(dreams);
+    
+    return {
+      queryType: 'dream_interpretation',
+      extractedSymbols: symbols,
+      similarDreams: similarDreams.slice(0, 3).map(dream => ({
+        title: dream.metadata.title,
+        description: dream.metadata.description,
+        createdAt: dream.createdAt.toDate().toISOString(),
+        sharedSymbols: dream.sharedSymbols
+      })),
+      recurringPatterns: patterns,
+      symbolFrequency: this.calculateSymbolFrequency(dreams)
+    };
+  }
+  
+  /**
+   * Get visualization specific data
+   */
+  private async getVisualizationData(userId: string, message: string): Promise<any> {
+    // Determine visualization type
+    const visualizationType = this.determineVisualizationType(message);
+    
+    // Get previous visualizations of similar type
+    const visualizations = await this.s2doManager?.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.VISUALIZATION,
+      'active',
+      userId
+    ) || [];
+    
+    const similarVisualizations = visualizations.filter(v => 
+      v.metadata.tags && 
+      v.metadata.tags.includes(visualizationType)
+    );
+    
+    return {
+      queryType: 'visualization',
+      visualizationType,
+      previousVisualizations: similarVisualizations.slice(0, 2).map(v => ({
+        title: v.metadata.title,
+        description: v.metadata.description,
+        createdAt: v.createdAt.toDate().toISOString()
+      })),
+      preferredElementsFromHistory: this.extractPreferredElements(visualizations)
+    };
+  }
+  
+  /**
+   * Calculate recording frequency from dream objects
+   */
+  private calculateRecordingFrequency(dreams: any[]): string {
+    if (dreams.length < 2) {
+      return 'insufficient data';
+    }
+    
+    // Sort dreams by creation date
+    const sortedDreams = [...dreams].sort(
+      (a, b) => a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime()
+    );
+    
+    // Calculate average days between recordings
+    let totalDays = 0;
+    for (let i = 1; i < sortedDreams.length; i++) {
+      const daysDiff = (sortedDreams[i].createdAt.toDate().getTime() - 
+                       sortedDreams[i-1].createdAt.toDate().getTime()) / (1000 * 60 * 60 * 24);
+      totalDays += daysDiff;
+    }
+    
+    const avgDays = totalDays / (sortedDreams.length - 1);
+    
+    // Categorize frequency
+    if (avgDays < 3) return 'frequent (every few days)';
+    if (avgDays < 7) return 'regular (weekly)';
+    if (avgDays < 14) return 'occasional (bi-weekly)';
+    if (avgDays < 30) return 'infrequent (monthly)';
+    return 'rare (less than monthly)';
+  }
+  
+  /**
+   * Categorize visualization types
+   */
+  private categorizeVisualizations(visualizations: any[]): Record<string, number> {
+    const typeCount: Record<string, number> = {
+      relaxation: 0,
+      creative: 0,
+      guided: 0,
+      descriptive: 0,
+      other: 0
+    };
+    
+    for (const vis of visualizations) {
+      if (!vis.metadata.tags) {
+        typeCount.other++;
+        continue;
+      }
+      
+      const tags = vis.metadata.tags;
+      
+      if (tags.includes('relaxation')) typeCount.relaxation++;
+      else if (tags.includes('creative')) typeCount.creative++;
+      else if (tags.includes('guided')) typeCount.guided++;
+      else if (tags.includes('descriptive')) typeCount.descriptive++;
+      else typeCount.other++;
+    }
+    
+    return typeCount;
+  }
+  
+  /**
+   * Extract symbols from a dream description
+   */
+  private extractDreamSymbols(text: string): string[] {
+    // Common dream symbols to look for
+    const commonSymbols = [
+      'water', 'flying', 'falling', 'teeth', 'house', 'school', 'chase',
+      'death', 'exam', 'test', 'naked', 'car', 'vehicle', 'animal', 'snake',
+      'spider', 'baby', 'child', 'parent', 'friend', 'stranger', 'monster',
+      'door', 'window', 'stairs', 'elevator', 'fire', 'flood', 'storm',
+      'mountain', 'forest', 'ocean', 'river', 'road', 'journey', 'lost'
+    ];
+    
+    const lowerText = text.toLowerCase();
+    const foundSymbols: string[] = [];
+    
+    for (const symbol of commonSymbols) {
+      if (lowerText.includes(symbol)) {
+        foundSymbols.push(symbol);
+      }
+    }
+    
+    // Also extract potential symbols that aren't in the common list
+    const potentialSymbols = text.match(/\b[A-Z][a-z]{4,}\b/g) || [];
+    
+    // Combine and deduplicate
+    return [...new Set([...foundSymbols, ...potentialSymbols])];
+  }
+  
+  /**
+   * Find dreams with similar symbols
+   */
+  private findSimilarDreams(dreams: any[], symbols: string[]): any[] {
+    if (symbols.length === 0 || dreams.length === 0) {
+      return [];
+    }
+    
+    // Score each dream by number of shared symbols
+    const scoredDreams = dreams.map(dream => {
+      const dreamSymbols: string[] = [];
+      
+      // Extract symbols from title and description
+      const title = dream.metadata.title?.toLowerCase() || '';
+      const description = dream.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      const sharedSymbols = symbols.filter(symbol => text.includes(symbol.toLowerCase()));
+      
+      return {
+        ...dream,
+        score: sharedSymbols.length,
+        sharedSymbols
+      };
+    });
+    
+    // Filter dreams with at least one shared symbol and sort by score
+    return scoredDreams
+      .filter(dream => dream.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }
+  
+  /**
+   * Analyze patterns in dream records
+   */
+  private analyzeDreamPatterns(dreams: any[]): string[] {
+    if (dreams.length < 3) {
+      return ['Insufficient dream records to analyze patterns'];
+    }
+    
+    const patterns: string[] = [];
+    
+    // Check for recurring symbols
+    const allSymbols: string[] = [];
+    for (const dream of dreams) {
+      const title = dream.metadata.title?.toLowerCase() || '';
+      const description = dream.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      const dreamSymbols = this.extractDreamSymbols(text);
+      allSymbols.push(...dreamSymbols);
+    }
+    
+    // Count symbol frequencies
+    const symbolFreq: Record<string, number> = {};
+    for (const symbol of allSymbols) {
+      symbolFreq[symbol] = (symbolFreq[symbol] || 0) + 1;
+    }
+    
+    // Identify recurring symbols (appearing in at least 3 dreams)
+    const recurringSymbols = Object.entries(symbolFreq)
+      .filter(([_, count]) => count >= 3)
+      .map(([symbol]) => symbol);
+    
+    if (recurringSymbols.length > 0) {
+      patterns.push(`Recurring symbols: ${recurringSymbols.join(', ')}`);
+    }
+    
+    // Check for recurring themes
+    const themeCounts: Record<string, number> = {
+      chase: 0,
+      flying: 0,
+      falling: 0,
+      unprepared: 0,
+      lost: 0,
+      searching: 0,
+      trapped: 0
+    };
+    
+    for (const dream of dreams) {
+      const title = dream.metadata.title?.toLowerCase() || '';
+      const description = dream.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      if (text.includes('chas') || text.includes('follow')) themeCounts.chase++;
+      if (text.includes('fly') || text.includes('float')) themeCounts.flying++;
+      if (text.includes('fall') || text.includes('drop')) themeCounts.falling++;
+      if (text.includes('unprepared') || text.includes('late') || text.includes('miss')) themeCounts.unprepared++;
+      if (text.includes('lost') || text.includes('can\'t find')) themeCounts.lost++;
+      if (text.includes('search') || text.includes('look for')) themeCounts.searching++;
+      if (text.includes('trap') || text.includes('can\'t escape') || text.includes('stuck')) themeCounts.trapped++;
+    }
+    
+    // Identify recurring themes (appearing in at least 25% of dreams)
+    const threshold = dreams.length * 0.25;
+    const recurringThemes = Object.entries(themeCounts)
+      .filter(([_, count]) => count >= threshold)
+      .map(([theme]) => theme);
+    
+    if (recurringThemes.length > 0) {
+      patterns.push(`Recurring themes: ${recurringThemes.join(', ')}`);
+    }
+    
+    // Check for time patterns
+    const timePatterns = this.analyzeTimePatterns(dreams);
+    if (timePatterns) {
+      patterns.push(timePatterns);
+    }
+    
+    // If no patterns found
+    if (patterns.length === 0) {
+      patterns.push('No clear recurring patterns detected in dream records');
+    }
+    
+    return patterns;
+  }
+  
+  /**
+   * Analyze time patterns in dream records
+   */
+  private analyzeTimePatterns(dreams: any[]): string | null {
+    if (dreams.length < 5) {
+      return null;
+    }
+    
+    // Extract creation timestamps
+    const timestamps = dreams.map(dream => dream.createdAt.toDate());
+    
+    // Count dreams by day of week
+    const dayCountMap: Record<number, number> = {};
+    for (const timestamp of timestamps) {
+      const day = timestamp.getDay();
+      dayCountMap[day] = (dayCountMap[day] || 0) + 1;
+    }
+    
+    // Find most common day
+    const entries = Object.entries(dayCountMap);
+    if (entries.length === 0) return null;
+    
+    const [maxDay, maxCount] = entries.reduce((max, entry) => 
+      entry[1] > max[1] ? entry : max, ['0', 0]);
+    
+    // Check if the pattern is significant (more than 40% of dreams)
+    if (maxCount > dreams.length * 0.4) {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      return `Time pattern: Dreams most frequently recorded on ${days[parseInt(maxDay)]}s (${maxCount} of ${dreams.length} dreams)`;
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Calculate symbol frequency across dreams
+   */
+  private calculateSymbolFrequency(dreams: any[]): Record<string, number> {
+    const symbolCount: Record<string, number> = {};
+    
+    for (const dream of dreams) {
+      const title = dream.metadata.title?.toLowerCase() || '';
+      const description = dream.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      const symbols = this.extractDreamSymbols(text);
+      
+      for (const symbol of symbols) {
+        symbolCount[symbol] = (symbolCount[symbol] || 0) + 1;
+      }
+    }
+    
+    // Sort by frequency and get top symbols
+    return Object.fromEntries(
+      Object.entries(symbolCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+    );
+  }
+  
+  /**
+   * Determine visualization type from request
+   */
+  private determineVisualizationType(message: string): string {
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('relax') || lowerMessage.includes('calm') || lowerMessage.includes('peace')) {
+      return 'relaxation';
+    }
+    
+    if (lowerMessage.includes('guide') || lowerMessage.includes('meditation') || lowerMessage.includes('journey')) {
+      return 'guided';
+    }
+    
+    if (lowerMessage.includes('creat') || lowerMessage.includes('inspir') || lowerMessage.includes('imagin')) {
+      return 'creative';
+    }
+    
+    if (lowerMessage.includes('scene') || lowerMessage.includes('picture') || lowerMessage.includes('image')) {
+      return 'descriptive';
+    }
+    
+    return 'general';
+  }
+  
+  /**
+   * Extract preferred elements from visualization history
+   */
+  private extractPreferredElements(visualizations: any[]): string[] {
+    if (visualizations.length === 0) {
+      return [];
+    }
+    
+    // Common visualization elements to look for
+    const elementTypes = [
+      'water', 'ocean', 'lake', 'river', 'stream',
+      'mountain', 'forest', 'trees', 'garden', 'beach',
+      'sky', 'clouds', 'stars', 'moon', 'sun',
+      'home', 'cabin', 'house', 'room', 'sanctuary',
+      'light', 'darkness', 'color', 'sound', 'music'
+    ];
+    
+    // Count element frequencies
+    const elementCount: Record<string, number> = {};
+    
+    for (const vis of visualizations) {
+      const title = vis.metadata.title?.toLowerCase() || '';
+      const description = vis.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      for (const element of elementTypes) {
+        if (text.includes(element)) {
+          elementCount[element] = (elementCount[element] || 0) + 1;
+        }
+      }
+    }
+    
+    // Get top elements (appearing in at least 2 visualizations)
+    return Object.entries(elementCount)
+      .filter(([_, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .map(([element]) => element)
+      .slice(0, 5);
+  }
+  
+  /**
+   * Get total dream count
+   */
+  private async getDreamCount(userId: string): Promise<number> {
+    const dreams = await this.s2doManager?.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.DREAM,
+      'active',
+      userId
+    ) || [];
+    
+    return dreams.length;
+  }
+  
+  /**
+   * Get total visualization count
+   */
+  private async getVisualizationCount(userId: string): Promise<number> {
+    const visualizations = await this.s2doManager?.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.VISUALIZATION,
+      'active',
+      userId
+    ) || [];
+    
+    return visualizations.length;
+  }
+  
+  /**
+   * Get recent dream symbols
+   */
+  private async getRecentDreamSymbols(userId: string): Promise<string[]> {
+    const dreams = await this.s2doManager?.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.DREAM,
+      'active',
+      userId
+    ) || [];
+    
+    if (dreams.length === 0) {
+      return [];
+    }
+    
+    // Sort dreams by creation date (newest first)
+    const sortedDreams = [...dreams].sort(
+      (a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()
+    );
+    
+    // Get the 3 most recent dreams
+    const recentDreams = sortedDreams.slice(0, 3);
+    
+    // Extract symbols from each dream
+    const allSymbols: string[] = [];
+    for (const dream of recentDreams) {
+      const title = dream.metadata.title?.toLowerCase() || '';
+      const description = dream.metadata.description?.toLowerCase() || '';
+      const text = `${title} ${description}`;
+      
+      const dreamSymbols = this.extractDreamSymbols(text);
+      allSymbols.push(...dreamSymbols);
+    }
+    
+    // Return unique symbols
+    return [...new Set(allSymbols)];
+  }
+}
+
+/**
+ * Dr. Match Adapter
+ * Specializes in profile analysis and networking
+ */
+export class DrMatchAdapter extends BaseAgentAdapter {
+  constructor(aiConnector: AIConnector, s2doManager: S2DOManager | null = null) {
+    super(
+      aiConnector,
+      PilotType.DR_MATCH_PILOT,
+      'Dr. Match',
+      'Profile analysis and networking specialist',
+      [
+        'profile_analysis',
+        'networking_recommendations',
+        'career_guidance',
+        'personal_branding',
+        'connection_optimization',
+        'opportunity_matching'
+      ],
+      s2doManager
+    );
+    
+    // Initialize sample prompts
+    this.samplePrompts = [
+      "Analyze my professional profile",
+      "Suggest improvements for my LinkedIn summary",
+      "How can I optimize my professional connections?",
+      "Give me networking tips for my industry",
+      "Help me develop a personal branding strategy",
+      "What career opportunities match my skills?",
+      "How can I improve my professional bio?"
+    ];
+  }
+  
+  protected initializeSystemPrompts(): void {
+    this.systemPrompts = {
+      standard: `You are Dr. Match, a profile analysis and networking specialist in the AIXTIV SYMPHONY system.
+Your purpose is to help users optimize their professional profiles, improve networking strategies, and develop effective personal branding.
+Focus on providing practical, actionable advice tailored to the user's specific industry, experience level, and career goals.
+Respond with clarity, precision, and professionalism, offering specific examples and templates when helpful.
+Structure your detailed responses with clear sections to enhance readability.
+Avoid generic advice - aim to provide insights that are specifically relevant to the user's situation.
+When appropriate, suggest specific metrics and methods for measuring the effectiveness of networking and branding efforts.`,
+
+      profile_analysis: `You are Dr. Match, specializing in profile analysis in the AIXTIV SYMPHONY system.
+Your task is to analyze the user's professional profile and provide detailed feedback and recommendations.
+Focus on identifying strengths, weaknesses, and opportunities for improvement in all aspects of the profile.
+Structure your analysis with these sections:
+1. Overall Impression - General assessment of profile effectiveness
+2. Strengths - What works well in the profile
+3. Improvement Areas - Specific elements that could be enhanced
+4. Keyword Analysis - Important industry terms and skills to include
+5. Action Steps - Prioritized list of recommended changes
+
+Respond with specific, actionable recommendations rather than general advice.
+Maintain a constructive, professional tone throughout your analysis.`,
+
+      networking_recommendations: `You are Dr. Match, specializing in networking recommendations in the AIXTIV SYMPHONY system.
+Your task is to provide tailored networking strategies and connection recommendations.
+Focus on both online and in-person networking approaches appropriate for the user's industry and goals.
+Structure your recommendations with clear categories (e.g., online platforms, industry events, outreach strategies).
+Include specific examples, templates, or scripts when appropriate.
+Respond with practical, actionable advice that acknowledges networking challenges.
+Maintain a supportive, encouraging tone while being realistic about networking efforts.`,
+
+      personal_branding: `You are Dr. Match, specializing in personal branding in the AIXTIV SYMPHONY system.
+Your task is to help the user develop or refine their personal brand strategy.
+Focus on creating a consistent, authentic, and distinctive professional image across platforms.
+Structure your recommendations with sections on brand elements, content strategy, and platform-specific approaches.
+Include specific examples and metrics for measuring brand effectiveness.
+Respond with creative yet practical advice that aligns with the user's career goals.
+Maintain a professional tone while encouraging authentic self-presentation.`,
+
+      career_guidance: `You are Dr. Match, specializing in career guidance in the AIXTIV SYMPHONY system.
+Your task is to provide strategic advice on career development and opportunity identification.
+Focus on helping the user align their skills, experience, and goals with potential career paths.
+Structure your guidance with sections on skills assessment, industry trends, and specific next steps.
+Include both short-term actions and long-term strategic considerations.
+Respond with balanced, realistic advice that acknowledges both challenges and opportunities.
+Maintain an encouraging tone while providing honest assessment of career options.`
+    };
+  }
+  
+  protected async enhanceUserContext(context: any, userId: string): Promise<any> {
+    try {
+      if (!this.s2doManager) {
+        return context;
+      }
+      
+      // Get user's profile objects
+      const profiles = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.PROFILE,
+        'active',
+        userId
+      );
+      
+      // Check for LinkedIn integration
+      const linkedinIntegration = await this.checkLinkedInIntegration(userId);
+      
+      // Add profile and integration information
+      const enhancedContext = {
+        ...context,
+        profiles: {
+          count: profiles.length,
+          hasLinkedInProfile: profiles.some(p => p.metadata.tags?.includes('linkedin')),
+          lastUpdated: profiles.length > 0 
+            ? profiles.reduce((latest, p) => 
+                p.updatedAt.toDate() > latest.toDate() ? p.updatedAt : latest, 
+                profiles[0].updatedAt)
+            : null
+        },
+        integrations: {
+          linkedin: linkedinIntegration
+        }
+      };
+      
+      return enhancedContext;
+    } catch (error) {
+      console.error(`Error enhancing user context for Dr. Match (${userId}):`, error);
+      return context;
+    }
+  }
+  
+  protected async getAgentSpecificData(userId: string, message: string): Promise<any> {
+    try {
+      // Determine query type
+      const queryType = this.determineQueryType(message);
+      
+      // Get data based on query type
+      switch (queryType) {
+        case 'profile_analysis':
+          return await this.getProfileAnalysisData(userId, message);
+        case 'networking':
+          return await this.getNetworkingData(userId, message);
+        case 'personal_branding':
+          return await this.getPersonalBrandingData(userId, message);
+        case 'career_guidance':
+          return await this.getCareerGuidanceData(userId, message);
+        default:
+          return {
+            queryType: 'general',
+            profileCount: await this.getProfileCount(userId),
+            hasLinkedInIntegration: await this.checkLinkedInIntegration(userId)
+          };
+      }
+    } catch (error) {
+      console.error(`Error getting Dr. Match specific data (${userId}):`, error);
+      return {};
+    }
+  }
+  
+  /**
+   * Determine the type of query
+   */
+  private determineQueryType(message: string): string {
+    const lowerMessage = message.toLowerCase();
+    
+    if (
+      lowerMessage.includes('profile') || 
+      lowerMessage.includes('linkedin') || 
+      lowerMessage.includes('bio') || 
+      lowerMessage.includes('resume')
+    ) {
+      return 'profile_analysis';
+    }
+    
+    if (
+      lowerMessage.includes('network') || 
+      lowerMessage.includes('connect') || 
+      lowerMessage.includes('contact') || 
+      lowerMessage.includes('relationship')
+    ) {
+      return 'networking';
+    }
+    
+    if (
+      lowerMessage.includes('brand') || 
+      lowerMessage.includes('image') || 
+      lowerMessage.includes('presence') || 
+      lowerMessage.includes('reputation')
+    ) {
+      return 'personal_branding';
+    }
+    
+    if (
+      lowerMessage.includes('career') || 
+      lowerMessage.includes('job') || 
+      lowerMessage.includes('opportunity') || 
+      lowerMessage.includes('position')
+    ) {
+      return 'career_guidance';
+    }
+    
+    return 'general';
+  }
+  
+  /**
+   * Check if user has LinkedIn integration
+   */
+  private async checkLinkedInIntegration(userId: string): Promise<boolean> {
+    try {
+      // Query for LinkedIn integration
+      const integrationsQuery = query(
+        collection(db, 'integrationConnections'),
+        where('ownerType', '==', 'user'),
+        where('ownerId', '==', userId),
+        where('connectionType', '==', 'LINKEDIN'),
+        where('status', '==', 'active'),
+        limit(1)
+      );
+      
+      const querySnapshot = await getDocs(integrationsQuery);
+      
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error(`Error checking LinkedIn integration for ${userId}:`, error);
+      return false;
+    }
+  }
+  
+  /**
+   * Get profile count
+   */
+  private async getProfileCount(userId: string): Promise<number> {
+    if (!this.s2doManager) {
+      return 0;
+    }
+    
+    const profiles = await this.s2doManager.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.PROFILE,
+      'active',
+      userId
+    );
+    
+    return profiles.length;
+  }
+  
+  /**
+   * Get profile analysis data
+   */
+  private async getProfileAnalysisData(userId: string, message: string): Promise<any> {
+    if (!this.s2doManager) {
+      return {
+        queryType: 'profile_analysis',
+        profileAvailable: false
+      };
+    }
+    
+    // Get profile data
+    const profiles = await this.s2doManager.getObjectsByOwner(
+      'user',
+      userId,
+      S2DOObjectType.PROFILE,
+      'active',
+      userId
+    );
+    
+    if (profiles.length === 0) {
+      return {
+        queryType: 'profile_analysis',
+        profileAvailable: false,
+        suggestedAction: 'create_profile'
+      };
+    }
+    
+    // Determine which profile to analyze
+    let targetProfile;
+    
+    // Check if message mentions LinkedIn or other specific profile type
+    const lowerMessage = message.toLowerCase();
+    if (lowerMessage.includes('linkedin')) {
+      targetProfile = profiles.find(p => p.metadata.tags?.includes('linkedin'));
+    } else if (lowerMessage.includes('resume')) {
+      targetProfile = profiles.find(p => p.metadata.tags?.includes('resume'));
+    } else if (lowerMessage.includes('website')) {
+      targetProfile = profiles.find(p => p.metadata.tags?.includes('website'));
+    } else {
+      // Default to most recently updated profile
+      targetProfile = profiles.reduce((latest, profile) => 
+        profile.updatedAt.toDate() > latest.updatedAt.toDate() ? profile : latest
+      );
+    }
+    
+    if (!targetProfile) {
+      targetProfile = profiles[0];
+    }
+    
+    // Extract keywords from profile
+    const keywords = await this.extractProfileKeywords(targetProfile);
+    
+    // Generate improvement suggestions
+    const suggestions = await this.generateProfileSuggestions(targetProfile);
+    
+    return {
+      queryType: 'profile_analysis',
+      profileAvailable: true,
+      profileType: targetProfile.metadata.tags?.includes('linkedin') ? 'linkedin' : 'general',
+      keywords,
+      suggestions,
+      lastUpdated: targetProfile.updatedAt.toDate().toISOString(),
+      profileAge: this.calculateProfileAge(targetProfile)
+    };
+  }
+  
+  /**
+   * Get networking data
+   */
+  private async getNetworkingData(userId: string, message: string): Promise<any> {
+    // Check if user has LinkedIn integration
+    const hasLinkedIn = await this.checkLinkedInIntegration(userId);
+    
+    // Get industry from user profile
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    let industry = 'unknown';
+    
+    if (userDoc.exists()) {
+      industry = userDoc.data().userMetadata?.industry || 'unknown';
+    }
+    
+    // Generate industry-specific networking tips
+    const networkingTips = this.generateNetworkingTips(industry);
+    
+    // Check for connection statistics if LinkedIn is integrated
+    let connectionStats = null;
+    if (hasLinkedIn) {
+      connectionStats = await this.getLinkedInConnectionStats(userId);
+    }
+    
+    return {
+      queryType: 'networking',
+      hasLinkedInIntegration: hasLinkedIn,
+      industry,
+      networkingTips,
+      connectionStats,
+      recommendedApproach: this.getRecommendedNetworkingApproach(industry, hasLinkedIn)
+    };
+  }
+  
+  /**
+   * Get personal branding data
+   */
+  private async getPersonalBrandingData(userId: string, message: string): Promise<any> {
+    // Get user profile data
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    
+    if (!userDoc.exists()) {
+      return {
+        queryType: 'personal_branding',
+        brandingElements: this.getDefaultBrandingElements()
+      };
+    }
+    
+    const userData = userDoc.data();
+    
+    // Determine industry and career level
+    const industry = userData.userMetadata?.industry || 'unknown';
+    const position = userData.position || 'unknown';
+    
+    // Generate branding recommendations
+    const brandingElements = this.getBrandingElements(industry, position);
+    
+    // Generate content strategy
+    const contentStrategy = this.generateContentStrategy(industry, position);
+    
+    // Check for existing profile
+    let existingBranding = null;
+    if (this.s2doManager) {
+      const profiles = await this.s2doManager.getObjectsByOwner(
+        'user',
+        userId,
+        S2DOObjectType.PROFILE,
+        'active',
+        userId
+      );
+      
+      if (profiles.length > 0) {
+        // Find profile with branding tag
+        const brandingProfile = profiles.find(p => p.metadata.tags?.includes('branding'));
+        
+        if (brandingProfile) {
+          existingBranding = {
+            created: brandingProfile.createdAt.toDate().toISOString(),
+            lastUpdated: brandingProfile.updatedAt.toDate().toISOString(),
+            elements: brandingProfile.metadata.brandingElements || []
+          };
+        }
+      }
+    }
+    
+    return {
+      queryType: 'personal_branding',
+      industry,
+      position,
+      brandingElements,
+      contentStrategy,
+      existingBranding,
+      platformRecommendations: this.getPlatformRecommendations(industry)
+    };
+  }
+  
+  /**
+   * Get career guidance data
+   */
+  private async getCareerGuidanceData(userId: string, message: string): Promise<any> {
+    // Get user profile data
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    
+    if (!userDoc.exists()) {
+      return {
+        queryType: 'career_guidance',
+        careerOptions: this.getDefaultCareerOptions()
+      };
+    }
+    
+    const userData = userDoc.data();
+    
+    // Determine industry and skills
+    const industry = userData.userMetadata?.industry || 'unknown';
+    const skills = userData.userMetadata?.skills || [];
+    
+    // Generate career path options
+    const careerOptions = this.generateCareerOptions(industry, skills);
+    
+    // Generate skill development recommendations
+    const skillRecommendations = this.generateSkillRecommendations(industry, skills);
+    
+    return {
+      queryType: 'career_guidance',
+      industry,
+      skills,
+      careerOptions,
+      skillRecommendations,
+      industryTrends: this.getIndustryTrends(industry)
+    };
+  }
+  
+  /**
+   * Extract keywords from profile
+   */
+  private async extractProfileKeywords(profile: any): Promise<string[]> {
+    // This would ideally use NLP to extract keywords
+    // For now, we'll use a simple approach
+    
+    // Get profile content
+    let content = '';
+    if (profile.metadata.title) content += profile.metadata.title + ' ';
+    if (profile.metadata.description) content += profile.metadata.description + ' ';
+    
+    // Common professional keywords
+    const commonKeywords = [
+      'experienced', 'leader', 'professional', 'expert', 'specialist',
+      'manager', 'director', 'consultant', 'analyst', 'developer',
+      'engineer', 'designer', 'strategist', 'coordinator', 'executive',
+      'innovative', 'creative', 'analytical', 'dedicated', 'committed',
+      'skilled', 'passionate', 'dynamic', 'results-driven', 'detail-oriented'
+    ];
+    
+    // Check for common keywords
+    const foundKeywords: string[] = [];
+    const lowerContent = content.toLowerCase();
+    
+    for (const keyword of commonKeywords) {
+      if (lowerContent.includes(keyword)) {
+        foundKeywords.push(keyword);
+      }
+    }
+    
+    // Extract industry-specific terms (capitalized phrases)
+    const industryTerms = content.match(/\b[A-Z][a-zA-Z]*\b/g) || [];
+    
+    // Combine and deduplicate
+    return [...new Set([...foundKeywords, ...industryTerms])].slice(0, 10);
+  }
+  
+  /**
+   * Generate profile improvement suggestions
+   */
+  private generateProfileSuggestions(profile: any): string[] {
+    // Basic suggestions that apply to most profiles
+    const suggestions = [
+      'Use specific metrics and achievements rather than general statements',
+      'Ensure your headline clearly communicates your expertise and value proposition',
+      'Include relevant industry keywords throughout your profile to improve searchability'
+    ];
+    
+    // Add suggestions based on profile content
+    const content = profile.metadata.description || '';
+    
+    if (content.length < 200) {
+      suggestions.push('Expand your profile description to provide more detailed information about your experience and expertise');
+    }
+    
+    if (!content.includes('%') && !content.includes('increased') && !content.includes('improved')) {
+      suggestions.push('Add quantifiable results and metrics to demonstrate the impact of your work');
+    }
+    
+    if (content.includes('responsible for') || content.includes('duties include')) {
+      suggestions.push('Replace duty-focused language with accomplishment-focused language');
+    }
+    
+    return suggestions;
+  }
+  
+  /**
+   * Calculate profile age in days
+   */
+  private calculateProfileAge(profile: any): number {
+    const creationDate = profile.createdAt.toDate();
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - creationDate.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  
+  /**
+   * Generate networking tips for specific industry
+   */
+  private generateNetworkingTips(industry: string): string[] {
+    // Basic networking tips that apply to most industries
+    const basicTips = [
+      'Regularly engage with content from your connections to maintain visibility',
+      'Personalize connection requests with context about why you want to connect',
+      'Follow up after networking events with a personalized message',
+      'Share industry insights and thought leadership content to establish expertise'
+    ];
+    
+    // Industry-specific tips
+    const industryTips: Record<string, string[]> = {
+      'technology': [
+        'Participate in open source projects to demonstrate skills and meet fellow developers',
+        'Attend hackathons and tech meetups for hands-on networking opportunities',
+        'Engage in technical forums and communities like Stack Overflow and GitHub'
+      ],
+      'finance': [
+        'Join industry associations like CFA Society or Financial Planning Association',
+        'Attend investor conferences and financial seminars',
+        'Follow and engage with financial thought leaders on platforms like LinkedIn'
+      ],
+      'healthcare': [
+        'Participate in medical conferences and continuing education events',
+        'Join healthcare-specific platforms like Doximity or Sermo',
+        'Volunteer for health-related community initiatives'
+      ],
+      'marketing': [
+        'Create and share case studies demonstrating successful campaigns',
+        'Participate in marketing awards and competitions',
+        'Join industry-specific groups like American Marketing Association'
+      ]
+    };
+    
+    // Combine basic tips with industry-specific tips if available
+    return [
+      ...basicTips,
+      ...(industryTips[industry.toLowerCase()] || [])
+    ];
+  }
+  
+  /**
+   * Get LinkedIn connection statistics
+   */
+  private async getLinkedInConnectionStats(userId: string): Promise<any> {
+    // In a real implementation, this would retrieve actual LinkedIn data
+    // For now, we'll return placeholder statistics
+    
+    return {
+      totalConnections: 273,
+      connectionGrowth: '+12 in the last month',
+      industryBreakdown: {
+        'Same industry': '45%',
+        'Related industries': '30%',
+        'Other industries': '25%'
+      },
+      engagementRate: '18%',
+      topEngagingContent: 'Industry thought leadership'
+    };
+  }
+  
+  /**
+   * Get recommended networking approach
+   */
+  private getRecommendedNetworkingApproach(industry: string, hasLinkedIn: boolean): string {
+    if (!hasLinkedIn) {
+      return 'Focus on establishing a professional online presence, starting with a LinkedIn profile.';
+    }
+    
+    const approaches: Record<string, string> = {
+      'technology': 'Focus on demonstrating technical expertise through project participation and content creation.',
+      'finance': 'Emphasize credibility through certifications and thought leadership on market trends and financial insights.',
+      'healthcare': 'Prioritize professional credibility through specialized knowledge sharing and participation in clinical discussions.',
+      'marketing': 'Showcase creativity and results through portfolio examples and case studies of successful campaigns.'
+    };
+    
+    return approaches[industry.toLowerCase()] || 
+      'Balance quality connections with strategic content sharing to establish your professional brand.';
+  }
+  
+  /**
+   * Get default branding elements
+   */
+  private getDefaultBrandingElements(): string[] {
+    return [
+      'Professional value proposition',
+      'Consistent visual identity',
+      'Authentic voice and communication style',
+      'Area of expertise and thought leadership',
+      'Professional story and journey'
+    ];
+  }
+  
+  /**
+   * Get branding elements for specific industry and position
+   */
+  private getBrandingElements(industry: string, position: string): string[] {
+    // Default elements
+    const elements = this.getDefaultBrandingElements();
+    
+    // Add industry-specific elements
+    const industryElements: Record<string, string[]> = {
+      'technology': [
+        'Technical expertise showcase',
+        'Open source contributions',
+        'Innovation mindset demonstration'
+      ],
+      'finance': [
+        'Market insights and analysis',
+        'Risk management perspective',
+        'Fiduciary approach emphasis'
+      ],
+      'healthcare': [
+        'Patient care philosophy',
+        'Medical expertise demonstration',
+        'Healthcare innovation perspective'
+      ],
+      'marketing': [
+        'Creative portfolio',
+        'Campaign result metrics',
+        'Consumer insight perspective'
+      ]
+    };
+    
+    // Add position-specific elements
+    const positionElements: Record<string, string[]> = {
+      'LEADER': [
+        'Leadership philosophy',
+        'Team development approach',
+        'Strategic vision communication'
+      ],
+      'MEMBER': [
+        'Collaboration approach',
+        'Specialized skill highlight',
+        'Growth mindset demonstration'
+      ],
+      'INDIVIDUAL': [
+        'Unique perspective articulation',
+        'Independent project showcase',
+        'Self-management process'
+      ]
+    };
+    
+    // Combine elements
+    return [
+      ...elements,
+      ...(industryElements[industry.toLowerCase()] || []),
+      ...(positionElements[position] || [])
+    ];
+  }
+  
+  /**
+   * Generate content strategy
+   */
+  private generateContentStrategy(industry: string, position: string): Record<string, string[]> {
+    // Default content types
+    const contentTypes = {
+      'Articles': [
+        'Industry trend analysis',
+        'Professional development insights',
+        'Case studies and success stories'
+      ],
+      'Posts': [
+        'Quick professional tips',
+        'Industry news reactions',
+        'Work milestone celebrations'
+      ],
+      'Comments': [
+        'Thoughtful additions to discussions',
+        'Question-based engagement',
+        'Supportive peer recognition'
+      ]
+    };
+    
+    // Add industry-specific content recommendations
+    if (industry.toLowerCase() === 'technology') {
+      contentTypes['Technical content'] = [
+        'Code samples and snippets',
+        'Architecture diagrams',
+        'Technology comparison analyses'
+      ];
+    } else if (industry.toLowerCase() === 'finance') {
+      contentTypes['Financial analysis'] = [
+        'Market trend reports',
+        'Investment strategy insights',
+        'Regulatory impact assessments'
+      ];
+    } else if (industry.toLowerCase() === 'healthcare') {
+      contentTypes['Clinical insights'] = [
+        'Treatment approach discussions',
+        'Patient care best practices',
+        'Healthcare innovation analyses'
+      ];
+    } else if (industry.toLowerCase() === 'marketing') {
+      contentTypes['Campaign analyses'] = [
+        'Marketing case studies',
+        'Brand strategy breakdowns',
+        'Consumer behavior insights'
+      ];
+    }
+    
+    return contentTypes;
+  }
+  
+  /**
+   * Get platform recommendations
+   */
+  private getPlatformRecommendations(industry: string): Record<string, string> {
+    // Default platform recommendations
+    const recommendations: Record<string, string> = {
+      'LinkedIn': 'Primary professional networking platform for all industries',
+      'Twitter': 'Rapid engagement and trend monitoring',
+      'Medium': 'Long-form content publishing platform'
+    };
+    
+    // Add industry-specific platform recommendations
+    if (industry.toLowerCase() === 'technology') {
+      recommendations['GitHub'] = 'Code portfolio and open source participation';
+      recommendations['Stack Overflow'] = 'Technical expertise demonstration';
+      recommendations['Dev.to'] = 'Developer community engagement';
+    } else if (industry.toLowerCase() === 'finance') {
+      recommendations['Bloomberg'] = 'Financial industry specific networking';
+      recommendations['Financial Times'] = 'Engagement with financial news';
+    } else if (industry.toLowerCase() === 'healthcare') {
+      recommendations['Doximity'] = 'Healthcare professional networking';
+      recommendations['ResearchGate'] = 'Medical research engagement';
+    } else if (industry.toLowerCase() === 'marketing') {
+      recommendations['Behance'] = 'Creative portfolio showcase';
+      recommendations['Instagram'] = 'Visual branding demonstration';
+    }
+    
+    return recommendations;
+  }
+  
+  /**
+   * Get default career options
+   */
+  private getDefaultCareerOptions(): string[] {
+    return [
+      'Specialized individual contributor',
+      'Team or department leadership',
+      'Cross-functional project management',
+      'Consulting or advisory roles',
+      'Entrepreneurship and business ownership'
+    ];
+  }
+  
+  /**
+   * Generate career options for specific industry and skills
+   */
+  private generateCareerOptions(industry: string, skills: string[]): string[] {
+    // Default options
+    const options = this.getDefaultCareerOptions();
+    
+    // Add industry-specific options
+    const industryOptions: Record<string, string[]> = {
+      'technology': [
+        'Technical architect',
+        'Product management',
+        'DevOps leadership',
+        'CTO/CIO track'
+      ],
+      'finance': [
+        'Financial analysis leadership',
+        'Investment management',
+        'Risk management specialization',
+        'CFO track'
+      ],
+      'healthcare': [
+        'Clinical specialization',
+        'Healthcare administration',
+        'Medical research',
+        'Health technology assessment'
+      ],
+      'marketing': [
+        'Brand management',
+        'Digital marketing specialization',
+        'Marketing analytics leadership',
+        'CMO track'
+      ]
+    };
+    
+    // Add skill-based options
+    const skillOptions: string[] = [];
+    const skillMap: Record<string, string[]> = {
+      'programming': [
+        'Software architecture',
+        'Technical lead',
+        'Open source contribution'
+      ],
+      'analysis': [
+        'Business intelligence',
+        'Data science',
+        'Research specialization'
+      ],
+      'communication': [
+        'Training and development',
+        'External relations',
+        'Content strategy'
+      ],
+      'management': [
+        'Team leadership',
+        'Program management',
+        'Organizational development'
+      ]
+    };
+    
+    // Check if any skills match the skill map
+    for (const [skillType, options] of Object.entries(skillMap)) {
+      if (skills.some(skill => skill.toLowerCase().includes(skillType))) {
+        skillOptions.push(...options);
+      }
+    }
+    
+    // Combine options
+    return [
+      ...options,
+      ...(industryOptions[industry.toLowerCase()] || []),
+      ...skillOptions
+    ].slice(0, 7); // Limit to 7 options
+  }
+  
+  /**
+   * Generate skill recommendations
+   */
+  private generateSkillRecommendations(industry: string, currentSkills: string[]): string[] {
+    // Default skill recommendations
+    const recommendations = [
+      'Data analysis and interpretation',
+      'Strategic communication',
+      'Project management',
+      'Leadership and team development'
+    ];
+    
+    // Industry-specific skill recommendations
+    const industrySkills: Record<string, string[]> = {
+      'technology': [
+        'Cloud architecture',
+        'DevOps practices',
+        'Machine learning basics',
+        'API design'
+      ],
+      'finance': [
+        'Financial modeling',
+        'Risk assessment',
+        'Regulatory compliance',
+        'Fintech integration'
+      ],
+      'healthcare': [
+        'Healthcare informatics',
+        'Clinical workflow optimization',
+        'Patient experience design',
+        'Healthcare regulation'
+      ],
+      'marketing': [
+        'Marketing automation',
+        'Customer journey mapping',
+        'Content strategy',
+        'Analytics implementation'
+      ]
+    };
+    
+    // Add industry-specific recommendations
+    const allRecommendations = [
+      ...recommendations,
+      ...(industrySkills[industry.toLowerCase()] || [])
+    ];
+    
+    // Filter out skills the user already has
+    return allRecommendations.filter(skill => 
+      !currentSkills.some(current => 
+        current.toLowerCase().includes(skill.toLowerCase()) ||
+        skill.toLowerCase().includes(current.toLowerCase())
+      )
+    );
+  }
+  
+  /**
+   * Get industry trends
+   */
+  private getIndustryTrends(industry: string): string[] {
+    // Default trends
+    const defaultTrends = [
+      'Remote and hybrid work model adoption',
+      'Increased focus on digital transformation',
+      'Growing emphasis on diversity and inclusion',
+      'Rising importance of sustainability'
+    ];
+    
+    // Industry-specific trends
+    const industryTrends: Record<string, string[]> = {
+      'technology': [
+        'AI and machine learning integration across platforms',
+        'Edge computing growth',
+        'Cybersecurity as a central business priority',
+        'Low-code/no-code development expansion'
+      ],
+      'finance': [
+        'Decentralized finance (DeFi) exploration',
+        'ESG (Environmental, Social, Governance) investment growth',
+        'Digital banking acceleration',
+        'Regulatory technology (RegTech) adoption'
+      ],
+      'healthcare': [
+        'Telehealth and virtual care expansion',
+        'AI in diagnostics and treatment planning',
+        'Value-based care model growth',
+        'Health data interoperability initiatives'
+      ],
+      'marketing': [
+        'First-party data strategy importance',
+        'AI-powered personalization',
+        'Video-first content strategies',
+        'Privacy-focused marketing adaptation'
+      ]
+    };
+    
+    // Combine defaults with industry-specific trends
+    return [
+      ...defaultTrends,
+      ...(industryTrends[industry.toLowerCase()] || [])
+    ];
+  }
+}
+
+/**
+ * Dr. Maria Adapter
+ * Specializes in multilingual communication and cultural adaptation
+ */
+export class DrMariaAdapter extends BaseAgentAdapter {
+  constructor(aiConnector: AIConnector, s2doManager: S2DOManager | null = null) {
+    super(
+      aiConnector,
+      PilotType.DR_MARIA_HISTORICAL_01,
+      'Dr. Maria',
+      'Multilingual communication and cultural adaptation specialist',
+      [
+        'language_translation',
+        'cultural_adaptation',
+        'communication_style_adjustment',
+        'localization',
+        'cross_cultural_guidance',
+        'global_etiquette'
+      ],
+      s2doManager
+    );
+    
+    // Initialize sample prompts
+    this.samplePrompts = [
+      "Translate this message into Spanish",
+      "Help me adapt this email for a Japanese audience",
+      "What cultural considerations should I keep in mind for my meeting with German clients?",
+      "How should I adjust my communication style for a Brazilian context?",
+      "What are appropriate business greetings in South Korea?",
+      "Help me localize this marketing content for a French audience",
+      "What cultural faux pas should I avoid in India?"
+    ];
+  }
+  
+  protected initializeSystemPrompts(): void {
+    this.systemPrompts = {
+      standard: `You are Dr. Maria, a multilingual communication and cultural adaptation specialist in the AIXTIV SYMPHONY system.
+Your purpose is to help users communicate effectively across cultural and linguistic boundaries.
+Focus on providing accurate translations, cultural context, and communication style recommendations.
+Respond with clarity, cultural sensitivity, and attention to nuance.
+Structure your detailed responses with clear sections to enhance readability.
+Avoid stereotypes while acknowledging genuine cultural differences and communication patterns.
+When appropriate, explain the reasoning behind cultural adaptations to help users develop cross-cultural competence.`,
+
+      language_translation: `You are Dr. Maria, specializing in language translation in the AIXTIV SYMPHONY system.
+Your task is to translate content accurately while preserving meaning, tone, and cultural context.
+Focus on creating natural, fluent translations rather than word-for-word equivalents.
+Structure your response with the translation followed by notes on any culturally specific terms or expressions.
+Respond with attention to register, formality level, and audience appropriateness.
+Avoid literal translations that might lose cultural meaning or nuance.
+When appropriate, offer alternatives for idioms or expressions that don't translate directly.`,
+
+      cultural_adaptation: `You are Dr. Maria, specializing in cultural adaptation in the AIXTIV SYMPHONY system.
+Your task is to help the user adapt content or behavior for different cultural contexts.
+Focus on identifying culturally specific elements that may need adjustment.
+Structure your adaptation with clear sections addressing

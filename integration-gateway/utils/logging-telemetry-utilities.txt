@@ -1,0 +1,692 @@
+// src/utils/logging/LoggingService.ts
+
+import { EventEmitter } from 'events';
+
+/**
+ * Log levels
+ */
+export enum LogLevel {
+  TRACE = 0,
+  DEBUG = 1,
+  INFO = 2,
+  WARN = 3,
+  ERROR = 4,
+  FATAL = 5,
+  SILENT = 6
+}
+
+/**
+ * Log entry structure
+ */
+export interface LogEntry {
+  timestamp: number;
+  level: LogLevel;
+  message: string;
+  context?: Record<string, any>;
+  tenantId?: string;
+  userId?: string;
+  correlationId?: string;
+  tags?: string[];
+  source?: string;
+  stackTrace?: string;
+}
+
+/**
+ * Log formatter function type
+ */
+export type LogFormatter = (entry: LogEntry) => string;
+
+/**
+ * Log transport interface - defines how logs are sent/stored
+ */
+export interface LogTransport {
+  name: string;
+  log(entry: LogEntry): Promise<void>;
+  setFormatter(formatter: LogFormatter): void;
+  setMinLevel(level: LogLevel): void;
+  getMinLevel(): LogLevel;
+}
+
+/**
+ * Console transport for logs
+ */
+export class ConsoleTransport implements LogTransport {
+  name: string = 'console';
+  private formatter: LogFormatter;
+  private minLevel: LogLevel;
+  
+  constructor(minLevel: LogLevel = LogLevel.INFO) {
+    this.minLevel = minLevel;
+    this.formatter = this.defaultFormatter;
+  }
+  
+  async log(entry: LogEntry): Promise<void> {
+    if (entry.level < this.minLevel) {
+      return;
+    }
+    
+    const formattedLog = this.formatter(entry);
+    
+    switch (entry.level) {
+      case LogLevel.TRACE:
+      case LogLevel.DEBUG:
+        console.debug(formattedLog);
+        break;
+      case LogLevel.INFO:
+        console.info(formattedLog);
+        break;
+      case LogLevel.WARN:
+        console.warn(formattedLog);
+        break;
+      case LogLevel.ERROR:
+      case LogLevel.FATAL:
+        console.error(formattedLog);
+        break;
+    }
+  }
+  
+  setFormatter(formatter: LogFormatter): void {
+    this.formatter = formatter;
+  }
+  
+  setMinLevel(level: LogLevel): void {
+    this.minLevel = level;
+  }
+  
+  getMinLevel(): LogLevel {
+    return this.minLevel;
+  }
+  
+  private defaultFormatter(entry: LogEntry): string {
+    const timestamp = new Date(entry.timestamp).toISOString();
+    const level = LogLevel[entry.level];
+    let result = `[${timestamp}] [${level}]`;
+    
+    if (entry.tenantId) {
+      result += ` [tenant:${entry.tenantId}]`;
+    }
+    
+    if (entry.correlationId) {
+      result += ` [cid:${entry.correlationId}]`;
+    }
+    
+    result += `: ${entry.message}`;
+    
+    if (entry.context && Object.keys(entry.context).length > 0) {
+      result += `\nContext: ${JSON.stringify(entry.context, null, 2)}`;
+    }
+    
+    if (entry.stackTrace) {
+      result += `\nStack Trace: ${entry.stackTrace}`;
+    }
+    
+    return result;
+  }
+}
+
+/**
+ * File transport for logs
+ */
+export class FileTransport implements LogTransport {
+  name: string = 'file';
+  private formatter: LogFormatter;
+  private minLevel: LogLevel;
+  private filePath: string;
+  
+  constructor(filePath: string, minLevel: LogLevel = LogLevel.INFO) {
+    this.filePath = filePath;
+    this.minLevel = minLevel;
+    this.formatter = this.defaultFormatter;
+  }
+  
+  async log(entry: LogEntry): Promise<void> {
+    if (entry.level < this.minLevel) {
+      return;
+    }
+    
+    const formattedLog = this.formatter(entry);
+    
+    // In a real implementation, we would write to a file
+    // For this example, we'll just console.log with a prefix
+    console.log(`[FILE:${this.filePath}] ${formattedLog}`);
+  }
+  
+  setFormatter(formatter: LogFormatter): void {
+    this.formatter = formatter;
+  }
+  
+  setMinLevel(level: LogLevel): void {
+    this.minLevel = level;
+  }
+  
+  getMinLevel(): LogLevel {
+    return this.minLevel;
+  }
+  
+  private defaultFormatter(entry: LogEntry): string {
+    const timestamp = new Date(entry.timestamp).toISOString();
+    const level = LogLevel[entry.level];
+    return `${timestamp} ${level} ${entry.tenantId ? `[${entry.tenantId}] ` : ''}${entry.message}`;
+  }
+}
+
+/**
+ * Main logging service
+ */
+export class LoggingService extends EventEmitter {
+  private static instance: LoggingService;
+  private transports: Map<string, LogTransport>;
+  private defaultContext: Record<string, any>;
+  private correlationIdProvider?: () => string;
+  
+  private constructor() {
+    super();
+    this.transports = new Map();
+    this.defaultContext = {};
+    this.addTransport(new ConsoleTransport());
+  }
+  
+  /**
+   * Get the singleton instance
+   */
+  static getInstance(): LoggingService {
+    if (!LoggingService.instance) {
+      LoggingService.instance = new LoggingService();
+    }
+    return LoggingService.instance;
+  }
+  
+  /**
+   * Add a transport to the logging service
+   */
+  addTransport(transport: LogTransport): void {
+    this.transports.set(transport.name, transport);
+  }
+  
+  /**
+   * Remove a transport from the logging service
+   */
+  removeTransport(name: string): boolean {
+    return this.transports.delete(name);
+  }
+  
+  /**
+   * Get a transport by name
+   */
+  getTransport(name: string): LogTransport | undefined {
+    return this.transports.get(name);
+  }
+  
+  /**
+   * Set the default context for all logs
+   */
+  setDefaultContext(context: Record<string, any>): void {
+    this.defaultContext = { ...context };
+  }
+  
+  /**
+   * Set a correlation ID provider function
+   */
+  setCorrelationIdProvider(provider: () => string): void {
+    this.correlationIdProvider = provider;
+  }
+  
+  /**
+   * Log a message with the TRACE level
+   */
+  trace(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.TRACE, message, options);
+  }
+  
+  /**
+   * Log a message with the DEBUG level
+   */
+  debug(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.DEBUG, message, options);
+  }
+  
+  /**
+   * Log a message with the INFO level
+   */
+  info(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.INFO, message, options);
+  }
+  
+  /**
+   * Log a message with the WARN level
+   */
+  warn(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.WARN, message, options);
+  }
+  
+  /**
+   * Log a message with the ERROR level
+   */
+  error(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.ERROR, message, options);
+  }
+  
+  /**
+   * Log a message with the FATAL level
+   */
+  fatal(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.FATAL, message, options);
+  }
+  
+  /**
+   * Log an error object with stack trace
+   */
+  logError(error: Error, level: LogLevel = LogLevel.ERROR, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message' | 'stackTrace'>> = {}): void {
+    this.log(level, error.message, {
+      ...options,
+      stackTrace: error.stack,
+      context: {
+        ...options.context,
+        errorName: error.name
+      }
+    });
+  }
+  
+  /**
+   * Create a child logger with a specific context
+   */
+  createChildLogger(context: Record<string, any>): ChildLogger {
+    return new ChildLogger(this, context);
+  }
+  
+  /**
+   * Set the minimum log level for all transports
+   */
+  setMinLogLevel(level: LogLevel): void {
+    for (const transport of this.transports.values()) {
+      transport.setMinLevel(level);
+    }
+  }
+  
+  /**
+   * Core logging method
+   */
+  log(level: LogLevel, message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    const timestamp = Date.now();
+    const correlationId = options.correlationId || (this.correlationIdProvider ? this.correlationIdProvider() : undefined);
+    
+    const entry: LogEntry = {
+      timestamp,
+      level,
+      message,
+      correlationId,
+      context: {
+        ...this.defaultContext,
+        ...options.context
+      },
+      tenantId: options.tenantId,
+      userId: options.userId,
+      tags: options.tags,
+      source: options.source,
+      stackTrace: options.stackTrace
+    };
+    
+    // Send to all transports
+    for (const transport of this.transports.values()) {
+      transport.log(entry).catch(err => {
+        console.error(`Error logging to transport ${transport.name}:`, err);
+      });
+    }
+    
+    // Emit events
+    this.emit('log', entry);
+    this.emit(`log:${LogLevel[level].toLowerCase()}`, entry);
+    
+    if (options.tenantId) {
+      this.emit(`log:tenant:${options.tenantId}`, entry);
+    }
+  }
+}
+
+/**
+ * Child logger with predefined context
+ */
+export class ChildLogger {
+  private parent: LoggingService;
+  private context: Record<string, any>;
+  
+  constructor(parent: LoggingService, context: Record<string, any>) {
+    this.parent = parent;
+    this.context = { ...context };
+  }
+  
+  trace(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.TRACE, message, options);
+  }
+  
+  debug(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.DEBUG, message, options);
+  }
+  
+  info(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.INFO, message, options);
+  }
+  
+  warn(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.WARN, message, options);
+  }
+  
+  error(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.ERROR, message, options);
+  }
+  
+  fatal(message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.log(LogLevel.FATAL, message, options);
+  }
+  
+  logError(error: Error, level: LogLevel = LogLevel.ERROR, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message' | 'stackTrace'>> = {}): void {
+    this.parent.logError(error, level, {
+      ...options,
+      context: {
+        ...this.context,
+        ...options.context
+      }
+    });
+  }
+  
+  private log(level: LogLevel, message: string, options: Partial<Omit<LogEntry, 'timestamp' | 'level' | 'message'>> = {}): void {
+    this.parent.log(level, message, {
+      ...options,
+      context: {
+        ...this.context,
+        ...options.context
+      }
+    });
+  }
+}
+
+// Telemetry section
+
+/**
+ * Types of metrics
+ */
+export enum MetricType {
+  COUNTER = 'counter',
+  GAUGE = 'gauge',
+  HISTOGRAM = 'histogram',
+  SUMMARY = 'summary'
+}
+
+/**
+ * Metric value type
+ */
+export type MetricValue = number;
+
+/**
+ * Metric interface
+ */
+export interface Metric {
+  name: string;
+  type: MetricType;
+  description?: string;
+  value: MetricValue;
+  labels?: Record<string, string>;
+  timestamp: number;
+  tenantId?: string;
+}
+
+/**
+ * Metric reporter interface
+ */
+export interface MetricReporter {
+  name: string;
+  report(metric: Metric): Promise<void>;
+}
+
+/**
+ * Console metric reporter
+ */
+export class ConsoleMetricReporter implements MetricReporter {
+  name: string = 'console';
+  
+  async report(metric: Metric): Promise<void> {
+    const timestamp = new Date(metric.timestamp).toISOString();
+    const labels = metric.labels ? Object.entries(metric.labels).map(([k, v]) => `${k}="${v}"`).join(', ') : '';
+    
+    console.log(`[METRIC] ${timestamp} ${metric.name}{${labels}} ${metric.type}=${metric.value}${metric.tenantId ? ` tenant="${metric.tenantId}"` : ''}`);
+  }
+}
+
+/**
+ * Telemetry service for metrics collection
+ */
+export class TelemetryService extends EventEmitter {
+  private static instance: TelemetryService;
+  private reporters: Map<string, MetricReporter>;
+  private metrics: Map<string, Metric>;
+  private defaultLabels: Record<string, string>;
+  
+  private constructor() {
+    super();
+    this.reporters = new Map();
+    this.metrics = new Map();
+    this.defaultLabels = {};
+    this.addReporter(new ConsoleMetricReporter());
+  }
+  
+  /**
+   * Get the singleton instance
+   */
+  static getInstance(): TelemetryService {
+    if (!TelemetryService.instance) {
+      TelemetryService.instance = new TelemetryService();
+    }
+    return TelemetryService.instance;
+  }
+  
+  /**
+   * Add a metric reporter
+   */
+  addReporter(reporter: MetricReporter): void {
+    this.reporters.set(reporter.name, reporter);
+  }
+  
+  /**
+   * Remove a metric reporter
+   */
+  removeReporter(name: string): boolean {
+    return this.reporters.delete(name);
+  }
+  
+  /**
+   * Set default labels for all metrics
+   */
+  setDefaultLabels(labels: Record<string, string>): void {
+    this.defaultLabels = { ...labels };
+  }
+  
+  /**
+   * Create or increment a counter
+   */
+  incrementCounter(
+    name: string,
+    increment: number = 1,
+    options: {
+      labels?: Record<string, string>;
+      description?: string;
+      tenantId?: string;
+    } = {}
+  ): MetricValue {
+    const metricKey = this.getMetricKey(name, options.labels || {}, options.tenantId);
+    const existingMetric = this.metrics.get(metricKey);
+    
+    const value = (existingMetric?.value || 0) + increment;
+    
+    const metric: Metric = {
+      name,
+      type: MetricType.COUNTER,
+      description: options.description || existingMetric?.description,
+      value,
+      labels: {
+        ...this.defaultLabels,
+        ...options.labels
+      },
+      timestamp: Date.now(),
+      tenantId: options.tenantId
+    };
+    
+    this.metrics.set(metricKey, metric);
+    this.reportMetric(metric);
+    
+    return value;
+  }
+  
+  /**
+   * Set a gauge value
+   */
+  setGauge(
+    name: string,
+    value: number,
+    options: {
+      labels?: Record<string, string>;
+      description?: string;
+      tenantId?: string;
+    } = {}
+  ): void {
+    const metric: Metric = {
+      name,
+      type: MetricType.GAUGE,
+      description: options.description,
+      value,
+      labels: {
+        ...this.defaultLabels,
+        ...options.labels
+      },
+      timestamp: Date.now(),
+      tenantId: options.tenantId
+    };
+    
+    const metricKey = this.getMetricKey(name, options.labels || {}, options.tenantId);
+    this.metrics.set(metricKey, metric);
+    this.reportMetric(metric);
+  }
+  
+  /**
+   * Record a value for a histogram
+   */
+  recordHistogram(
+    name: string,
+    value: number,
+    options: {
+      labels?: Record<string, string>;
+      description?: string;
+      tenantId?: string;
+    } = {}
+  ): void {
+    const metric: Metric = {
+      name,
+      type: MetricType.HISTOGRAM,
+      description: options.description,
+      value,
+      labels: {
+        ...this.defaultLabels,
+        ...options.labels
+      },
+      timestamp: Date.now(),
+      tenantId: options.tenantId
+    };
+    
+    this.reportMetric(metric);
+  }
+  
+  /**
+   * Time a function execution
+   */
+  async timeExecution<T>(
+    name: string,
+    fn: () => Promise<T> | T,
+    options: {
+      labels?: Record<string, string>;
+      description?: string;
+      tenantId?: string;
+    } = {}
+  ): Promise<T> {
+    const startTime = Date.now();
+    
+    try {
+      const result = await fn();
+      const duration = Date.now() - startTime;
+      
+      this.recordHistogram(name, duration, {
+        ...options,
+        labels: {
+          ...options.labels,
+          status: 'success'
+        }
+      });
+      
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      this.recordHistogram(name, duration, {
+        ...options,
+        labels: {
+          ...options.labels,
+          status: 'error',
+          errorName: error instanceof Error ? error.name : 'Unknown'
+        }
+      });
+      
+      throw error;
+    }
+  }
+  
+  /**
+   * Get all metrics
+   */
+  getAllMetrics(): Metric[] {
+    return Array.from(this.metrics.values());
+  }
+  
+  /**
+   * Reset all metrics
+   */
+  resetMetrics(): void {
+    this.metrics.clear();
+  }
+  
+  /**
+   * Report a metric to all reporters
+   */
+  private reportMetric(metric: Metric): void {
+    for (const reporter of this.reporters.values()) {
+      reporter.report(metric).catch(err => {
+        console.error(`Error reporting metric to ${reporter.name}:`, err);
+      });
+    }
+    
+    this.emit('metric', metric);
+    this.emit(`metric:${metric.type}`, metric);
+    
+    if (metric.tenantId) {
+      this.emit(`metric:tenant:${metric.tenantId}`, metric);
+    }
+  }
+  
+  /**
+   * Generate a unique key for a metric based on name and labels
+   */
+  private getMetricKey(name: string, labels: Record<string, string>, tenantId?: string): string {
+    const labelString = Object.entries({
+      ...this.defaultLabels,
+      ...labels
+    })
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .map(([k, v]) => `${k}=${v}`)
+      .join(',');
+    
+    return `${name}${tenantId ? `#${tenantId}` : ''}${labelString ? `{${labelString}}` : ''}`;
+  }
+}
+
+export default {
+  LogLevel,
+  LoggingService,
+  TelemetryService
+};
