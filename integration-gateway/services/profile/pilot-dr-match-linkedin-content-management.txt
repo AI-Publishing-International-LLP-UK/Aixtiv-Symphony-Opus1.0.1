@@ -1,0 +1,551 @@
+/**
+ * LinkedIn Content Management Service
+ * Comprehensive implementation of Share on LinkedIn endpoints (202401)
+ */
+
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
+
+/**
+ * Content Upload Metadata Interface
+ */
+export interface ContentUploadMetadata {
+  type: 'document' | 'image' | 'video';
+  filename: string;
+  mimeType: string;
+  fileSize: number;
+  title?: string;
+  description?: string;
+}
+
+/**
+ * Content Management Interface
+ */
+export interface LinkedInContentManagementService {
+  /**
+   * Initialize content upload
+   * @param metadata Content upload metadata
+   */
+  initializeUpload(
+    metadata: ContentUploadMetadata
+  ): Promise<{
+    uploadUrl: string;
+    uploadToken: string;
+    uploadHeaders?: Record<string, string>;
+  }>;
+
+  /**
+   * Upload content to LinkedIn
+   * @param uploadUrl URL for content upload
+   * @param filePath Path to the file
+   * @param metadata Content metadata
+   */
+  uploadContent(
+    uploadUrl: string,
+    filePath: string,
+    metadata: ContentUploadMetadata
+  ): Promise<{
+    contentId: string;
+    publicUrl?: string;
+  }>;
+
+  /**
+   * Finalize video upload
+   * @param videoId Video identifier
+   */
+  finalizeVideoUpload(videoId: string): Promise<{
+    status: string;
+    processedVideoId?: string;
+  }>;
+
+  /**
+   * Create a post with uploaded content
+   * @param contentDetails Post creation details
+   */
+  createPost(contentDetails: {
+    content: {
+      contentId?: string;
+      title?: string;
+      description?: string;
+    };
+    visibility?: 'PUBLIC' | 'CONNECTIONS' | 'PRIVATE';
+    targetAudience?: {
+      industries?: string[];
+      jobTitles?: string[];
+    };
+  }): Promise<{
+    postUrn: string;
+    shareUrl: string;
+  }>;
+
+  /**
+   * Update an existing post
+   * @param postUrn URN of the post to update
+   * @param updateDetails Post update details
+   */
+  updatePost(
+    postUrn: string,
+    updateDetails: {
+      content?: {
+        title?: string;
+        description?: string;
+      };
+      visibility?: 'PUBLIC' | 'CONNECTIONS' | 'PRIVATE';
+    }
+  ): Promise<{
+    postUrn: string;
+    updatedAt: number;
+  }>;
+
+  /**
+   * Delete a post
+   * @param postUrn URN of the post to delete
+   */
+  deletePost(postUrn: string): Promise<{
+    status: 'DELETED' | 'FAILED';
+  }>;
+
+  /**
+   * List documents associated with an account
+   */
+  listDocuments(options?: {
+    maxResults?: number;
+    pagination?: string;
+  }): Promise<{
+    documents: Array<{
+      id: string;
+      name: string;
+      type: string;
+      createdAt: number;
+    }>;
+    nextPaginationCursor?: string;
+  }>;
+
+  /**
+   * Manage post reactions
+   */
+  manageReactions(options: {
+    action: 'ADD' | 'REMOVE';
+    postUrn: string;
+    reactionType: 'LIKE' | 'CELEBRATE' | 'SUPPORT' | 'FUNNY' | 'LOVE' | 'INSIGHTFUL' | 'CURIOUS';
+  }): Promise<{
+    status: string;
+    reactionUrn?: string;
+  }>;
+}
+
+/**
+ * LinkedIn Content Management Implementation
+ */
+export class DrMatchLinkedInContentManager implements LinkedInContentManagementService {
+  private accessToken: string;
+  private apiVersion: string = '202401';
+
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
+
+  /**
+   * Initialize content upload
+   */
+  async initializeUpload(
+    metadata: ContentUploadMetadata
+  ): Promise<{
+    uploadUrl: string;
+    uploadToken: string;
+    uploadHeaders?: Record<string, string>;
+  }> {
+    const endpoint = metadata.type === 'document' 
+      ? '/rest/documents/initializeUpload'
+      : metadata.type === 'image'
+      ? '/rest/images/initializeUpload'
+      : '/rest/videos/initializeUpload';
+
+    try {
+      const response = await axios.post(
+        `https://api.linkedin.com${endpoint}`,
+        {
+          initializeUploadRequest: {
+            fileSizeBytes: metadata.fileSize,
+            fileNameAndExtension: metadata.filename
+          }
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return {
+        uploadUrl: response.data.uploadUrl,
+        uploadToken: response.data.uploadToken,
+        uploadHeaders: response.data.headers
+      };
+    } catch (error) {
+      console.error('Upload initialization failed', error);
+      throw new Error('Failed to initialize upload');
+    }
+  }
+
+  /**
+   * Upload content to LinkedIn
+   */
+  async uploadContent(
+    uploadUrl: string,
+    filePath: string,
+    metadata: ContentUploadMetadata
+  ): Promise<{
+    contentId: string;
+    publicUrl?: string;
+  }> {
+    try {
+      // Read file
+      const fileStream = fs.createReadStream(filePath);
+      const formData = new FormData();
+      formData.append('file', fileStream);
+
+      // Upload to provided URL
+      const response = await axios.post(uploadUrl, formData, {
+        headers: {
+          ...formData.getHeaders(),
+          'Authorization': `Bearer ${this.accessToken}`,
+          'LinkedIn-Version': this.apiVersion
+        }
+      });
+
+      return {
+        contentId: response.data.id,
+        publicUrl: response.data.publicUrl
+      };
+    } catch (error) {
+      console.error('Content upload failed', error);
+      throw new Error('Failed to upload content');
+    }
+  }
+
+  /**
+   * Finalize video upload
+   */
+  async finalizeVideoUpload(videoId: string): Promise<{
+    status: string;
+    processedVideoId?: string;
+  }> {
+    try {
+      const response = await axios.post(
+        `https://api.linkedin.com/rest/videos/${videoId}/finalizeUpload`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion
+          }
+        }
+      );
+
+      return {
+        status: response.data.status,
+        processedVideoId: response.data.processedVideoId
+      };
+    } catch (error) {
+      console.error('Video upload finalization failed', error);
+      throw new Error('Failed to finalize video upload');
+    }
+  }
+
+  /**
+   * Create a post
+   */
+  async createPost(contentDetails: {
+    content: {
+      contentId?: string;
+      title?: string;
+      description?: string;
+    };
+    visibility?: 'PUBLIC' | 'CONNECTIONS' | 'PRIVATE';
+    targetAudience?: {
+      industries?: string[];
+      jobTitles?: string[];
+    };
+  }): Promise<{
+    postUrn: string;
+    shareUrl: string;
+  }> {
+    try {
+      const response = await axios.post(
+        'https://api.linkedin.com/rest/posts',
+        {
+          author: 'urn:li:organization:coaching2100',
+          commentary: contentDetails.content.description,
+          visibility: contentDetails.visibility || 'PUBLIC',
+          content: {
+            contentEntities: contentDetails.content.contentId ? [{
+              entityLocation: contentDetails.content.contentId,
+              thumbnails: [{
+                resolvedUrl: contentDetails.content.contentId
+              }]
+            }] : undefined,
+            title: contentDetails.content.title
+          },
+          targeting: contentDetails.targetAudience ? {
+            industries: contentDetails.targetAudience.industries,
+            jobTitles: contentDetails.targetAudience.jobTitles
+          } : undefined
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return {
+        postUrn: response.data.urn,
+        shareUrl: response.data.shareUrl
+      };
+    } catch (error) {
+      console.error('Post creation failed', error);
+      throw new Error('Failed to create post');
+    }
+  }
+
+  /**
+   * Update an existing post
+   */
+  async updatePost(
+    postUrn: string,
+    updateDetails: {
+      content?: {
+        title?: string;
+        description?: string;
+      };
+      visibility?: 'PUBLIC' | 'CONNECTIONS' | 'PRIVATE';
+    }
+  ): Promise<{
+    postUrn: string;
+    updatedAt: number;
+  }> {
+    try {
+      const response = await axios.patch(
+        `https://api.linkedin.com/rest/posts/${postUrn}`,
+        {
+          ...(updateDetails.content ? {
+            commentary: updateDetails.content.description,
+            title: updateDetails.content.title
+          } : {}),
+          ...(updateDetails.visibility ? {
+            visibility: updateDetails.visibility
+          } : {})
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion,
+            'Content-Type': 'application/json-patch+json'
+          }
+        }
+      );
+
+      return {
+        postUrn: postUrn,
+        updatedAt: Date.now()
+      };
+    } catch (error) {
+      console.error('Post update failed', error);
+      throw new Error('Failed to update post');
+    }
+  }
+
+  /**
+   * Delete a post
+   */
+  async deletePost(postUrn: string): Promise<{
+    status: 'DELETED' | 'FAILED';
+  }> {
+    try {
+      await axios.delete(
+        `https://api.linkedin.com/rest/posts/${postUrn}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion
+          }
+        }
+      );
+
+      return { status: 'DELETED' };
+    } catch (error) {
+      console.error('Post deletion failed', error);
+      return { status: 'FAILED' };
+    }
+  }
+
+  /**
+   * List documents associated with the account
+   */
+  async listDocuments(options?: {
+    maxResults?: number;
+    pagination?: string;
+  }): Promise<{
+    documents: Array<{
+      id: string;
+      name: string;
+      type: string;
+      createdAt: number;
+    }>;
+    nextPaginationCursor?: string;
+  }> {
+    try {
+      const response = await axios.get(
+        'https://api.linkedin.com/rest/documents',
+        {
+          params: {
+            associatedAccount: 'urn:li:organization:coaching2100',
+            maxResults: options?.maxResults || 10,
+            paginationCursor: options?.pagination
+          },
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'LinkedIn-Version': this.apiVersion
+          }
+        }
+      );
+
+      return {
+        documents: response.data.elements.map((doc: any) => ({
+          id: doc.id,
+          name: doc.name,
+          type: doc.type,
+          createdAt: doc.createdAt
+        })),
+        nextPaginationCursor: response.data.paging?.nextCursor
+      };
+    } catch (error) {
+      console.error('Document listing failed', error);
+      throw new Error('Failed to list documents');
+    }
+  }
+
+  /**
+   * Manage post reactions
+   */
+  async manageReactions(options: {
+    action: 'ADD' | 'REMOVE';
+    postUrn: string;
+    reactionType: 'LIKE' | 'CELEBRATE' | 'SUPPORT' | 'FUNNY' | 'LOVE' | 'INSIGHTFUL' | 'CURIOUS';
+  }): Promise<{
+    status: string;
+    reactionUrn?: string;
+  }> {
+    try {
+      if (options.action === 'ADD') {
+        const response = await axios.post(
+          'https://api.linkedin.com/rest/reactions',
+          {
+            entity: options.postUrn,
+            type: options.reactionType
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'LinkedIn-Version': this.apiVersion,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        return {
+          status: 'ADDED',
+          reactionUrn: response.data.urn
+        };
+      } else {
+        // Find and delete existing reaction
+        const findResponse = await axios.get(
+          'https://api.linkedin.com/rest/reactions',
+          {
+            params: {
+              entity: options.postUrn
+            },
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'LinkedIn-Version': this.apiVersion
+            }
+          }
+        );
+
+        const existingReaction = findResponse.data.elements.find(
+          (r: any) => r.type === options.reactionType
+        );
+
+        if (existingReaction) {
+          await axios.delete(
+            `https://api.linkedin.com/rest/reactions/${existingReaction.urn}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${this.accessToken}`,
+                'LinkedIn-Version': this.apiVersion
+              }
+            }
+          );
+        }
+
+        return { status: 'REMOVED' };
+      }
+    } catch (error) {
+      console.error('Reaction management failed', error);
+      throw new Error('Failed to manage reaction');
+    }
+  }
+}
+
+/**
+ * Demonstration of LinkedIn Content Management
+ */
+async function demonstrateLinkedInContentManagement() {
+  // Assume accessToken is available
+  const contentManager = new DrMatchLinkedInContentManager(accessToken);
+
+  try {
+    // Initialize document upload
+    const uploadInitiation = await contentManager.initializeUpload({
+      type: 'document',
+      filename: 'coaching-insights.pdf',
+      mimeType: 'application/pdf',
+      fileSize: 1024 * 1024 // 1MB
+    });
+
+    // Upload document
+    const uploadedDocument = await contentManager.uploadContent(
+      uploadInitiation.uploadUrl,
+      '/path/to/coaching-insights.pdf',
+      {
+        type: 'document',
+        filename: 'coaching-insights.pdf',
+        mimeType: 'application/pdf',
+        fileSize: 1024 * 1024
+      }
+    );
+
+    // Create a post with the uploaded document
+    const post = await contentManager.createPost({
+      content: {
+        contentId: uploadedDocument.contentId,
+        title: 'Coaching Insights',
+        description: 'Latest strategies for professional growth'
+      },
+      visibility: 'PUBLIC',
+      targetAudience: {
+        industries: ['Professional Services'],
+        jobTitles: ['Business Leader', 'Consultant']
+      }
+    });
+
+    // Add a reaction to the post
+    await contentManager.manageReactions({
+      action: 'ADD',
+      post

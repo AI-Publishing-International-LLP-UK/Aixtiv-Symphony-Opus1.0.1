@@ -1,0 +1,25 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: integration-gateway
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/client-name: "integration-gateway"
+    spec:
+      containers:
+      - image: ${IMAGE_URL}
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        env:
+        - name: NODE_ENV
+          value: ${ENVIRONMENT}
+        # Additional environment variables can be added here
+      serviceAccountName: ${SERVICE_ACCOUNT}
+      timeoutSeconds: 300
+

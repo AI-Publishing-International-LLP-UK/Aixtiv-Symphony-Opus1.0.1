@@ -1,0 +1,864 @@
+// Filter out timestamps older than the time window (60 seconds for most actions)
+    const timeWindowMs = 60 * 1000; // Default to 60 seconds
+    timestamps = timestamps.filter(time => now - time < timeWindowMs);
+    
+    // Add the current timestamp
+    timestamps.push(now);
+    
+    // Update the stored timestamps
+    userMap.set(userId, timestamps);
+    
+    // Get the rate limit configuration
+    const limit = this.getActionRateLimit(action);
+    
+    // Check if exceeding the limit
+    const isExceeded = timestamps.length > limit;
+    
+    // Log rate limit events
+    if (isExceeded) {
+      this.logSecurityEvent({
+        type: SecurityEventType.RATE_LIMIT_EXCEEDED,
+        severity: SecurityEventSeverity.MEDIUM,
+        timestamp: now,
+        userId,
+        action,
+        outcome: 'blocked',
+        details: {
+          limit,
+          actualCount: timestamps.length,
+          timeWindowMs
+        }
+      });
+      
+      // Log rate limit event to performance monitoring
+      performanceMonitor.recordCount('rate_limit_exceeded', 1, {
+        userId,
+        actionType: action
+      });
+    }
+    
+    return isExceeded;
+  }
+  
+  /**
+   * Get the rate limit for an action
+   */
+  private getActionRateLimit(action: string): number {
+    // Default rate limits based on action type
+    if (action === 'auth_attempt') return 10;
+    if (action === 'auth_failure') return 5;
+    if (action.startsWith('access_')) return 5;
+    if (this.options.sensitiveActions.includes(action)) return 3;
+    if (action === 'api_call') return 100;
+    
+    // Default fallback
+    return 20;
+  }
+  
+  /**
+   * Load user behavior baselines from storage
+   */
+  private loadUserBaselines(): void {
+    if (!this.options.userBehaviorBaselineEnabled) return;
+    
+    // In a real implementation, this would load from a database
+    // For now, we'll just initialize with empty baselines
+    
+    // Example loading code:
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const baselineData = localStorage.getItem('aixtiv_user_baselines');
+        if (baselineData) {
+          const baselines = JSON.parse(baselineData) as Array<[string, UserBehaviorBaseline]>;
+          this.userBaselines = new Map(baselines);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user baselines:', error);
+    }
+  }
+  
+  /**
+   * Save user behavior baselines to storage
+   */
+  private saveUserBaselines(): void {
+    if (!this.options.userBehaviorBaselineEnabled) return;
+    
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const baselineData = JSON.stringify(Array.from(this.userBaselines.entries()));
+        localStorage.setItem('aixtiv_user_baselines', baselineData);
+      }
+    } catch (error) {
+      console.error('Error saving user baselines:', error);
+    }
+  }
+  
+  /**
+   * Update user behavior baseline with new activity
+   */
+  private updateUserBaseline(event: SecurityEventRecord): void {
+    if (!event.userId || !this.options.userBehaviorBaselineEnabled) return;
+    
+    const userId = event.userId;
+    let baseline = this.userBaselines.get(userId);
+    
+    if (!baseline) {
+      // Initialize new baseline
+      baseline = {
+        userId,
+        userLevel: event.userLevel || UserAuthLevel.NON_AUTHENTICATED,
+        commonIpAddresses: event.ipAddress ? [event.ipAddress] : [],
+        commonLocations: event.location ? [event.location] : [],
+        commonUserAgents: event.userAgent ? [event.userAgent] : [],
+        commonAccessPatterns: {
+          timeOfDay: Array(24).fill(0),
+          dayOfWeek: Array(7).fill(0),
+          resourceTypes: {},
+          actions: {}
+        },
+        lastActivity: event.timestamp,
+        riskScore: 0
+      };
+    }
+    
+    // Update the baseline with the new activity
+    baseline.lastActivity = event.timestamp;
+    
+    // Update IP addresses (limit to 10 most common)
+    if (event.ipAddress && !baseline.commonIpAddresses.includes(event.ipAddress)) {
+      baseline.commonIpAddresses.push(event.ipAddress);
+      if (baseline.commonIpAddresses.length > 10) {
+        baseline.commonIpAddresses.shift(); // Remove oldest
+      }
+    }
+    
+    // Update locations (limit to 10 most common)
+    if (event.location && !baseline.commonLocations.includes(event.location)) {
+      baseline.commonLocations.push(event.location);
+      if (baseline.commonLocations.length > 10) {
+        baseline.commonLocations.shift(); // Remove oldest
+      }
+    }
+    
+    // Update user agents (limit to 10 most common)
+    if (event.userAgent && !baseline.commonUserAgents.includes(event.userAgent)) {
+      baseline.commonUserAgents.push(event.userAgent);
+      if (baseline.commonUserAgents.length > 10) {
+        baseline.commonUserAgents.shift(); // Remove oldest
+      }
+    }
+    
+    // Update access patterns
+    const date = new Date(event.timestamp);
+    const hour = date.getHours();
+    const day = date.getDay();
+    
+    baseline.commonAccessPatterns.timeOfDay[hour]++;
+    baseline.commonAccessPatterns.dayOfWeek[day]++;
+    
+    if (event.resourceType) {
+      baseline.commonAccessPatterns.resourceTypes[event.resourceType] = 
+        (baseline.commonAccessPatterns.resourceTypes[event.resourceType] || 0) + 1;
+    }
+    
+    baseline.commonAccessPatterns.actions[event.action] = 
+      (baseline.commonAccessPatterns.actions[event.action] || 0) + 1;
+    
+    // Update user level
+    if (event.userLevel !== undefined) {
+      baseline.userLevel = event.userLevel;
+    }
+    
+    // Store the updated baseline
+    this.userBaselines.set(userId, baseline);
+    
+    // Periodically save baselines
+    if (Math.random() < 0.1) { // 10% chance to save on update to reduce writes
+      this.saveUserBaselines();
+    }
+  }
+  
+  /**
+   * Calculate anomaly score for an event
+   * @returns Score between 0-100, higher is more anomalous
+   */
+  private calculateAnomalyScore(event: SecurityEventRecord): number {
+    if (!event.userId || !this.options.anomalyDetectionEnabled) return 0;
+    
+    const baseline = this.userBaselines.get(event.userId);
+    if (!baseline) return 50; // New user = medium risk
+    
+    let score = 0;
+    let factorsConsidered = 0;
+    
+    // Check time pattern
+    const date = new Date(event.timestamp);
+    const hour = date.getHours();
+    const day = date.getDay();
+    
+    // Check if the time of day is unusual
+    const hourFrequency = baseline.commonAccessPatterns.timeOfDay[hour];
+    const totalHours = baseline.commonAccessPatterns.timeOfDay.reduce((a, b) => a + b, 0);
+    if (totalHours > 0) {
+      const hourScore = 100 * (1 - (hourFrequency / totalHours) * 24);
+      score += hourScore;
+      factorsConsidered++;
+    }
+    
+    // Check if the day of week is unusual
+    const dayFrequency = baseline.commonAccessPatterns.dayOfWeek[day];
+    const totalDays = baseline.commonAccessPatterns.dayOfWeek.reduce((a, b) => a + b, 0);
+    if (totalDays > 0) {
+      const dayScore = 100 * (1 - (dayFrequency / totalDays) * 7);
+      score += dayScore;
+      factorsConsidered++;
+    }
+    
+    // Check if IP is unusual
+    if (event.ipAddress && !baseline.commonIpAddresses.includes(event.ipAddress)) {
+      score += 70; // High score for new IP
+      factorsConsidered++;
+    }
+    
+    // Check if location is unusual
+    if (event.location && !baseline.commonLocations.includes(event.location)) {
+      score += 60; // High score for new location
+      factorsConsidered++;
+    }
+    
+    // Check if user agent is unusual
+    if (event.userAgent && !baseline.commonUserAgents.includes(event.userAgent)) {
+      score += 40; // Medium score for new user agent
+      factorsConsidered++;
+    }
+    
+    // Check if action is unusual
+    const actionFrequency = baseline.commonAccessPatterns.actions[event.action] || 0;
+    const totalActions = Object.values(baseline.commonAccessPatterns.actions).reduce((a, b) => a + b, 0);
+    if (totalActions > 0) {
+      if (actionFrequency === 0) {
+        score += 80; // High score for never-before-seen action
+      } else {
+        const actionScore = 100 * (1 - (actionFrequency / totalActions));
+        score += actionScore;
+      }
+      factorsConsidered++;
+    }
+    
+    // Check if resource type is unusual
+    if (event.resourceType) {
+      const resourceFrequency = baseline.commonAccessPatterns.resourceTypes[event.resourceType] || 0;
+      const totalResources = Object.values(baseline.commonAccessPatterns.resourceTypes).reduce((a, b) => a + b, 0);
+      if (totalResources > 0) {
+        if (resourceFrequency === 0) {
+          score += 60; // High score for never-before-seen resource
+        } else {
+          const resourceScore = 100 * (1 - (resourceFrequency / totalResources));
+          score += resourceScore;
+        }
+        factorsConsidered++;
+      }
+    }
+    
+    // Special case: check for session hijacking pattern
+    const timeSinceLastActivity = event.timestamp - baseline.lastActivity;
+    if (
+      timeSinceLastActivity < 300000 && // Less than 5 minutes
+      event.ipAddress && 
+      baseline.commonIpAddresses.length > 0 &&
+      !baseline.commonIpAddresses.includes(event.ipAddress)
+    ) {
+      score += 100; // Very high score for rapid IP change
+      factorsConsidered++;
+    }
+    
+    // Special case: check for privilege escalation
+    if (
+      event.type === SecurityEventType.PRIVILEGE_ESCALATION ||
+      event.type === SecurityEventType.PRIVILEGE_USE
+    ) {
+      score += 50; // Higher base score for privilege-related events
+      factorsConsidered++;
+    }
+    
+    // Special case: sensitive resources
+    if (
+      event.resourceType && 
+      this.options.sensitiveResources.includes(event.resourceType)
+    ) {
+      score += 40; // Higher base score for sensitive resource access
+      factorsConsidered++;
+    }
+    
+    // Calculate final average score (0-100)
+    return factorsConsidered > 0 ? Math.min(100, score / factorsConsidered) : 0;
+  }
+  
+  /**
+   * Check if an IP address is suspicious
+   */
+  private isIpSuspicious(ipAddress?: string): boolean {
+    if (!ipAddress || !this.options.ipReputationCheckEnabled) return false;
+    
+    // Check local cache of suspicious IPs
+    if (this.suspiciousIPs.has(ipAddress)) return true;
+    
+    // In a real implementation, this would check against an IP reputation database
+    // For now, we'll just use a simple pattern check for demonstration
+    
+    // Example: Consider IPs starting with 192.168.0 as suspicious for demo
+    if (ipAddress.startsWith('192.168.0.')) return true;
+    
+    return false;
+  }
+  
+  /**
+   * Check if an action is sensitive
+   */
+  private isActionSensitive(action: string): boolean {
+    return this.options.sensitiveActions.includes(action);
+  }
+  
+  /**
+   * Check if a resource is sensitive
+   */
+  private isResourceSensitive(resourceType?: string): boolean {
+    return !!resourceType && this.options.sensitiveResources.includes(resourceType);
+  }
+  
+  /**
+   * Determine the severity for an event based on context
+   */
+  private determineSeverity(event: Omit<SecurityEventRecord, 'severity'>): SecurityEventSeverity {
+    // High priority event types always get higher severity
+    if (event.type === SecurityEventType.USER_IMPERSONATION_ATTEMPT) {
+      return SecurityEventSeverity.CRITICAL;
+    }
+    
+    if (event.type === SecurityEventType.PRIVILEGE_ESCALATION) {
+      return event.outcome === 'success' ? SecurityEventSeverity.HIGH : SecurityEventSeverity.MEDIUM;
+    }
+    
+    // Auth failures get higher severity after multiple attempts
+    if (event.type === SecurityEventType.AUTH_FAILURE && event.userId) {
+      const failureCount = this.getRecentEventCount(
+        SecurityEventType.AUTH_FAILURE,
+        event.userId,
+        300000 // 5 minutes
+      );
+      
+      if (failureCount >= 5) return SecurityEventSeverity.HIGH;
+      if (failureCount >= 3) return SecurityEventSeverity.MEDIUM;
+    }
+    
+    // Sensitive actions and resources get higher severity
+    if (this.isActionSensitive(event.action)) {
+      return SecurityEventSeverity.MEDIUM;
+    }
+    
+    if (this.isResourceSensitive(event.resourceType)) {
+      return SecurityEventSeverity.MEDIUM;
+    }
+    
+    // S2DO verification failures are high severity
+    if (
+      event.type === SecurityEventType.S2DO_VERIFICATION && 
+      event.s2doVerification && 
+      !event.s2doVerification.verified
+    ) {
+      return SecurityEventSeverity.HIGH;
+    }
+    
+    // Check anomaly score for events with user IDs
+    if (event.userId && this.options.anomalyDetectionEnabled) {
+      const anomalyScore = this.calculateAnomalyScore(event as SecurityEventRecord);
+      
+      if (anomalyScore >= 80) return SecurityEventSeverity.HIGH;
+      if (anomalyScore >= 60) return SecurityEventSeverity.MEDIUM;
+      if (anomalyScore >= 40) return SecurityEventSeverity.LOW;
+    }
+    
+    // Default severity based on event type
+    switch (event.type) {
+      case SecurityEventType.AUTH_SUCCESS:
+        return SecurityEventSeverity.INFO;
+      case SecurityEventType.AUTH_FAILURE:
+        return SecurityEventSeverity.LOW;
+      case SecurityEventType.SUSPICIOUS_ACTIVITY:
+        return SecurityEventSeverity.MEDIUM;
+      case SecurityEventType.RATE_LIMIT_EXCEEDED:
+        return SecurityEventSeverity.LOW;
+      case SecurityEventType.API_ABUSE:
+        return SecurityEventSeverity.MEDIUM;
+      case SecurityEventType.TOKEN_VALIDATION:
+        return event.outcome === 'failure' ? SecurityEventSeverity.MEDIUM : SecurityEventSeverity.INFO;
+      default:
+        return SecurityEventSeverity.INFO;
+    }
+  }
+  
+  /**
+   * Get count of recent events of a specific type for a user
+   */
+  private getRecentEventCount(type: SecurityEventType, userId: string, timeWindowMs: number): number {
+    const now = Date.now();
+    return this.eventBuffer.filter(event => 
+      event.type === type && 
+      event.userId === userId && 
+      now - event.timestamp <= timeWindowMs
+    ).length;
+  }
+  
+  /**
+   * Log a security event
+   */
+  public logSecurityEvent(event: Omit<SecurityEventRecord, 'severity'>): void {
+    // Check if this event type is enabled
+    if (!this.options.enabledEventTypes.includes(event.type)) {
+      return;
+    }
+    
+    // Determine the severity
+    const severity = this.determineSeverity(event);
+    
+    // Create the complete event record
+    const eventRecord: SecurityEventRecord = {
+      ...event,
+      severity,
+      timestamp: event.timestamp || Date.now()
+    };
+    
+    // Apply S2DO verification if required and not already provided
+    if (
+      this.options.s2doVerificationRequired && 
+      !eventRecord.s2doVerification &&
+      (this.isActionSensitive(eventRecord.action) || this.isResourceSensitive(eventRecord.resourceType))
+    ) {
+      // In a real implementation, this would verify the S2DO signature
+      // For now, we'll just mark it as unverified
+      eventRecord.s2doVerification = {
+        verified: false,
+        stem: 'Missing',
+        action: 'Missing'
+      };
+      
+      // Log S2DO verification failure
+      this.logSecurityEvent({
+        type: SecurityEventType.S2DO_VERIFICATION,
+        timestamp: Date.now(),
+        userId: eventRecord.userId,
+        userLevel: eventRecord.userLevel,
+        action: 'verify_s2do',
+        outcome: 'failure',
+        details: {
+          originalEvent: eventRecord.type,
+          originalAction: eventRecord.action,
+          reason: 'Missing S2DO verification'
+        },
+        s2doVerification: {
+          verified: false,
+          stem: 'SecurityAuditor',
+          action: 'VerifyS2DO'
+        }
+      });
+    }
+    
+    // Update user behavior baseline
+    if (eventRecord.userId) {
+      this.updateUserBaseline(eventRecord);
+    }
+    
+    // Store the event if it meets severity threshold
+    if (severity >= this.options.minSeverityForStorage) {
+      this.eventBuffer.push(eventRecord);
+      
+      // Trim buffer if it exceeds max size
+      if (this.eventBuffer.length > this.options.maxEventsInMemory) {
+        this.eventBuffer.shift();
+      }
+    }
+    
+    // Log to console if enabled
+    if (this.options.enableConsoleLogging) {
+      const severityColors = {
+        [SecurityEventSeverity.INFO]: '#6b7280',    // Gray
+        [SecurityEventSeverity.LOW]: '#3b82f6',     // Blue
+        [SecurityEventSeverity.MEDIUM]: '#f59e0b',  // Amber
+        [SecurityEventSeverity.HIGH]: '#ef4444',    // Red
+        [SecurityEventSeverity.CRITICAL]: '#7f1d1d' // Dark red
+      };
+      
+      console.log(
+        `%cSECURITY [${severity.toUpperCase()}] ${event.type}: ${event.action}`,
+        `color: ${severityColors[severity]}; font-weight: bold`,
+        eventRecord
+      );
+    }
+    
+    // Send real-time alert for high severity events
+    if (severity >= this.options.minSeverityForRealTimeAlert) {
+      this.sendRealTimeAlert(eventRecord);
+    }
+    
+    // Track in performance monitoring
+    performanceMonitor.recordCount('security_event', 1, {
+      eventType: eventRecord.type,
+      severity: eventRecord.severity,
+      outcome: eventRecord.outcome,
+      userId: eventRecord.userId
+    });
+  }
+  
+  /**
+   * Send a real-time alert for high severity events
+   */
+  private sendRealTimeAlert(event: SecurityEventRecord): void {
+    // In a real implementation, this would send to a security monitoring system
+    
+    const alertEndpoint = this.options.alertEndpoint || '/api/security/alerts';
+    
+    // Only send if we're in a browser and online
+    if (typeof window !== 'undefined' && navigator.onLine) {
+      fetch(alertEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          event,
+          timestamp: Date.now(),
+          source: 'security_auditor'
+        })
+      }).catch(err => {
+        console.error('Error sending security alert:', err);
+      });
+    }
+  }
+  
+  /**
+   * Flush events to storage
+   */
+  private flushEvents(): void {
+    if (this.eventBuffer.length === 0) return;
+    
+    const events = [...this.eventBuffer];
+    
+    // In a real implementation, this would send to a security event storage system
+    const auditEndpoint = this.options.auditEndpoint || '/api/security/audit-logs';
+    
+    // Only send if we're in a browser and online
+    if (typeof window !== 'undefined' && navigator.onLine) {
+      fetch(auditEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          events,
+          timestamp: Date.now(),
+          batchId: Math.random().toString(36).substring(2, 15)
+        })
+      }).catch(err => {
+        console.error('Error flushing security events:', err);
+      });
+    }
+  }
+  
+  /**
+   * Get recent security events for a user
+   */
+  public getRecentEventsForUser(userId: string, limit: number = 100): SecurityEventRecord[] {
+    return this.eventBuffer
+      .filter(event => event.userId === userId)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
+  }
+  
+  /**
+   * Get security events by type
+   */
+  public getEventsByType(type: SecurityEventType, limit: number = 100): SecurityEventRecord[] {
+    return this.eventBuffer
+      .filter(event => event.type === type)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
+  }
+  
+  /**
+   * Get high severity events
+   */
+  public getHighSeverityEvents(limit: number = 100): SecurityEventRecord[] {
+    return this.eventBuffer
+      .filter(event => 
+        event.severity === SecurityEventSeverity.HIGH || 
+        event.severity === SecurityEventSeverity.CRITICAL
+      )
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, limit);
+  }
+  
+  /**
+   * Get the risk score for a user
+   * @returns Score from 0-100, higher is riskier
+   */
+  public getUserRiskScore(userId: string): number {
+    const baseline = this.userBaselines.get(userId);
+    if (!baseline) return 50; // Default medium risk for unknown users
+    
+    return baseline.riskScore;
+  }
+  
+  /**
+   * Log authentication event
+   */
+  public logAuthEvent(
+    success: boolean,
+    userId: string,
+    userLevel: UserAuthLevel,
+    method: string,
+    ipAddress?: string,
+    userAgent?: string,
+    location?: string,
+    errorDetails?: any
+  ): void {
+    // Check rate limits first
+    const actionType = success ? 'auth_attempt' : 'auth_failure';
+    if (this.checkRateLimit(actionType, userId)) {
+      // Rate limit exceeded, log and return
+      return;
+    }
+    
+    this.logSecurityEvent({
+      type: success ? SecurityEventType.AUTH_SUCCESS : SecurityEventType.AUTH_FAILURE,
+      timestamp: Date.now(),
+      userId,
+      userLevel,
+      ipAddress,
+      userAgent,
+      location,
+      action: `auth_${method}`,
+      outcome: success ? 'success' : 'failure',
+      details: {
+        method,
+        ...(errorDetails ? { error: errorDetails } : {})
+      },
+      s2doVerification: {
+        verified: true, // Auth system is trusted
+        stem: 'AuthService',
+        action: `${success ? 'Login' : 'LoginFailed'}`
+      }
+    });
+  }
+  
+  /**
+   * Log S2DO verification event
+   */
+  public logS2DOVerification(
+    verified: boolean,
+    stem: string,
+    action: string,
+    userId?: string,
+    userLevel?: UserAuthLevel,
+    signature?: string,
+    details?: any
+  ): void {
+    this.logSecurityEvent({
+      type: SecurityEventType.S2DO_VERIFICATION,
+      timestamp: Date.now(),
+      userId,
+      userLevel,
+      action: 'verify_s2do',
+      outcome: verified ? 'success' : 'failure',
+      details: {
+        ...details
+      },
+      s2doVerification: {
+        verified,
+        stem,
+        action,
+        signature
+      }
+    });
+  }
+  
+  /**
+   * Log privilege escalation event
+   */
+  public logPrivilegeEscalation(
+    userId: string,
+    fromLevel: UserAuthLevel,
+    toLevel: UserAuthLevel,
+    method: string,
+    success: boolean,
+    ipAddress?: string,
+    details?: any
+  ): void {
+    // This is always sensitive, so check rate limits
+    if (this.checkRateLimit('upgrade_auth_level', userId)) {
+      // Rate limit exceeded, log and return
+      return;
+    }
+    
+    this.logSecurityEvent({
+      type: SecurityEventType.PRIVILEGE_ESCALATION,
+      timestamp: Date.now(),
+      userId,
+      userLevel: toLevel,
+      ipAddress,
+      action: 'upgrade_auth_level',
+      outcome: success ? 'success' : 'failure',
+      details: {
+        method,
+        fromLevel,
+        toLevel,
+        ...details
+      }
+    });
+  }
+  
+  /**
+   * Log agent access event
+   */
+  public logAgentAccess(
+    userId: string,
+    userLevel: UserAuthLevel,
+    agentId: string,
+    action: string,
+    success: boolean,
+    details?: any
+  ): void {
+    this.logSecurityEvent({
+      type: SecurityEventType.AGENT_ACCESS,
+      timestamp: Date.now(),
+      userId,
+      userLevel,
+      resourceId: agentId,
+      resourceType: 'agent',
+      action,
+      outcome: success ? 'success' : 'failure',
+      details: {
+        ...details
+      }
+    });
+  }
+  
+  /**
+   * Log integration access event
+   */
+  public logIntegrationAccess(
+    userId: string,
+    userLevel: UserAuthLevel,
+    integrationType: IntegrationType,
+    action: string,
+    success: boolean,
+    details?: any
+  ): void {
+    this.logSecurityEvent({
+      type: SecurityEventType.INTEGRATION_ACCESS,
+      timestamp: Date.now(),
+      userId,
+      userLevel,
+      resourceType: 'integration',
+      resourceId: integrationType,
+      action,
+      outcome: success ? 'success' : 'failure',
+      details: {
+        integrationType,
+        ...details
+      }
+    });
+  }
+  
+  /**
+   * Log suspicious activity
+   */
+  public logSuspiciousActivity(
+    userId: string,
+    userLevel: UserAuthLevel,
+    activity: string,
+    details: any,
+    ipAddress?: string
+  ): void {
+    this.logSecurityEvent({
+      type: SecurityEventType.SUSPICIOUS_ACTIVITY,
+      timestamp: Date.now(),
+      userId,
+      userLevel,
+      ipAddress,
+      action: activity,
+      outcome: 'blocked', // Suspicious activities are typically blocked
+      details
+    });
+  }
+}
+
+// Export a singleton instance
+export const securityAuditor = SecurityAuditor.getInstance();
+
+// React hook for using security auditing in components
+import { useEffect, useContext, createContext } from 'react';
+import { useAuth } from '../auth/use-auth-hook';
+
+interface SecurityContextType {
+  logAuthEvent: typeof securityAuditor.logAuthEvent;
+  logS2DOVerification: typeof securityAuditor.logS2DOVerification;
+  logPrivilegeEscalation: typeof securityAuditor.logPrivilegeEscalation;
+  logAgentAccess: typeof securityAuditor.logAgentAccess;
+  logIntegrationAccess: typeof securityAuditor.logIntegrationAccess;
+  logSuspiciousActivity: typeof securityAuditor.logSuspiciousActivity;
+  getUserRiskScore: typeof securityAuditor.getUserRiskScore;
+  getHighSeverityEvents: typeof securityAuditor.getHighSeverityEvents;
+}
+
+const SecurityContext = createContext<SecurityContextType>({
+  logAuthEvent: securityAuditor.logAuthEvent.bind(securityAuditor),
+  logS2DOVerification: securityAuditor.logS2DOVerification.bind(securityAuditor),
+  logPrivilegeEscalation: securityAuditor.logPrivilegeEscalation.bind(securityAuditor),
+  logAgentAccess: securityAuditor.logAgentAccess.bind(securityAuditor),
+  logIntegrationAccess: securityAuditor.logIntegrationAccess.bind(securityAuditor),
+  logSuspiciousActivity: securityAuditor.logSuspiciousActivity.bind(securityAuditor),
+  getUserRiskScore: securityAuditor.getUserRiskScore.bind(securityAuditor),
+  getHighSeverityEvents: securityAuditor.getHighSeverityEvents.bind(securityAuditor)
+});
+
+export const SecurityProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <SecurityContext.Provider value={{
+      logAuthEvent: securityAuditor.logAuthEvent.bind(securityAuditor),
+      logS2DOVerification: securityAuditor.logS2DOVerification.bind(securityAuditor),
+      logPrivilegeEscalation: securityAuditor.logPrivilegeEscalation.bind(securityAuditor),
+      logAgentAccess: securityAuditor.logAgentAccess.bind(securityAuditor),
+      logIntegrationAccess: securityAuditor.logIntegrationAccess.bind(securityAuditor),
+      logSuspiciousActivity: securityAuditor.logSuspiciousActivity.bind(securityAuditor),
+      getUserRiskScore: securityAuditor.getUserRiskScore.bind(securityAuditor),
+      getHighSeverityEvents: securityAuditor.getHighSeverityEvents.bind(securityAuditor)
+    }}>
+      {children}
+    </SecurityContext.Provider>
+  );
+};
+
+export const useSecurity = () => {
+  const context = useContext(SecurityContext);
+  const { authState } = useAuth();
+  
+  useEffect(() => {
+    // Log user activity when auth state changes
+    if (authState.user) {
+      // Get client information
+      const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : undefined;
+      const ipAddress = undefined; // This would come from the server in a real implementation
+      
+      // Log auth state change
+      securityAuditor.logAuthEvent(
+        true,
+        authState.user.uid,
+        authState.user.authLevel,
+        'session_refresh',
+        ipAddress,
+        userAgent
+      );
+    }
+  }, [authState.user]);
+  

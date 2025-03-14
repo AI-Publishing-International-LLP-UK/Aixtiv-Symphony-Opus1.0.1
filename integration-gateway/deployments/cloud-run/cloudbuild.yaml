@@ -1,0 +1,53 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}', '.']
+  
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}']
+  
+  # Substitute environment variables in service.yaml
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        envsubst < deployments/cloud-run/service.yaml > service_substituted.yaml
+    env:
+      - 'IMAGE_URL=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}'
+      - 'ENVIRONMENT=${_ENVIRONMENT}'
+      - 'SERVICE_ACCOUNT=${_SERVICE_ACCOUNT}'
+  
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'replace'
+      - 'service_substituted.yaml'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+  
+  # Create revision tag for easier rollbacks
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'update-traffic'
+      - 'integration-gateway'
+      - '--platform=managed'
+      - '--region=${_REGION}'
+      - '--update-tags=${_ENVIRONMENT}=${SHORT_SHA}'
+
+substitutions:
+  _REGION: us-central1
+  _REPOSITORY: integration-gateway-images
+  _ENVIRONMENT: dev
+  _SERVICE_ACCOUNT: integration-gateway-sa@${PROJECT_ID}.iam.gserviceaccount.com
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
