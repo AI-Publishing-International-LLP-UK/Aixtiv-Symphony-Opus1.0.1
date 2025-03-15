@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" font-weight="bold" fill="#333">Owned Domain Ecosystem Map</text>
+  
+  <!-- Central Hub -->
+  <circle cx="600" cy="350" r="70" fill="#4a86e8" />
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="white">aixtiv.com</text>
+  <text x="600" y="360" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Central Hub</text>
+  
+  <!-- 2100 Family Group -->
+  <rect x="50" y="80" width="200" height="30" rx="5" fill="#6aa84f" />
+  <text x="150" y="100" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">2100 Domains Family</text>
+  
+  <!-- 2100 Domain Family Members -->
+  <circle cx="120" cy="160" r="35" fill="#93c47d" />
+  <text x="120" y="155" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">2100.cool</text>
+  <text x="120" y="170" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">Co-Pilot Showcase</text>
+  <line x1="120" y1="125" x2="120" y2="115" stroke="#93c47d" stroke-width="2" />
+  <line x1="120" y1="115" x2="550" y2="320" stroke="#93c47d" stroke-width="2" />
+  
+  <circle cx="200" cy="160" r="35" fill="#93c47d" />
+  <text x="200" y="155" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">coaching2100.com</text>
+  <text x="200" y="170" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">Executive Coaching</text>
+  <line x1="200" y1="125" x2="200" y2="115" stroke="#93c47d" stroke-width="2" />
+  <line x1="200" y1="115" x2="550" y2="320" stroke="#93c47d" stroke-width="2" />
+  
+  <circle cx="120" cy="240" r="35" fill="#93c47d" />
+  <text x="120" y="235" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">getready2100.com</text>
+  <text x="120" y="250" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">English Learning</text>
+  <line x1="120" y1="205" x2="120" y2="195" stroke="#93c47d" stroke-width="2" />
+  <line x1="120" y1="195" x2="550" y2="330" stroke="#93c47d" stroke-width="2" />
+  
+  <circle cx="200" cy="240" r="35" fill="#93c47d" />
+  <text x="200" y="235" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">preparate2100.mx</text>
+  <text x="200" y="250" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">Spanish Learning</text>
+  <line x1="200" y1="205" x2="200" y2="195" stroke="#93c47d" stroke-width="2" />
+  <line x1="200" y1="195" x2="550" y2="330" stroke="#93c47d" stroke-width="2" />
+  
+  <!-- More 2100 Domains -->
+  <circle cx="160" cy="320" r="30" fill="#93c47d" />
+  <text x="160" y="318" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" font-weight="bold" fill="#333">2100.* TLDs</text>
+  <text x="160" y="330" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">(25+ variants)</text>
+  <line x1="160" y1="290" x2="160" y2="280" stroke="#93c47d" stroke-width="2" />
+  <line x1="160" y1="280" x2="550" y2="340" stroke="#93c47d" stroke-width="2" />
+  
+  <!-- Aixtiv Family Group -->
+  <rect x="50" y="380" width="200" height="30" rx="5" fill="#9fc5e8" />
+  <text x="150" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Aixtiv Family</text>
+  
+  <!-- Aixtiv Family Members -->
+  <circle cx="120" cy="450" r="30" fill="#c9daf8" />
+  <text x="120" y="447" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" font-weight="bold" fill="#333">aixtiv-symphony.com</text>
+  <text x="120" y="460" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">Symphony Platform</text>
+  <line x1="120" y1="420" x2="120" y2="410" stroke="#c9daf8" stroke-width="2" />
+  <line x1="120" y1="410" x2="550" y2="350" stroke="#c9daf8" stroke-width="2" />
+  
+  <circle cx="190" cy="450" r="30" fill="#c9daf8" />
+  <text x="190" y="447" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" font-weight="bold" fill="#333">aixtiv.* TLDs</text>
+  <text x="190" y="460" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">(10+ variants)</text>
+  <line x1="190" y1="420" x2="190" y2="410" stroke="#c9daf8" stroke-width="2" />
+  <line x1="190" y1="410" x2="560" y2="350" stroke="#c9daf8" stroke-width="2" />
+  
+  <!-- "Live" Personas Group -->
+  <rect x="50" y="510" width="200" height="30" rx="5" fill="#e06666" />
+  <text x="150" y="530" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Persona Domains (.live)</text>
+  
+  <!-- Persona Domain Clusters -->
+  <circle cx="100" cy="580" r="35" fill="#f4cccc" />
+  <text x="100" y="575" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" font-weight="bold" fill="#333">Doctor Personas</text>
+  <text x="100" y="590" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">drburby, drmatch, etc.</text>
+  <line x1="100" y1="545" x2="100" y2="540" stroke="#f4cccc" stroke-width="2" />
+  <line x1="100" y1="540" x2="565" y2="380" stroke="#f4cccc" stroke-width="2" />
+  
+  <circle cx="200" cy="580" r="35" fill="#f4cccc" />
+  <text x="200" y="575" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" font-weight="bold" fill="#333">Character Personas</text>
+  <text x="200" y="590" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">thepoet, thevisionary, etc.</text>
+  <line x1="200" y1="545" x2="200" y2="540" stroke="#f4cccc" stroke-width="2" />
+  <line x1="200" y1="540" x2="570" y2="380" stroke="#f4cccc" stroke-width="2" />
+  
+  <!-- AI Companion Group -->
+  <rect x="50" y="640" width="200" height="30" rx="5" fill="#f1c232" />
+  <text x="150" y="660" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">AI Companions (.ai)</text>
+  
+  <!-- AI Companion Domains -->
+  <circle cx="150" cy="710" r="35" fill="#ffd966" />
+  <text x="150" y="705" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" font-weight="bold" fill="#333">AI Personas</text>
+  <text x="150" y="720" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" fill="#333">drmatch.ai, visionaryvoices.ai, etc.</text>
+  <line x1="150" y1="675" x2="150" y2="670" stroke="#ffd966" stroke-width="2" />
+  <line x1="150" y1="670" x2="575" y2="380" stroke="#ffd966" stroke-width="2" />
+  
+  <!-- Command/System Domains Group -->
+  <rect x="900" y="80" width="200" height="30" rx="5" fill="#76a5af" />
+  <text x="1000" y="100" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Command Systems</text>
+  
+  <!-- Command System Domains -->
+  <circle cx="950" cy="160" r="35" fill="#a2c4c9" />
+  <text x="950" y="155" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">dreamcommand.live</text>
+  <text x="950" y="170" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">Task Orchestration</text>
+  <line x1="950" y1="195" x2="950" y2="200" stroke="#a2c4c9" stroke-width="2" />
+  <line x1="950" y1="200" x2="650" y2="320" stroke="#a2c4c9" stroke-width="2" />
+  
+  <circle cx="1050" cy="160" r="35" fill="#a2c4c9" />
+  <text x="1050" y="155" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">*command.live</text>
+  <text x="1050" y="170" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">vision, prediction, etc.</text>
+  <line x1="1050" y1="195" x2="1050" y2="200" stroke="#a2c4c9" stroke-width="2" />
+  <line x1="1050" y1="200" x2="650" y2="330" stroke="#a2c4c9" stroke-width="2" />
+  
+  <!-- Operational Structure Group -->
+  <rect x="900" y="220" width="200" height="30" rx="5" fill="#b4a7d6" />
+  <text x="1000" y="240" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Operational Structure</text>
+  
+  <!-- Operational Structure Domains -->
+  <circle cx="950" cy="300" r="35" fill="#d9d2e9" />
+  <text x="950" y="295" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">Wing/Squadron</text>
+  <text x="950" y="310" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">wing-*.live, squadron-*.live</text>
+  <line x1="950" y1="265" x2="950" y2="255" stroke="#d9d2e9" stroke-width="2" />
+  <line x1="950" y1="255" x2="650" y2="340" stroke="#d9d2e9" stroke-width="2" />
+  
+  <circle cx="1050" cy="300" r="35" fill="#d9d2e9" />
+  <text x="1050" y="295" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">Opus Series</text>
+  <text x="1050" y="310" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">as-opus*.live</text>
+  <line x1="1050" y1="265" x2="1050" y2="255" stroke="#d9d2e9" stroke-width="2" />
+  <line x1="1050" y1="255" x2="650" y2="345" stroke="#d9d2e9" stroke-width="2" />
+  
+  <!-- Governance/Standards Group -->
+  <rect x="900" y="360" width="200" height="30" rx="5" fill="#ea9999" />
+  <text x="1000" y="380" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Governance & Standards</text>
+  
+  <!-- Governance Domains -->
+  <circle cx="1000" cy="440" r="35" fill="#f5b7b1" />
+  <text x="1000" y="435" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">s2do Domains</text>
+  <text x="1000" y="450" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">s2do.live, .org.uk, etc.</text>
+  <line x1="1000" y1="405" x2="1000" y2="395" stroke="#f5b7b1" stroke-width="2" />
+  <line x1="1000" y1="395" x2="650" y2="360" stroke="#f5b7b1" stroke-width="2" />
+  
+  <!-- Specialty Group -->
+  <rect x="900" y="500" width="200" height="30" rx="5" fill="#f1c232" />
+  <text x="1000" y="520" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Specialty Domains</text>
+  
+  <!-- Specialty Domains -->
+  <circle cx="950" cy="580" r="35" fill="#ffd966" />
+  <text x="950" y="575" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">Agency Domains</text>
+  <text x="950" y="590" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">1-c.agency, c2100.agency</text>
+  <line x1="950" y1="545" x2="950" y2="535" stroke="#ffd966" stroke-width="2" />
+  <line x1="950" y1="535" x2="650" y2="370" stroke="#ffd966" stroke-width="2" />
+  
+  <circle cx="1050" cy="580" r="35" fill="#ffd966" />
+  <text x="1050" y="575" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">IP Protection</text>
+  <text x="1050" y="590" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">ai-ip.co, aiip.agency</text>
+  <line x1="1050" y1="545" x2="1050" y2="535" stroke="#ffd966" stroke-width="2" />
+  <line x1="1050" y1="535" x2="650" y2="375" stroke="#ffd966" stroke-width="2" />
+  
+  <!-- Roark Brand Group -->
+  <rect x="900" y="640" width="200" height="30" rx="5" fill="#6aa84f" />
+  <text x="1000" y="660" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="white">Roark Brand</text>
+  
+  <!-- Roark Domains -->
+  <circle cx="1000" cy="710" r="35" fill="#93c47d" />
+  <text x="1000" y="705" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#333">roark.* Domains</text>
+  <text x="1000" y="720" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" fill="#333">.club, .email, .live, .one</text>
+  <line x1="1000" y1="675" x2="1000" y2="670" stroke="#93c47d" stroke-width="2" />
+  <line x1="1000" y1="670" x2="650" y2="380" stroke="#93c47d" stroke-width="2" />
+  
+  <!-- Legend -->
+  <rect x="450" y="780" width="300" height="100" fill="#ffffff" stroke="#cccccc" stroke-width="1" />
+  <text x="600" y="800" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#333">Legend</text>
+  
+  <circle cx="480" cy="825" r="10" fill="#4a86e8" />
+  <text x="500" y="830" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#333">Central Hub Domain</text>
+  
+  <circle cx="480" cy="855" r="10" fill="#93c47d" />
+  <text x="500" y="860" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#333">Primary Domains</text>
+  
+  <circle cx="600" cy="825" r="10" fill="#c9daf8" />
+  <text x="620" y="830" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#333">Platform/Infrastructure</text>
+  
+  <circle cx="600" cy="855" r="10" fill="#f4cccc" />
+  <text x="620" y="860" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#333">Persona/Character Domains</text>
+</svg>

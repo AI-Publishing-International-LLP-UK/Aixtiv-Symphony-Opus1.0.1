@@ -1,0 +1,64 @@
+name: Domain Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain to configure (e.g., vision.coaching2100.com)'
+        required: false
+        type: string
+      environment:
+        description: 'Deployment environment (dev/staging/prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  configure-domain:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure domain settings
+        run: node scripts/domain-all-in-one-cli.js configure
+        env:
+          DOMAIN: ${{ inputs.domain }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+
+      - name: Deploy DNS configuration
+        run: node scripts/domain-all-in-one-cli.js deploy-dns
+        env:
+          DOMAIN: ${{ inputs.domain }}
+          ENVIRONMENT: ${{ inputs.environment }}
+
+      - name: Setup SSL certificates
+        run: node scripts/domain-all-in-one-cli.js setup-ssl
+        env:
+          DOMAIN: ${{ inputs.domain }}
+          ENVIRONMENT: ${{ inputs.environment }}
+
+      - name: Verify deployment
+        run: node scripts/domain-all-in-one-cli.js verify
+        env:
+          DOMAIN: ${{ inputs.domain }}
+          ENVIRONMENT: ${{ inputs.environment }}
+

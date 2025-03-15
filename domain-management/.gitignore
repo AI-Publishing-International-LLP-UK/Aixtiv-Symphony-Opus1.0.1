@@ -1,0 +1,6 @@
+.env
+service-account-key.json
+node_modules/
+*.log
+.DS_Store
+package.json.backup

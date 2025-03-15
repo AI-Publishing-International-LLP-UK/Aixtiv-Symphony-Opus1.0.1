@@ -1,0 +1,173 @@
+# 2100.cool Main Site Configuration
+
+site:
+  domain: 2100.cool
+  title: "2100 Cool"
+  template: main_site_v1
+  theme: 2100_modern
+
+deployment:
+  project_id: api-for-warp-drive
+  region: us-west1-b
+  cloud_run:
+    service: 2100-cool-main
+    domain_mapping: 2100.cool
+
+design:
+  colors:
+    primary: "#000000"
+    secondary: "#FFFFFF"
+    accent: "#FF0000"
+    text: "#333333"
+    background: "#F5F5F5"
+  
+  typography:
+    headings: "Montserrat"
+    body: "Roboto"
+    
+  layout:
+    max_width: "1440px"
+    grid: "16-column"
+
+content:
+  homepage:
+    hero:
+      title: "2100 Cool"
+      subtitle: "Building the Future of Digital Innovation"
+      video_background: true
+      
+    sections:
+      - title: "Services"
+        layout: "grid"
+        items:
+          - title: "AI Integration"
+            description: "Next-generation AI solutions"
+            icon: "ai"
+          - title: "Digital Transformation"
+            description: "Comprehensive digital strategies"
+            icon: "digital"
+          - title: "Innovation Labs"
+            description: "Cutting-edge research and development"
+            icon: "innovation"
+          - title: "Technical Excellence"
+            description: "Best-in-class engineering"
+            icon: "engineering"
+            
+      - title: "Projects"
+        layout: "dynamic-grid"
+        content_type: "portfolio"
+        filter: "featured"
+        
+      - title: "White Label Solutions"
+        layout: "showcase"
+        items:
+          - title: "Zena Harris Works"
+            url: "https://zena.2100.cool"
+            image: "zena-preview.jpg"
+
+  navigation:
+    main:
+      - text: "Home"
+        url: "/"
+      - text: "Services"
+        url: "/services"
+      - text: "Portfolio"
+        url: "/portfolio"
+      - text: "White Label"
+        url: "/white-label"
+      - text: "Contact"
+        url: "/contact"
+
+integrations:
+  analytics:
+    provider: google_analytics
+    id: "UA-XXXXXXXX-X"
+    
+  forms:
+    provider: formspree
+    endpoint: "xyz123"
+    
+  marketing:
+    provider: mailchimp
+    list_id: "abc123"
+
+features:
+  dynamic_portfolio:
+    enabled: true
+    categories:
+      - AI Projects
+      - Digital Transformation
+      - Innovation Labs
+      - White Label Solutions
+      
+  case_studies:
+    enabled: true
+    layout: "detailed"
+    showcase_count: 6
+    
+  team_section:
+    enabled: true
+    layout: "grid"
+    show_roles: true
+    
+  blog:
+    enabled: true
+    posts_per_page: 9
+    categories_enabled: true
+
+security:
+  ssl: true
+  headers:
+    - Content-Security-Policy
+    - X-Frame-Options
+    - X-XSS-Protection
+    - Strict-Transport-Security
+
+performance:
+  caching:
+    enabled: true
+    duration: 3600
+    cdn: true
+    
+  optimization:
+    images: true
+    minification: true
+    compression: true
+    lazy_loading: true
+    
+  prefetching:
+    enabled: true
+    resources:
+      - fonts
+      - critical-images
+      - next-page
+
+monitoring:
+  uptime:
+    check_interval: 30
+    alert_threshold: 99.99
+    
+  performance:
+    metric_collection: true
+    alert_threshold:
+      response_time: 150
+      error_rate: 0.01
+      
+  analytics:
+    real_time: true
+    conversion_tracking: true
+    user_flow_analysis: true
+
+seo:
+  meta_tags:
+    title: "2100 Cool - Digital Innovation & AI Solutions"
+    description: "Leading digital innovation with AI integration, transformation, and white label solutions."
+    keywords: "AI, digital transformation, innovation, technology"
+    
+  social_media:
+    og_image: "2100-social-preview.jpg"
+    twitter_card: "summary_large_image"
+    
+  sitemap:
+    enabled: true
+    update_frequency: "daily"

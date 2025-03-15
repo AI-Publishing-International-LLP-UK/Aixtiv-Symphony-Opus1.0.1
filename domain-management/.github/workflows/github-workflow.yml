@@ -1,0 +1,38 @@
+name: Domain Management Workflow
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'domain-management/config/**'
+      - 'domain-management/scripts/**'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      - name: Install Dependencies
+        run: npm install
+      
+      - name: Validate Domain Configurations
+        run: node ci-cd/scripts/validate-domains.js
+      
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Cloud Run
+        run: ./scripts/deployment.sh
+

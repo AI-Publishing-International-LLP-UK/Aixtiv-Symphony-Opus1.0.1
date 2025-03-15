@@ -1,0 +1,461 @@
+name: Domain Ecosystem Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'users/as/asoos/domain-management/domains/**'
+      - 'users/as/asoos/domain-management/characters/**'
+      - 'users/as/asoos/domain-management/pilots/**'
+      - 'users/as/asoos/domain-management/opus/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'users/as/asoos/domain-management/**'
+  workflow_dispatch:
+    inputs:
+      deployment_type:
+        description: 'Deployment type'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - characters
+          - pilots
+          - opus
+          - brands
+          - command
+      character_group:
+        description: 'Character group (if deployment_type is characters)'
+        required: false
+        type: choice
+        options:
+          - all
+          - apex
+          - mercurials
+          - abuelos
+          - brains
+          - ladies-waiting
+      domain:
+        description: 'Single domain to configure (leave empty for batch processing)'
+        required: false
+        type: string
+      pilot_id:
+        description: 'Specific pilot ID (1-11)'
+        required: false
+        type: string
+      google_verification:
+        description: 'Google verification ID'
+        required: false
+        type: string
+
+env:
+  FIREBASE_PROJECT_ID: api-for-warp-drive
+  NODE_VERSION: '20'
+  CLOUD_RUN_REGION: us-west1
+  DEPLOYMENT_SCRIPT: ./users/as/asoos/domain-management/scripts/deployment.sh
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+
+      - name: Validate domain lists
+        run: |
+          cd users/as/asoos/domain-management
+          node scripts/validate-domains.js
+
+      - name: Validate site mappings
+        run: |
+          cd users/as/asoos/domain-management
+          node scripts/validate-site-mappings.js
+
+  ### CHARACTER DOMAINS DEPLOYMENT ###
+  
+  deploy-character-domains:
+    needs: validate
+    if: ${{ github.event.inputs.deployment_type == 'all' || github.event.inputs.deployment_type == 'characters' || github.event.inputs.deployment_type == null }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        character_group: 
+          - apex
+          - mercurials
+          - abuelos 
+          - brains
+          - ladies-waiting
+        include:
+          - character_group: apex
+            site_id: thehand-live,queen-lucy-live,asoos-live
+            domains: thehand.live,drclaude.live,thepoet.live,queenlucy.live,asoos.live
+          - character_group: mercurials
+            site_id: themercurials-live
+            domains: themercurials.live,drgrant.live,drburby.live
+          - character_group: abuelos
+            site_id: abuelos-live
+            domains: losabuelos.live,drcypriot.live,drmaria.live
+          - character_group: brains
+            site_id: thebrains-live
+            domains: thebrains.live,professorlee.live,drmemoria.live
+          - character_group: ladies-waiting
+            site_id: ladies-waiting-live
+            domains: drsabina.live,drmatch.live
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+          
+      - name: Decode Firebase service account
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | base64 -d > ./users/as/asoos/domain-management/service-account-key.json
+
+      - name: Check specific character group
+        id: check_group
+        run: |
+          if [ "${{ github.event.inputs.character_group }}" != "" ] && [ "${{ github.event.inputs.character_group }}" != "all" ] && [ "${{ github.event.inputs.character_group }}" != "${{ matrix.character_group }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy character domains
+        if: steps.check_group.outputs.skip != 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT_PATH: ./service-account-key.json
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+          GOOGLE_VERIFICATION_ID: ${{ github.event.inputs.google_verification || secrets.GOOGLE_VERIFICATION_ID }}
+          ENABLE_SEO: 'true'
+          GENERATE_SITEMAP: 'true'
+          GENERATE_ROBOTS_TXT: 'true'
+        run: |
+          cd users/as/asoos/domain-management
+          
+          # Process either the specific domain or the whole group
+          if [ -n "${{ github.event.inputs.domain }}" ]; then
+            node scripts/domain-manager.js deploy ${{ github.event.inputs.domain }} --character-group=${{ matrix.character_group }} --seo
+          else
+            # Convert comma-separated list to space-separated for the command line
+            DOMAINS=$(echo "${{ matrix.domains }}" | tr ',' ' ')
+            node scripts/domain-manager.js deploy-batch --character-group=${{ matrix.character_group }} --site-ids=${{ matrix.site_id }} --seo $DOMAINS
+          fi
+          
+      - name: Upload character deployment results
+        uses: actions/upload-artifact@v3
+        with:
+          name: character-deploy-results-${{ matrix.character_group }}
+          path: users/as/asoos/domain-management/domain-results-*.json
+
+  ### WING/OPUS DOMAINS DEPLOYMENT ###
+  
+  deploy-opus-domains:
+    needs: validate
+    if: ${{ github.event.inputs.deployment_type == 'all' || github.event.inputs.deployment_type == 'opus' || github.event.inputs.deployment_type == null }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        opus_group:
+          - opus-1-3
+          - opus-4-6
+          - opus-7-10
+        include:
+          - opus_group: opus-1-3
+            site_ids: aixtiv-symphony-opus1,aixtiv-symphony-opus2,aixtiv-symphony-opus3
+            domains: as-opus1.live,wing-1.live,as-opus2.live,wing-2.live,as-opus3.live,wing-3.live
+          - opus_group: opus-4-6
+            site_ids: vision-coaching-domain,coaching2100,specialty-domains
+            domains: as-opus4.live,wing-4.live,as-opus5.live,wing-5.live,as-opus6.live,wing-6.live
+          - opus_group: opus-7-10
+            site_ids: regional-domains,knowledge-content,community-groups,primary-platforms
+            domains: as-opus7.live,wing-7.live,as-opus8.live,wing-8.live,as-opus9.live,wing-9.live,as-opus10.live,wing-10.live
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+          
+      - name: Decode Firebase service account
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | base64 -d > ./users/as/asoos/domain-management/service-account-key.json
+
+      - name: Deploy opus domains
+        env:
+          FIREBASE_SERVICE_ACCOUNT_PATH: ./service-account-key.json
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+          GOOGLE_VERIFICATION_ID: ${{ github.event.inputs.google_verification || secrets.GOOGLE_VERIFICATION_ID }}
+          ENABLE_SEO: 'true'
+          GENERATE_SITEMAP: 'true'
+          GENERATE_ROBOTS_TXT: 'true'
+        run: |
+          cd users/as/asoos/domain-management
+          
+          # Convert comma-separated lists to space-separated for the command line
+          DOMAINS=$(echo "${{ matrix.domains }}" | tr ',' ' ')
+          SITE_IDS=$(echo "${{ matrix.site_ids }}" | tr ',' ' ')
+          
+          node scripts/domain-manager.js deploy-batch --opus-group=${{ matrix.opus_group }} --site-ids="${SITE_IDS}" --seo $DOMAINS
+          
+      - name: Upload opus deployment results
+        uses: actions/upload-artifact@v3
+        with:
+          name: opus-deploy-results-${{ matrix.opus_group }}
+          path: users/as/asoos/domain-management/domain-results-*.json
+
+  ### COMMAND SYSTEMS DEPLOYMENT ###
+  
+  deploy-command-domains:
+    needs: validate
+    if: ${{ github.event.inputs.deployment_type == 'all' || github.event.inputs.deployment_type == 'command' || github.event.inputs.deployment_type == null }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+          
+      - name: Decode Firebase service account
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | base64 -d > ./users/as/asoos/domain-management/service-account-key.json
+
+      - name: Deploy command domains
+        env:
+          FIREBASE_SERVICE_ACCOUNT_PATH: ./service-account-key.json
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+          GOOGLE_VERIFICATION_ID: ${{ github.event.inputs.google_verification || secrets.GOOGLE_VERIFICATION_ID }}
+          ENABLE_SEO: 'true'
+        run: |
+          cd users/as/asoos/domain-management
+          
+          COMMAND_DOMAINS="dreamcommand.live visioncommand.live predictioncommand.live wishcommand.live lenzcommand.live"
+          node scripts/domain-manager.js deploy-batch --site-id=command-system-live --seo $COMMAND_DOMAINS
+          
+      - name: Upload command deployment results
+        uses: actions/upload-artifact@v3
+        with:
+          name: command-deploy-results
+          path: users/as/asoos/domain-management/domain-results-*.json
+
+  ### DRGRANT PILOTS DEPLOYMENT ###
+  
+  deploy-pilots:
+    needs: validate
+    if: ${{ github.event.inputs.deployment_type == 'all' || github.event.inputs.deployment_type == 'pilots' || github.event.inputs.deployment_type == null }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        domain: [drgrant.live, drgrant.ai]
+        include:
+          - domain: drgrant.live
+            site_id: drgrant-live
+            paths: /clinical,/research,/diagnostic,/education,/treatment,/medical-research,/navigator,/training,/summarize,/protocols,/advocate
+          - domain: drgrant.ai
+            site_id: drgrant-ai
+            paths: /assistant,/analyst,/diagnosis,/learn,/plan,/studies,/guide,/learn,/brief,/advisor,/support
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+          
+      - name: Decode Firebase service account
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | base64 -d > ./users/as/asoos/domain-management/service-account-key.json
+
+      - name: Determine pilot to deploy
+        id: pilot_selection
+        run: |
+          if [ -n "${{ github.event.inputs.pilot_id }}" ]; then
+            echo "deploy_specific=true" >> $GITHUB_OUTPUT
+            echo "pilot_id=${{ github.event.inputs.pilot_id }}" >> $GITHUB_OUTPUT
+          else
+            echo "deploy_specific=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy pilot domains
+        env:
+          FIREBASE_SERVICE_ACCOUNT_PATH: ./service-account-key.json
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
+          GOOGLE_VERIFICATION_ID: ${{ github.event.inputs.google_verification || secrets.GOOGLE_VERIFICATION_ID }}
+          ENABLE_SEO: 'true'
+        run: |
+          cd users/as/asoos/domain-management
+          
+          if [ "${{ steps.pilot_selection.outputs.deploy_specific }}" == "true" ]; then
+            # Deploy specific pilot
+            node scripts/domain-manager.js deploy-pilot --domain=${{ matrix.domain }} --site-id=${{ matrix.site_id }} --pilot-id=${{ steps.pilot_selection.outputs.pilot_id }} --seo
+          else
+            # Deploy all pilots
+            node scripts/domain-manager.js deploy-pilots --domain=${{ matrix.domain }} --site-id=${{ matrix.site_id }} --seo
+          fi
+          
+      - name: Upload pilot deployment results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pilot-deploy-results-${{ matrix.domain }}
+          path: users/as/asoos/domain-management/pilot-results-*.json
+
+  ### CLOUD RUN DEPLOYMENT ###
+  
+  deploy-cloud-run:
+    needs: [deploy-character-domains, deploy-opus-domains, deploy-command-domains, deploy-pilots]
+    if: ${{ always() && !contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          cd users/as/asoos/domain-management
+          npm ci
+      
+      - name: Download all deployment results
+        uses: actions/download-artifact@v3
+        with:
+          path: deployment-results
+      
+      - name: Set up Cloud Run deployment script
+        run: |
+          chmod +x ${{ env.DEPLOYMENT_SCRIPT }}
+      
+      - name: Deploy to Cloud Run
+        env:
+          CLOUD_RUN_REGION: ${{ env.CLOUD_RUN_REGION }}
+          DEPLOY_CONCURRENCY: 2
+        run: |
+          # Merge all successful domains from deployment results
+          cd users/as/asoos/domain-management
+          node scripts/merge-deployment-results.js ../../deployment-results
+          
+          # Deploy services for successful domains
+          DOMAIN_LIST=$(cat successful-domains.txt)
+          ${{ env.DEPLOYMENT_SCRIPT }} $DOMAIN_LIST
+      
+      - name: Upload Cloud Run deployment results
+        uses: actions/upload-artifact@v3
+        with:
+          name: cloud-run-results
+          path: users/as/asoos/domain-management/cloud-run-results-*.json
+
+  ### NOTIFICATIONS ###
+  
+  notify:
+    needs: [deploy-character-domains, deploy-opus-domains, deploy-command-domains, deploy-pilots, deploy-cloud-run]
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: all-results
+
+      - name: Prepare notification summary
+        id: notify
+        run: |
+          # Count successful and failed domains from all result files
+          TOTAL_SUCCESS=$(grep -r "success" all-results | wc -l)
+          TOTAL_FAILED=$(grep -r "failed" all-results | wc -l)
+          
+          # Create summary messages
+          if [ $TOTAL_FAILED -eq 0 ]; then
+            STATUS="✅ Success"
+          elif [ $TOTAL_SUCCESS -eq 0 ]; then
+            STATUS="❌ Failed"
+          else
+            STATUS="⚠️ Partial Success"
+          fi
+          
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "summary=Domain deployment complete: $TOTAL_SUCCESS successful, $TOTAL_FAILED failed." >> $GITHUB_OUTPUT
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "${{ steps.notify.outputs.status }}: Domain Ecosystem Deployment",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.notify.outputs.status }}: Domain Ecosystem Deployment"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.notify.outputs.summary }}\n\n*Build:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|#${{ github.run_number }}>"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "Triggered by: ${{ github.actor }} | Repository: ${{ github.repository }} | Ref: ${{ github.ref }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

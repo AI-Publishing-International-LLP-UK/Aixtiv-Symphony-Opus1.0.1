@@ -1,0 +1,264 @@
+users/
+└── as/
+    └── asoos/
+        └── domain-management/
+            ├── config/
+            │   ├── firebase-projects.json         # Project ID mappings
+            │   ├── site-mappings.json             # Domain to site ID mappings
+            │   ├── domain-character-mappings.json # Character to domain mappings
+            │   ├── godaddy-api.json               # GoDaddy API configuration
+            │   ├── verification-tokens.json       # Google verification tokens
+            │   └── seo-defaults.json              # Default SEO settings
+            │
+            ├── scripts/
+            │   ├── domain-manager.js              # Main CLI tool
+            │   ├── firebase-domain-service.js     # Firebase interactions
+            │   ├── godaddy-service.js             # GoDaddy API service
+            │   ├── seo-service.js                 # SEO optimization service
+            │   ├── site-selector.js               # Intelligent site selection
+            │   └── deployment.sh                  # Cloud Run deployment script
+            │
+            ├── characters/                        # Character-based domains
+            │   ├── apex/                          # Spiritual and leadership apex
+            │   │   ├── asoos/                     # Spiritual apex
+            │   │   │   ├── site-config.json       # Site configuration 
+            │   │   │   ├── seo-config.json        # SEO settings
+            │   │   │   └── content/               # Domain content
+            │   │   │
+            │   │   ├── thehand/                   # The Hand/DrClaude/ThePoet
+            │   │   │   ├── site-config.json
+            │   │   │   ├── seo-config.json
+            │   │   │   ├── content/
+            │   │   │   └── aliases/               # Alias domains (drclaude, thepoet)
+            │   │   │
+            │   │   └── queenlucy/                 # Queen Lucy (QB)
+            │   │       ├── site-config.json
+            │   │       ├── seo-config.json
+            │   │       └── content/
+            │   │
+            │   ├── mercurials/                    # The Mercurials
+            │   │   ├── site-config.json
+            │   │   ├── seo-config.json
+            │   │   ├── content/
+            │   │   ├── drgrant/                   # M1
+            │   │   │   ├── site-config.json
+            │   │   │   ├── seo-config.json
+            │   │   │   └── content/
+            │   │   └── drburby/                   # M2
+            │   │       ├── site-config.json
+            │   │       ├── seo-config.json
+            │   │       └── content/
+            │   │
+            │   ├── abuelos/                       # Los Abuelos
+            │   │   ├── site-config.json
+            │   │   ├── seo-config.json
+            │   │   ├── content/
+            │   │   ├── drcypriot/                 # African American grandfather
+            │   │   │   ├── site-config.json
+            │   │   │   ├── seo-config.json
+            │   │   │   └── content/
+            │   │   └── drmaria/                   # Italian grandmother
+            │   │       ├── site-config.json
+            │   │       ├── seo-config.json
+            │   │       └── content/
+            │   │
+            │   ├── brains/                        # The Brains
+            │   │   ├── site-config.json
+            │   │   ├── seo-config.json
+            │   │   ├── content/
+            │   │   ├── professorlee/              # Chinese Master of Library Science
+            │   │   │   ├── site-config.json
+            │   │   │   ├── seo-config.json
+            │   │   │   └── content/
+            │   │   └── drmemoria/                 # British storymaker
+            │   │       ├── site-config.json
+            │   │       ├── seo-config.json
+            │   │       └── content/
+            │   │
+            │   └── ladies-waiting/                # The Ladies in Waiting
+            │       ├── site-config.json
+            │       ├── seo-config.json
+            │       ├── content/
+            │       ├── drsabina/                  # Hispanic CEO
+            │       │   ├── site-config.json
+            │       │   ├── seo-config.json
+            │       │   └── content/
+            │       └── drmatch/                   # Arab COO
+            │           ├── site-config.json
+            │           ├── seo-config.json
+            │           └── content/
+            │
+            ├── opus/                              # Wing/Opus structure
+            │   ├── shared/                        # Shared resources
+            │   │   ├── templates/                 # Common templates
+            │   │   ├── components/                # Shared components
+            │   │   └── styles/                    # Common styles
+            │   │
+            │   ├── aixtiv-symphony-opus1/         # Wing 1 = Opus 1
+            │   │   ├── site-config.json
+            │   │   ├── seo-config.json
+            │   │   ├── content/
+            │   │   └── wing-mapping.json          # Wing to Opus mapping
+            │   │
+            │   ├── aixtiv-symphony-opus2/         # Wing 2 = Opus 2
+            │   │   └── ...
+            │   │
+            │   ├── aixtiv-symphony-opus3/         # Wing 3 = Opus 3
+            │   │   └── ...
+            │   │
+            │   ├── vision-coaching-domain/        # Wing 4 = Opus 4
+            │   │   └── ...
+            │   │
+            │   ├── coaching2100/                  # Wing 5 = Opus 5
+            │   │   └── ...
+            │   │
+            │   ├── specialty-domains/             # Wing 6 = Opus 6
+            │   │   └── ...
+            │   │
+            │   ├── regional-domains/              # Wing 7 = Opus 7
+            │   │   └── ...
+            │   │
+            │   ├── knowledge-content/             # Wing 8 = Opus 8
+            │   │   └── ...
+            │   │
+            │   ├── community-groups/              # Wing 9 = Opus 9
+            │   │   └── ...
+            │   │
+            │   └── primary-platforms/             # Wing 10 = Opus 10
+            │       └── ...
+            │
+            ├── squadrons/                         # Squadron domains
+            │   ├── squadron-1/
+            │   │   ├── site-config.json
+            │   │   ├── seo-config.json
+            │   │   └── content/
+            │   ├── squadron-2/
+            │   │   └── ...
+            │   └── ...
+            │
+            ├── commands/                          # Command system domains
+            │   ├── site-config.json               # Shared site configuration
+            │   ├── seo-config.json                # Shared SEO configuration
+            │   ├── shared/                        # Shared resources
+            │   │   ├── templates/
+            │   │   ├── components/
+            │   │   └── styles/
+            │   ├── dreamcommand/
+            │   │   ├── config.json
+            │   │   └── content/
+            │   ├── visioncommand/
+            │   │   └── ...
+            │   ├── predictioncommand/
+            │   │   └── ...
+            │   ├── wishcommand/
+            │   │   └── ...
+            │   └── lenzcommand/
+            │       └── ...
+            │
+            ├── pilots/                            # DrGrant pilots
+            │   ├── config/                        # Shared configuration
+            │   │   ├── pilot-mappings.json        # Maps pilots to domains and paths
+            │   │   ├── pilot-features.json        # Features for each pilot
+            │   │   └── routing.json               # Path-based routing configuration
+            │   │
+            │   ├── templates/                     # Pilot templates
+            │   │   ├── landing-page.template
+            │   │   ├── dashboard.template
+            │   │   └── api-docs.template
+            │   │
+            │   ├── drgrant-live/                  # Configuration for drgrant.live
+            │   │   ├── site-config.json           # Site-wide configuration
+            │   │   ├── seo-config.json            # Site-wide SEO
+            │   │   ├── shared/                    # Shared assets
+            │   │   │   ├── assets/
+            │   │   │   ├── components/
+            │   │   │   └── styles/
+            │   │   ├── pilot-01/                  # Clinical Assistant
+            │   │   │   ├── config.json            # Pilot-specific config
+            │   │   │   ├── routes.json            # Path: /clinical
+            │   │   │   ├── seo.json               # Pilot-specific SEO
+            │   │   │   └── content/               # Pilot-specific content
+            │   │   ├── pilot-02/                  # Research Analyst
+            │   │   │   └── ...                    # Path: /research
+            │   │   └── ...                        # Pilots 03-11
+            │   │
+            │   └── drgrant-ai/                    # Configuration for drgrant.ai
+            │       ├── site-config.json
+            │       ├── seo-config.json
+            │       ├── shared/
+            │       ├── pilot-01/                  # Path: /assistant
+            │       │   └── ...
+            │       ├── pilot-02/                  # Path: /analyst
+            │       │   └── ...
+            │       └── ...                        # Pilots 03-11
+            │
+            ├── brands/                            # Brand domains
+            │   ├── 2100/                          # 2100 family domains
+            │   │   ├── coaching2100/              # Executive Leadership Coaching
+            │   │   │   └── ...
+            │   │   ├── coaching2100-com/          # Secondary coaching site
+            │   │   │   └── ...
+            │   │   ├── preparate2100-mx/          # Spanish AI Learning Hub
+            │   │   │   └── ...
+            │   │   ├── getready2100-com/          # English learning platform
+            │   │   │   └── ...
+            │   │   ├── 2100-cool/                 # AI Copilot Showcase
+            │   │   │   └── ...
+            │   │   └── ...                        # Other 2100 domains
+            │   │
+            │   ├── aixtiv/                        # Aixtiv family domains
+            │   │   ├── aixtiv-com/                # Central hub
+            │   │   │   └── ...
+            │   │   ├── aixtiv-symphony-com/       # Proactive AI System
+            │   │   │   └── ...
+            │   │   ├── workforce-aixtiv-com/      # Workforce Solutions
+            │   │   │   └── ...
+            │   │   └── ...                        # Other Aixtiv domains
+            │   │
+            │   └── deploy-agency/                 # Agency domains
+            │       ├── c2100-agency/
+            │       │   └── ...
+            │       ├── ai-ip-co/
+            │       │   └── ...
+            │       └── ...
+            │
+            ├── governance/                        # Governance domains
+            │   ├── s2do-live/                     # S2DO framework
+            │   │   └── ...
+            │   ├── s2do-governance-live/          # S2DO governance
+            │   │   └── ...
+            │   └── ...
+            │
+            ├── ci-cd/                             # CI/CD pipeline
+            │   ├── workflows/                     # GitHub Actions workflows
+            │   │   ├── domain-workflow.yml        # Main domain config workflow
+            │   │   ├── verify-workflow.yml        # Ownership verification workflow
+            │   │   └── pilot-deployment.yml       # Pilot deployment workflow
+            │   ├── templates/                     # CI/CD templates
+            │   └── scripts/                       # CI/CD helper scripts
+            │
+            ├── seo/                               # SEO resources
+            │   ├── templates/                     # SEO templates
+            │   │   ├── robots-txt.template        # Template for robots.txt
+            │   │   ├── sitemap.template           # Template for sitemap.xml
+            │   │   └── meta-tags.template         # Template for meta tags
+            │   ├── verification/                  # Google verification files
+            │   └── analytics/                     # Analytics configuration
+            │
+            ├── genai/                             # GenAI templates
+            │   ├── templates/                     # Base templates
+            │   │   ├── landing-page.template      # Landing page template
+            │   │   ├── character-page.template    # Character page template
+            │   │   └── story-template.js          # Story generation template
+            │   ├── prompts/                       # GenAI prompts
+            │   └── assets/                        # Shared assets for GenAI
+            │
+            └── domains/                           # Domain management
+                ├── active/                        # Currently active domains
+                │   ├── character-domains.txt      # Character domains
+                │   ├── pilot-domains.txt          # Pilot domains
+                │   ├── opus-domains.txt           # Opus/Wing domains
+                │   └── brand-domains.txt          # Brand domains
+                ├── pending/                       # Pending configuration
+                ├── verified/                      # Verified domains
+                └── site-mappings/                 # Domain to site mappings

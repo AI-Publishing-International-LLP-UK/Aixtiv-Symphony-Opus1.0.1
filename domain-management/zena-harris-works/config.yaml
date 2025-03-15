@@ -1,0 +1,12 @@
+site:
+  domain: zena.2100.cool
+  title: "Zena Harris Works"
+  template: white_label_v1
+  theme: zena_custom
+
+deployment:
+  project_id: api-for-warp-drive
+  region: us-west1-a
+  cloud_run:
+    service: zena-harris-works
+    domain_mapping: zena.2100.cool
