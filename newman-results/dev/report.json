@@ -1,0 +1,4831 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "11eca03d-c08a-4a1c-8d02-b372e5583f46",
+        "name": "Environment Setup",
+        "item": [
+          {
+            "id": "f9c9f81e-b5bc-4f5e-9093-a8ed0b087bdb",
+            "name": "Verify Environment",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v1",
+                  "status"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "cc1761d9-6de0-443f-b1df-01e6c3e3141c",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Environment is properly configured', function() {",
+                    "    pm.expect(pm.environment.get('baseUrl')).to.not.be.empty;",
+                    "    pm.expect(pm.environment.get('authToken')).to.not.be.empty;",
+                    "});"
+                  ],
+                  "_lastExecutionId": "34573679-aff4-4d19-8720-5438697e53c9"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "a540c59d-5bd4-4373-a340-72c58eb1b1f2",
+        "name": "Health Checks",
+        "item": [
+          {
+            "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+            "name": "API Health Check",
+            "request": {
+              "url": {
+                "path": [
+                  "health"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Health check response is valid', function() {",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.status).to.eql('healthy');",
+                    "    pm.expect(response.version).to.exist;",
+                    "});"
+                  ],
+                  "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+                }
+              }
+            ]
+          },
+          {
+            "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+            "name": "Integration Gateway Health",
+            "request": {
+              "url": {
+                "path": [
+                  "gateway",
+                  "health"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Gateway is healthy', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.gateway_status).to.eql('operational');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "b2d8d8bd-bc85-40ff-8f7c-0e43922c24e3",
+        "name": "Authentication",
+        "item": [
+          {
+            "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+            "name": "Login",
+            "request": {
+              "url": {
+                "path": [
+                  "auth",
+                  "login"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Authentication successful', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.token).to.exist;",
+                    "    pm.environment.set('authToken', response.token);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "e7543966-1007-4c93-9f90-9d82547f4485"
+                }
+              }
+            ]
+          },
+          {
+            "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+            "name": "Verify Token",
+            "request": {
+              "url": {
+                "path": [
+                  "auth",
+                  "verify"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Token is valid', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.valid).to.be.true;",
+                    "});"
+                  ],
+                  "_lastExecutionId": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "d1705b5c-c7d9-4cf3-bb3e-c2e1a56c4eee",
+        "name": "API Endpoints",
+        "item": [
+          {
+            "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+            "name": "List Resources",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v1",
+                  "resources"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Can list resources', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.items).to.be.an('array');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "350476e8-b858-41dc-b35f-85e41b599447"
+                }
+              }
+            ]
+          },
+          {
+            "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+            "name": "Create Resource",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v1",
+                  "resources"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Resource created successfully', function() {",
+                    "    pm.response.to.have.status(201);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.id).to.exist;",
+                    "});"
+                  ],
+                  "_lastExecutionId": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "ff934d39-65d4-4d0a-80aa-18b70e578f1b",
+        "name": "Rate Limiting",
+        "item": [
+          {
+            "id": "45b055c6-f3cb-424f-8dde-dfdd31c4e7db",
+            "name": "Rapid Requests",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v1",
+                  "resources"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "934e4684-aa76-4cd1-8e5d-5ae2442adb62",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Rate limiting is enforced', function() {",
+                    "    if (pm.iterationData.get('iteration') > pm.environment.get('rateLimit')) {",
+                    "        pm.response.to.have.status(429);",
+                    "    }",
+                    "});"
+                  ],
+                  "_lastExecutionId": "88ed9f55-b5c8-4b31-9a6b-bb322c9442aa"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "e256f470-3e85-4405-9bcf-e76c99fd711d",
+        "name": "Integration Gateway",
+        "item": [
+          {
+            "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+            "name": "Gateway Routes",
+            "request": {
+              "url": {
+                "path": [
+                  "gateway",
+                  "routes"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "61c54441-035b-4215-954d-c085b36417b6",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Gateway routes are configured', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.routes).to.be.an('array');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+                }
+              }
+            ]
+          },
+          {
+            "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+            "name": "Gateway Metrics",
+            "request": {
+              "url": {
+                "path": [
+                  "gateway",
+                  "metrics"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{authToken}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Gateway metrics are available', function() {",
+                    "    pm.response.to.have.status(200);",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.metrics).to.exist;",
+                    "});"
+                  ],
+                  "_lastExecutionId": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "id": "df72f8f8-a8d2-4d88-b917-33628374e0bd",
+          "type": "text/javascript",
+          "exec": [
+            "// Global Pre-request Script",
+            "if (!pm.environment.get('authToken')) {",
+            "    console.log('No auth token found, initiating authentication...');",
+            "    // Add authentication logic here",
+            "}"
+          ],
+          "_lastExecutionId": "5965b78e-a4ff-47b3-9205-588ab0738b7a"
+        }
+      }
+    ],
+    "variable": [
+      {
+        "type": "string",
+        "value": "https://api.day1.asoos.com",
+        "key": "baseUrl"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "authToken"
+      }
+    ],
+    "info": {
+      "_postman_id": "ce23d4bd-64c1-48ec-a174-b96196faed01",
+      "name": "Day1 API Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2024-03-14T00:00:00.000Z",
+      "postman_exported_using": "Warp Terminal Assistant"
+    },
+    "id": "day1-api-env-dev",
+    "name": "Day1 API Environment Dev",
+    "values": [
+      {
+        "type": "any",
+        "value": "https://dev-api.day1.asoos.com",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "Bearer dummy-token-for-testing",
+        "key": "authToken"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "api_key"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "client_id"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "client_secret"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "access_token"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "refresh_token"
+      },
+      {
+        "type": "any",
+        "value": "https://auth.day1.asoos.com",
+        "key": "auth_server_url"
+      },
+      {
+        "type": "any",
+        "value": "test@asoos.com",
+        "key": "test_user_email"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "test_user_password"
+      },
+      {
+        "type": "any",
+        "value": "https://gateway.day1.asoos.com",
+        "key": "integration_gateway_url"
+      }
+    ]
+  },
+  "globals": {
+    "id": "3f274398-658d-4ef4-9efa-1e9c06e62589",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 20,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 10,
+        "pending": 0,
+        "failed": 10
+      },
+      "tests": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 11,
+        "pending": 0,
+        "failed": 9
+      },
+      "testScripts": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 0,
+      "responseMin": 0,
+      "responseMax": 0,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1741992420365,
+      "completed": 1741992423256
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 10,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "be0a078c-48a2-4b2e-af07-369fedf9c506",
+          "httpRequestId": "d5926a8b-c73f-449b-a177-cac6b27ac091"
+        },
+        "item": {
+          "id": "f9c9f81e-b5bc-4f5e-9093-a8ed0b087bdb",
+          "name": "Verify Environment",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "status"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "cc1761d9-6de0-443f-b1df-01e6c3e3141c",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Environment is properly configured', function() {",
+                  "    pm.expect(pm.environment.get('baseUrl')).to.not.be.empty;",
+                  "    pm.expect(pm.environment.get('authToken')).to.not.be.empty;",
+                  "});"
+                ],
+                "_lastExecutionId": "34573679-aff4-4d19-8720-5438697e53c9"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "v1",
+              "status"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "93891dc5-76d3-44d2-8a85-1b4f14d016ee",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "f9c9f81e-b5bc-4f5e-9093-a8ed0b087bdb",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Environment is properly configured",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "2965dd8a-7a49-4c95-bddf-08b64b0d66cb",
+          "length": 10,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "e750c3b2-d6f2-410c-9500-e66ecc7cc7af"
+        },
+        "item": {
+          "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+          "name": "API Health Check",
+          "request": {
+            "url": {
+              "path": [
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check response is valid', function() {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('healthy');",
+                  "    pm.expect(response.version).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "health"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "dece468a-2237-4526-aa4b-ee8cd6cfe458",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code is 200",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:2)"
+            }
+          },
+          {
+            "assertion": "Health check response is valid",
+            "skipped": false,
+            "error": {
+              "name": "JSONError",
+              "index": 1,
+              "test": "Health check response is valid",
+              "message": "\"undefined\" is not valid JSON",
+              "stack": "JSONError: \"undefined\" is not valid JSON\n   at Object.eval sandbox-script.js:2:2)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "6ff59d19-bcfa-479e-9dd8-8662ee73e748",
+          "length": 10,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "9c260326-3097-4b82-b696-9cf0cff98253"
+        },
+        "item": {
+          "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+          "name": "Integration Gateway Health",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway is healthy', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.gateway_status).to.eql('operational');",
+                  "});"
+                ],
+                "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "gateway",
+              "health"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "c0070ddd-edaf-4ce2-a323-9bb93489d5bf",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Gateway is healthy",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Gateway is healthy",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:3)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "fda023cb-3c98-4497-bea5-905b5227e6c2",
+          "length": 10,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "e598adba-bb9b-4878-87d6-2cd12e54dd19"
+        },
+        "item": {
+          "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+          "name": "Login",
+          "request": {
+            "url": {
+              "path": [
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Authentication successful', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.token).to.exist;",
+                  "    pm.environment.set('authToken', response.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "e7543966-1007-4c93-9f90-9d82547f4485"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "auth",
+              "login"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "bb685802-d907-409d-b9b9-6ab0938e4362",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+          }
+        },
+        "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Authentication successful",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Authentication successful",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:4)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "d68738ff-532b-4c30-a9f1-2ce9a3a65d84",
+          "length": 10,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "036262ef-9749-4e7a-ab06-d99995454bd6"
+        },
+        "item": {
+          "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+          "name": "Verify Token",
+          "request": {
+            "url": {
+              "path": [
+                "auth",
+                "verify"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token is valid', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.valid).to.be.true;",
+                  "});"
+                ],
+                "_lastExecutionId": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "auth",
+              "verify"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "04e2d391-a8ff-4959-86ea-71e5be65fba9",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Token is valid",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Token is valid",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:5)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "ac21fbaf-df31-4409-863a-b3492994aafe",
+          "length": 10,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "1e38581b-82fc-42bd-8c84-0dc4a7aea768"
+        },
+        "item": {
+          "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+          "name": "List Resources",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Can list resources', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.items).to.be.an('array');",
+                  "});"
+                ],
+                "_lastExecutionId": "350476e8-b858-41dc-b35f-85e41b599447"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "v1",
+              "resources"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "2dd9bd06-a8e2-44f7-ac51-63849a04dc1c",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Can list resources",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Can list resources",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:6)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "136e14b4-e789-44d6-927b-60e4c3b74a3f",
+          "length": 10,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "2a317989-f690-42f2-a649-b79fe8cb12a1"
+        },
+        "item": {
+          "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+          "name": "Create Resource",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Resource created successfully', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "v1",
+              "resources"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "180f458e-0b14-49f1-ad20-b705d3e1654f",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+          }
+        },
+        "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Resource created successfully",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Resource created successfully",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:7)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "549362d0-d1b4-4123-a501-40eef1b84d2e",
+          "length": 10,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "f0f9f409-20b8-459a-a25d-2778da171bbb"
+        },
+        "item": {
+          "id": "45b055c6-f3cb-424f-8dde-dfdd31c4e7db",
+          "name": "Rapid Requests",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "934e4684-aa76-4cd1-8e5d-5ae2442adb62",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rate limiting is enforced', function() {",
+                  "    if (pm.iterationData.get('iteration') > pm.environment.get('rateLimit')) {",
+                  "        pm.response.to.have.status(429);",
+                  "    }",
+                  "});"
+                ],
+                "_lastExecutionId": "88ed9f55-b5c8-4b31-9a6b-bb322c9442aa"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "v1",
+              "resources"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "7f3801db-0e52-4c85-9e8c-044abc60935f",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "45b055c6-f3cb-424f-8dde-dfdd31c4e7db",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Rate limiting is enforced",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "4b7711ba-98ec-408f-ab7e-aac1bc6d943a",
+          "length": 10,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "89da2cd2-755c-426f-b8ad-4582378d1e6d"
+        },
+        "item": {
+          "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+          "name": "Gateway Routes",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "routes"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "61c54441-035b-4215-954d-c085b36417b6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway routes are configured', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.routes).to.be.an('array');",
+                  "});"
+                ],
+                "_lastExecutionId": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "gateway",
+              "routes"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "a54742c7-788d-4220-a991-e7dbd83a4c9e",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Gateway routes are configured",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Gateway routes are configured",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:9)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "21f8d818-f984-4398-af25-dc720405928c",
+          "length": 10,
+          "cycles": 1,
+          "position": 9,
+          "iteration": 0,
+          "httpRequestId": "adb5b760-4074-4c81-8769-56269ba2c5cc"
+        },
+        "item": {
+          "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+          "name": "Gateway Metrics",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway metrics are available', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.metrics).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "gateway",
+              "metrics"
+            ],
+            "host": [
+              "dev-api",
+              "day1",
+              "asoos",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer Bearer dummy-token-for-testing"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "cfa86f15-09b2-43f0-92da-4c4c854f3335",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "dev-api.day1.asoos.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+        "requestError": {
+          "code": "CERT_HAS_EXPIRED"
+        },
+        "assertions": [
+          {
+            "assertion": "Gateway metrics are available",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Gateway metrics are available",
+              "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+              "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:10)"
+            }
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 0
+    },
+    "failures": [
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "0eddf3e7-7d2c-4617-aadc-7389870254b8",
+          "timestamp": 1741992421241,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "f9c9f81e-b5bc-4f5e-9093-a8ed0b087bdb",
+          "name": "Verify Environment",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "api",
+                "v1",
+                "status"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "93891dc5-76d3-44d2-8a85-1b4f14d016ee",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "cc1761d9-6de0-443f-b1df-01e6c3e3141c",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Environment is properly configured', function() {",
+                  "    pm.expect(pm.environment.get('baseUrl')).to.not.be.empty;",
+                  "    pm.expect(pm.environment.get('authToken')).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 10,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "be0a078c-48a2-4b2e-af07-369fedf9c506",
+          "httpRequestId": "d5926a8b-c73f-449b-a177-cac6b27ac091"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "fef65f28-f459-4649-849d-e5a708fa0726",
+          "timestamp": 1741992421461,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+          "name": "API Health Check",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "health"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "dece468a-2237-4526-aa4b-ee8cd6cfe458",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check response is valid', function() {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('healthy');",
+                  "    pm.expect(response.version).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "2965dd8a-7a49-4c95-bddf-08b64b0d66cb",
+          "length": 10,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "e750c3b2-d6f2-410c-9500-e66ecc7cc7af"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code is 200",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:2)",
+          "checksum": "169020131664477cec85b1c00a6464f6",
+          "id": "dc45a7e5-498e-46c7-a78b-cf83bf2e435d",
+          "timestamp": 1741992421477,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+          "name": "API Health Check",
+          "request": {
+            "url": {
+              "path": [
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check response is valid', function() {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('healthy');",
+                  "    pm.expect(response.version).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "a540c59d-5bd4-4373-a340-72c58eb1b1f2",
+          "name": "Health Checks",
+          "item": [
+            {
+              "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+              "name": "API Health Check",
+              "request": {
+                "url": {
+                  "path": [
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Health check response is valid', function() {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.eql('healthy');",
+                      "    pm.expect(response.version).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+              "name": "Integration Gateway Health",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway is healthy', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.gateway_status).to.eql('operational');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "2965dd8a-7a49-4c95-bddf-08b64b0d66cb",
+          "length": 10,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "e750c3b2-d6f2-410c-9500-e66ecc7cc7af",
+          "scriptId": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+          "execution": "52889be4-3d92-486d-910f-7ba282e673b8"
+        }
+      },
+      {
+        "error": {
+          "name": "JSONError",
+          "index": 1,
+          "test": "Health check response is valid",
+          "message": "\"undefined\" is not valid JSON",
+          "stack": "JSONError: \"undefined\" is not valid JSON\n   at Object.eval sandbox-script.js:2:2)",
+          "checksum": "e4387c68322ccf36a62eaa8addc0bd80",
+          "id": "8065f219-1856-4e68-b54d-6e4a275a7ce3",
+          "timestamp": 1741992421478,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+          "name": "API Health Check",
+          "request": {
+            "url": {
+              "path": [
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check response is valid', function() {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('healthy');",
+                  "    pm.expect(response.version).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "a540c59d-5bd4-4373-a340-72c58eb1b1f2",
+          "name": "Health Checks",
+          "item": [
+            {
+              "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+              "name": "API Health Check",
+              "request": {
+                "url": {
+                  "path": [
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Health check response is valid', function() {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.eql('healthy');",
+                      "    pm.expect(response.version).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+              "name": "Integration Gateway Health",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway is healthy', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.gateway_status).to.eql('operational');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "2965dd8a-7a49-4c95-bddf-08b64b0d66cb",
+          "length": 10,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "e750c3b2-d6f2-410c-9500-e66ecc7cc7af",
+          "scriptId": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+          "execution": "52889be4-3d92-486d-910f-7ba282e673b8"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "197a5fdd-5a92-4b14-8131-a94c17c798f9",
+          "timestamp": 1741992421690,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+          "name": "Integration Gateway Health",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gateway",
+                "health"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "c0070ddd-edaf-4ce2-a323-9bb93489d5bf",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway is healthy', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.gateway_status).to.eql('operational');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "6ff59d19-bcfa-479e-9dd8-8662ee73e748",
+          "length": 10,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "9c260326-3097-4b82-b696-9cf0cff98253"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Gateway is healthy",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:3)",
+          "checksum": "8cd8d0b9834987d3ab22b5796ab4eb28",
+          "id": "1efb6892-1746-4cb9-927e-4da80d246863",
+          "timestamp": 1741992421699,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+          "name": "Integration Gateway Health",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway is healthy', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.gateway_status).to.eql('operational');",
+                  "});"
+                ],
+                "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "a540c59d-5bd4-4373-a340-72c58eb1b1f2",
+          "name": "Health Checks",
+          "item": [
+            {
+              "id": "f0deae03-9306-49d0-b5ff-4105feb3c886",
+              "name": "API Health Check",
+              "request": {
+                "url": {
+                  "path": [
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "19e3843f-5c91-4de2-adbf-f3f5ee3e1f16",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Health check response is valid', function() {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.eql('healthy');",
+                      "    pm.expect(response.version).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "52889be4-3d92-486d-910f-7ba282e673b8"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "8e3ab184-beaa-4ed1-83b0-b1a6f2fb3414",
+              "name": "Integration Gateway Health",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "health"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway is healthy', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.gateway_status).to.eql('operational');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "6ff59d19-bcfa-479e-9dd8-8662ee73e748",
+          "length": 10,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "9c260326-3097-4b82-b696-9cf0cff98253",
+          "scriptId": "e606e50c-0244-4beb-bd67-e0645acb10d1",
+          "execution": "e5385a8e-4d67-4abb-aa95-c3defce4bb66"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "a5819eec-0db2-4953-a47b-e325a1b282fa",
+          "timestamp": 1741992421911,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+          "name": "Login",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "auth",
+                "login"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "bb685802-d907-409d-b9b9-6ab0938e4362",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Authentication successful', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.token).to.exist;",
+                  "    pm.environment.set('authToken', response.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "fda023cb-3c98-4497-bea5-905b5227e6c2",
+          "length": 10,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "e598adba-bb9b-4878-87d6-2cd12e54dd19"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Authentication successful",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:4)",
+          "checksum": "e1b15be6dd07480244d6e2f8e12a8fa5",
+          "id": "6897d47d-3828-40b4-9120-0a634789fb2e",
+          "timestamp": 1741992421919,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+          "name": "Login",
+          "request": {
+            "url": {
+              "path": [
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Authentication successful', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.token).to.exist;",
+                  "    pm.environment.set('authToken', response.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "e7543966-1007-4c93-9f90-9d82547f4485"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b2d8d8bd-bc85-40ff-8f7c-0e43922c24e3",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+              "name": "Login",
+              "request": {
+                "url": {
+                  "path": [
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Authentication successful', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.token).to.exist;",
+                      "    pm.environment.set('authToken', response.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e7543966-1007-4c93-9f90-9d82547f4485"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+              "name": "Verify Token",
+              "request": {
+                "url": {
+                  "path": [
+                    "auth",
+                    "verify"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Token is valid', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.valid).to.be.true;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "fda023cb-3c98-4497-bea5-905b5227e6c2",
+          "length": 10,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "e598adba-bb9b-4878-87d6-2cd12e54dd19",
+          "scriptId": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+          "execution": "e7543966-1007-4c93-9f90-9d82547f4485"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "9867c0c1-368c-4831-997b-ce944e0a9509",
+          "timestamp": 1741992422141,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+          "name": "Verify Token",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "auth",
+                "verify"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "04e2d391-a8ff-4959-86ea-71e5be65fba9",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token is valid', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "d68738ff-532b-4c30-a9f1-2ce9a3a65d84",
+          "length": 10,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "036262ef-9749-4e7a-ab06-d99995454bd6"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Token is valid",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:5)",
+          "checksum": "0a96c2f9ddb812809a5142e5d4b76f4a",
+          "id": "b55d4d03-e794-4264-8af7-e43ed2d4ac07",
+          "timestamp": 1741992422150,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 5,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+          "name": "Verify Token",
+          "request": {
+            "url": {
+              "path": [
+                "auth",
+                "verify"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token is valid', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.valid).to.be.true;",
+                  "});"
+                ],
+                "_lastExecutionId": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b2d8d8bd-bc85-40ff-8f7c-0e43922c24e3",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "9c105e28-2718-44c7-915b-cd720e1fd071",
+              "name": "Login",
+              "request": {
+                "url": {
+                  "path": [
+                    "auth",
+                    "login"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "be3a4195-77f0-410d-bbff-88c5b835b8c8",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Authentication successful', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.token).to.exist;",
+                      "    pm.environment.set('authToken', response.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "e7543966-1007-4c93-9f90-9d82547f4485"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "18271802-bfee-49cd-8c40-2612d27e5ccf",
+              "name": "Verify Token",
+              "request": {
+                "url": {
+                  "path": [
+                    "auth",
+                    "verify"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Token is valid', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.valid).to.be.true;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "d68738ff-532b-4c30-a9f1-2ce9a3a65d84",
+          "length": 10,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "036262ef-9749-4e7a-ab06-d99995454bd6",
+          "scriptId": "2ace2c0f-0488-4fe7-b30e-a8d9b5d35085",
+          "execution": "5a415da9-9663-4189-9ff4-ac3aeb824c0e"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "8262ea60-409c-46d5-a153-4e418a1d93f6",
+          "timestamp": 1741992422363,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+          "name": "List Resources",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "2dd9bd06-a8e2-44f7-ac51-63849a04dc1c",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Can list resources', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "ac21fbaf-df31-4409-863a-b3492994aafe",
+          "length": 10,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "1e38581b-82fc-42bd-8c84-0dc4a7aea768"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Can list resources",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:6)",
+          "checksum": "718f54a639a53c094ae492168bd61e76",
+          "id": "88b41d24-7783-4070-8b15-38e0d9862824",
+          "timestamp": 1741992422371,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 6,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+          "name": "List Resources",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Can list resources', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.items).to.be.an('array');",
+                  "});"
+                ],
+                "_lastExecutionId": "350476e8-b858-41dc-b35f-85e41b599447"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "d1705b5c-c7d9-4cf3-bb3e-c2e1a56c4eee",
+          "name": "API Endpoints",
+          "item": [
+            {
+              "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+              "name": "List Resources",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Can list resources', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.items).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "350476e8-b858-41dc-b35f-85e41b599447"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+              "name": "Create Resource",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Resource created successfully', function() {",
+                      "    pm.response.to.have.status(201);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "ac21fbaf-df31-4409-863a-b3492994aafe",
+          "length": 10,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "1e38581b-82fc-42bd-8c84-0dc4a7aea768",
+          "scriptId": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+          "execution": "350476e8-b858-41dc-b35f-85e41b599447"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "b1e24cef-1521-459e-82e2-021e49274be4",
+          "timestamp": 1741992422583,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+          "name": "Create Resource",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "180f458e-0b14-49f1-ad20-b705d3e1654f",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Resource created successfully', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "136e14b4-e789-44d6-927b-60e4c3b74a3f",
+          "length": 10,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "2a317989-f690-42f2-a649-b79fe8cb12a1"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Resource created successfully",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:7)",
+          "checksum": "b6296d743696f2fed0684f0e27a9e47d",
+          "id": "89058941-f60c-48ea-9483-dbb94a96b4ff",
+          "timestamp": 1741992422591,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 7,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+          "name": "Create Resource",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Resource created successfully', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "d1705b5c-c7d9-4cf3-bb3e-c2e1a56c4eee",
+          "name": "API Endpoints",
+          "item": [
+            {
+              "id": "acb10cf4-686b-44cf-89aa-21d846af719e",
+              "name": "List Resources",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "91cf062d-1ba1-4b71-8351-62b3f54ee9e0",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Can list resources', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.items).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "350476e8-b858-41dc-b35f-85e41b599447"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "51162c84-4141-4e14-9f9c-970d76c717da",
+              "name": "Create Resource",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test Resource\",\n    \"description\": \"Test resource creation\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "a8424c11-beba-49f8-a356-d1444ee8a698",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Resource created successfully', function() {",
+                      "    pm.response.to.have.status(201);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "136e14b4-e789-44d6-927b-60e4c3b74a3f",
+          "length": 10,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "2a317989-f690-42f2-a649-b79fe8cb12a1",
+          "scriptId": "a8424c11-beba-49f8-a356-d1444ee8a698",
+          "execution": "d12939ee-21f8-48c0-832b-58f6bfcec09c"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "cdea6635-6af4-4dfe-ad57-c33fa9517275",
+          "timestamp": 1741992422802,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "45b055c6-f3cb-424f-8dde-dfdd31c4e7db",
+          "name": "Rapid Requests",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "7f3801db-0e52-4c85-9e8c-044abc60935f",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "934e4684-aa76-4cd1-8e5d-5ae2442adb62",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rate limiting is enforced', function() {",
+                  "    if (pm.iterationData.get('iteration') > pm.environment.get('rateLimit')) {",
+                  "        pm.response.to.have.status(429);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "549362d0-d1b4-4123-a501-40eef1b84d2e",
+          "length": 10,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "f0f9f409-20b8-459a-a25d-2778da171bbb"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "8d6c84ec-8347-4d3e-9a29-d226f06bd766",
+          "timestamp": 1741992423023,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+          "name": "Gateway Routes",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gateway",
+                "routes"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "a54742c7-788d-4220-a991-e7dbd83a4c9e",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "61c54441-035b-4215-954d-c085b36417b6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway routes are configured', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.routes).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "4b7711ba-98ec-408f-ab7e-aac1bc6d943a",
+          "length": 10,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "89da2cd2-755c-426f-b8ad-4582378d1e6d"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Gateway routes are configured",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:9)",
+          "checksum": "254a5c8ecc846151b5b89548be1ebe0a",
+          "id": "fc383019-b7a0-4b28-b017-4ba5c5c85d19",
+          "timestamp": 1741992423031,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 9,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+          "name": "Gateway Routes",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "routes"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "61c54441-035b-4215-954d-c085b36417b6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway routes are configured', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.routes).to.be.an('array');",
+                  "});"
+                ],
+                "_lastExecutionId": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "e256f470-3e85-4405-9bcf-e76c99fd711d",
+          "name": "Integration Gateway",
+          "item": [
+            {
+              "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+              "name": "Gateway Routes",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "routes"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "61c54441-035b-4215-954d-c085b36417b6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway routes are configured', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.routes).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+              "name": "Gateway Metrics",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway metrics are available', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.metrics).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "4b7711ba-98ec-408f-ab7e-aac1bc6d943a",
+          "length": 10,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "89da2cd2-755c-426f-b8ad-4582378d1e6d",
+          "scriptId": "61c54441-035b-4215-954d-c085b36417b6",
+          "execution": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+        }
+      },
+      {
+        "error": {
+          "code": "CERT_HAS_EXPIRED",
+          "name": "Error",
+          "message": "certificate has expired",
+          "stack": "Error: certificate has expired\n    at TLSSocket.onConnectSecure (node:_tls_wrap:1679:34)\n    at TLSSocket.emit (node:events:507:28)\n    at TLSSocket._finishInit (node:_tls_wrap:1078:8)\n    at ssl.onhandshakedone (node:_tls_wrap:864:12)",
+          "checksum": "2309b612bccef9d62f60a1bc1743459d",
+          "id": "26600958-e50d-40fb-86d8-02e3fe01c473",
+          "timestamp": 1741992423245,
+          "stacktrace": [
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1679,
+              "functionName": "TLSSocket.onConnectSecure",
+              "typeName": "TLSSocket",
+              "methodName": "onConnectSecure",
+              "columnNumber": 34,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "TLSSocket.emit",
+              "typeName": "TLSSocket",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 1078,
+              "functionName": "TLSSocket._finishInit",
+              "typeName": "TLSSocket",
+              "methodName": "_finishInit",
+              "columnNumber": 8,
+              "native": false
+            },
+            {
+              "fileName": "node:_tls_wrap",
+              "lineNumber": 864,
+              "functionName": "ssl.onhandshakedone",
+              "typeName": "ssl",
+              "methodName": "onhandshakedone",
+              "columnNumber": 12,
+              "native": false
+            }
+          ]
+        },
+        "at": "request",
+        "source": {
+          "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+          "name": "Gateway Metrics",
+          "request": {
+            "url": {
+              "protocol": "https",
+              "path": [
+                "gateway",
+                "metrics"
+              ],
+              "host": [
+                "dev-api",
+                "day1",
+                "asoos",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer Bearer dummy-token-for-testing"
+              },
+              {
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true
+              },
+              {
+                "key": "Accept",
+                "value": "*/*",
+                "system": true
+              },
+              {
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true
+              },
+              {
+                "key": "Postman-Token",
+                "value": "cfa86f15-09b2-43f0-92da-4c4c854f3335",
+                "system": true
+              },
+              {
+                "key": "Host",
+                "value": "dev-api.day1.asoos.com",
+                "system": true
+              },
+              {
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true
+              },
+              {
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway metrics are available', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.metrics).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        "cursor": {
+          "ref": "21f8d818-f984-4398-af25-dc720405928c",
+          "length": 10,
+          "cycles": 1,
+          "position": 9,
+          "iteration": 0,
+          "httpRequestId": "adb5b760-4074-4c81-8769-56269ba2c5cc"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Gateway metrics are available",
+          "message": "expected PostmanResponse{ …(5) } to have property 'code'",
+          "stack": "AssertionError: expected PostmanResponse{ …(5) } to have property 'code'\n   at Object.eval sandbox-script.js:1:10)",
+          "checksum": "cda4ac30b3da1558afe57dbed2091aa4",
+          "id": "a4efb491-a689-4981-99b0-ad08b2068163",
+          "timestamp": 1741992423253,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 10,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+          "name": "Gateway Metrics",
+          "request": {
+            "url": {
+              "path": [
+                "gateway",
+                "metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Gateway metrics are available', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.metrics).to.exist;",
+                  "});"
+                ],
+                "_lastExecutionId": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "e256f470-3e85-4405-9bcf-e76c99fd711d",
+          "name": "Integration Gateway",
+          "item": [
+            {
+              "id": "e913967b-0e6d-4a23-a23f-a190cbc9fd32",
+              "name": "Gateway Routes",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "routes"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "61c54441-035b-4215-954d-c085b36417b6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway routes are configured', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.routes).to.be.an('array');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "c9fca4c1-d3ba-46b4-8144-252e64ed56d1"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c4810362-2155-41d7-bdb4-d6607156dc08",
+              "name": "Gateway Metrics",
+              "request": {
+                "url": {
+                  "path": [
+                    "gateway",
+                    "metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "c711610f-8480-4cb9-a91d-1355d6c44243",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Gateway metrics are available', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.metrics).to.exist;",
+                      "});"
+                    ],
+                    "_lastExecutionId": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "21f8d818-f984-4398-af25-dc720405928c",
+          "length": 10,
+          "cycles": 1,
+          "position": 9,
+          "iteration": 0,
+          "httpRequestId": "adb5b760-4074-4c81-8769-56269ba2c5cc",
+          "scriptId": "c711610f-8480-4cb9-a91d-1355d6c44243",
+          "execution": "65b6783b-290c-4e68-bfbc-c8620ce42049"
+        }
+      }
+    ],
+    "error": null
+  }
+}
