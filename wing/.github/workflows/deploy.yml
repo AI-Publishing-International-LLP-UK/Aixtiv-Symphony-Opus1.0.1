@@ -1,0 +1,60 @@
+name: Build and Deploy drlucyautomation to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+env:
+  PROJECT_ID: API-for-Warp-Drive
+  SERVICE_NAME: drlucyautomation  # GitHub app service name
+  REGION: us-west1  # Replace with your preferred region
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required to check out the repository
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: 'projects/API-for-Warp-Drive/locations/us-west1/workloadIdentityPools/DrLucy-5-0-Framework/providers/github-oidc-provider'
+          service_account: 'dr-lucy-automation@API-for-Warp-Drive.iam.gserviceaccount.com'
+          token_format: 'access_token'
+          repository: 'DrLucy-5-0-Framework'
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker to use gcloud credentials
+        run: |
+          gcloud auth configure-docker gcr.io
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          flags: '--allow-unauthenticated'  # Remove if authentication is required
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+
