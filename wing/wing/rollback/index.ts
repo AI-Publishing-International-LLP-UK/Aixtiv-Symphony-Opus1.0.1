@@ -1026,6 +1026,7 @@ export class RollbackSystem extends EventEmitter {
   }
 
   /**
+  /**
    * Register backup components with the backup manager
    */
   private async registerBackupComponents(): Promise<void> {
@@ -1066,8 +1067,49 @@ export class RollbackSystem extends EventEmitter {
       },
       priority: 20
     });
-  }
 
+    // Register Agent Backup component
+    this.backupManager.registerComponent({
+      id: 'agents',
+      name: 'Pilot Agents',
+      description: 'Backup and restore agent states and configurations',
+      backup: async () => {
+        return await this.agentBackup.createBackup({
+          includeMetadata: true,
+          compress: true,
+          tags: ['scheduled']
+        });
+      },
+      restore: async (backupId: string) => {
+        return await this.agentBackup.restore(backupId);
+      },
+      verify: async (backupId: string) => {
+        return await this.agentBackup.verifyBackup(backupId);
+      },
+      priority: 30
+    });
+
+    // Register Squadron Backup component
+    this.backupManager.registerComponent({
+      id: 'squadrons',
+      name: 'Squadrons',
+      description: 'Backup and restore squadron structures and assignments',
+      backup: async () => {
+        return await this.squadronBackup.createBackup({
+          includeMetadata: true,
+          compress: true,
+          tags: ['scheduled']
+        });
+      },
+      restore: async (backupId: string) => {
+        return await this.squadronBackup.restore(backupId);
+      },
+      verify: async (backupId: string) => {
+        return await this.squadronBackup.verifyBackup(backupId);
+      },
+      priority: 40
+    });
+  }
   /**
    * Set up health monitoring for system components
    */
@@ -1172,6 +1214,74 @@ export class RollbackSystem extends EventEmitter {
               healthy: false,
               details: `Backup system health check failed: ${error.message}`,
               metrics: {}
+            };
+          }
+        }
+      },
+      {
+        id: 'agents',
+        name: 'Agent System',
+        healthCheck: async () => {
+          try {
+            const status = await this.agentBackup.checkHealth();
+            return {
+              healthy: status.healthy,
+              details: status.message || 'Agent system health check completed',
+              metrics: status.metrics || {}
+            };
+          } catch (error) {
+            return {
+              healthy: false,
+              details: `Agent system health check failed: ${error.message}`,
+              metrics: {}
+            };
+          }
+        },
+        recoverFunction: async () => {
+          try {
+            const result = await this.agentBackup.performRecovery();
+            return {
+              success: result.success,
+              details: result.message || 'Agent recovery completed'
+            };
+          } catch (error) {
+            return {
+              success: false,
+              error: `Agent recovery failed: ${error.message}`
+            };
+          }
+        }
+      },
+      {
+        id: 'squadrons',
+        name: 'Squadron System',
+        healthCheck: async () => {
+          try {
+            const status = await this.squadronBackup.checkHealth();
+            return {
+              healthy: status.healthy,
+              details: status.message || 'Squadron system health check completed',
+              metrics: status.metrics || {}
+            };
+          } catch (error) {
+            return {
+              healthy: false,
+              details: `Squadron system health check failed: ${error.message}`,
+              metrics: {}
+            };
+          }
+        },
+        recoverFunction: async () => {
+          try {
+            const result = await this.squadronBackup.performRecovery();
+            return {
+              success: result.success,
+              details: result.message || 'Squadron recovery completed'
+            };
+          } catch (error) {
+            return {
+              success: false,
+              error: `Squadron recovery failed: ${error.message}`
             };
           }
         }
@@ -1281,10 +1391,116 @@ export class RollbackSystem extends EventEmitter {
         initiatedBy: username,
         reason,
         status: RollbackStatus.PENDING,
-        components: ['vision-lake', 'auth'],
+        components: ['vision-lake', 'auth', 'agents', 'squadrons'],
         backupId: nearestBackup.id,
         healthBeforeRollback
       };
+
+      // Set current rollback
+      this.currentRollback = rollbackMeta;
+      this.rollbackHistory.push(rollbackMeta);
+
+      // Log rollback start
+      this.log('info', `Starting emergency rollback ${rollbackId} to backup from ${new Date(nearestBackup.timestamp).toISOString()}`);
+
+      // Update status
+      rollbackMeta.status = RollbackStatus.IN_PROGRESS;
+      this.emit('rollback:started', { id: rollbackId, timestamp: Date.now() });
+
+      // Define component restore order based on dependencies
+      // Order should be:
+      // 1. Vision Lake (knowledge base needed by agents)
+      // 2. Auth (authentication needed for security)
+      // 3. Agents (individual agents needed for squadron formation)
+      // 4. Squadrons (depends on agents being available)
+      const componentOrder = [
+        { id: 'vision-lake', name: 'Vision Lake', priority: 10 },
+        { id: 'auth', name: 'Authentication', priority: 20 },
+        { id: 'agents', name: 'Pilot Agents', priority: 30 },
+        { id: 'squadrons', name: 'Squadrons', priority: 40 }
+      ];
+
+      // Sort by priority
+      componentOrder.sort((a, b) => a.priority - b.priority);
+
+      // Execute rollback for each component in order
+      const results: Record<string, any> = {};
+      let overallSuccess = true;
+
+      for (const component of componentOrder) {
+        try {
+          this.log('info', `Rolling back ${component.name} from backup ${nearestBackup.id}`);
+          
+          let result: any;
+          
+          switch (component.id) {
+            case 'vision-lake':
+              result = await this.visionLakeBackup.restore(nearestBackup.id);
+              break;
+            case 'auth':
+              result = await this.authBackup.restore(nearestBackup.id);
+              break;
+            case 'agents':
+              result = await this.agentBackup.restore(nearestBackup.id);
+              break;
+            case 'squadrons':
+              result = await this.squadronBackup.restore(nearestBackup.id);
+              break;
+            default:
+              throw new Error(`Unknown component: ${component.id}`);
+          }
+          
+          results[component.id] = result;
+          
+          if (!result.success) {
+            this.log('error', `Failed to restore ${component.name}: ${result.error || 'Unknown error'}`);
+            overallSuccess = false;
+            break;
+          }
+          
+          this.log('info', `Successfully restored ${component.name}`);
+          
+          // Short pause between component restores to ensure system stability
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+        } catch (error) {
+          this.log('error', `Error restoring ${component.name}: ${error.message}`);
+          results[component.id] = { success: false, error: error.message };
+          overallSuccess = false;
+          break;
+        }
+      }
+      
+      // Capture health status after rollback
+      const healthAfterRollback = await this.healthMonitor.getComponentsHealth();
+      rollbackMeta.healthAfterRollback = healthAfterRollback;
+      
+      // Check for critical health issues
+      const hasIssues = Object.values(healthAfterRollback).some(
+        h => h.status === 'critical' || h.status === 'error'
+      );
+      
+      // Update rollback status based on results
+      if (overallSuccess && !hasIssues) {
+        rollbackMeta.status = RollbackStatus.COMPLETED;
+        rollbackMeta.completedAt = Date.now();
+        this.log('info', `Emergency rollback ${rollbackId} completed successfully`);
+        this.emit('rollback:completed', { 
+          id: rollbackId, 
+          timestamp: Date.now(),
+          success: true 
+        });
+        
+        return {
+          success: true,
+          rollbackId,
+          message: `Successfully rolled back to backup from ${new Date(nearestBackup.timestamp).toLocaleString()}`,
+          status: RollbackStatus.COMPLETED
+        };
+        
+      } else if (hasIssues) {
+        // Health issues detected, attempt recovery
+        rollbackM
 
       // Log the rollback initiation
       this.log('info', `Initiating emergency rollback to backup from ${new Date(nearestBackup
