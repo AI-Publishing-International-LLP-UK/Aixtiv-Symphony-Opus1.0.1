@@ -1,0 +1,247 @@
+name: Dr. Lucy Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issues:
+    types: [opened, labeled, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened]
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+
+jobs:
+  # PR Size Labeler - Automatically adds size labels to PRs
+  pr-size-labeler:
+    name: Label PR by Size
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Label PRs by Size
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/xs'
+          xs_max_size: '10'
+          s_label: 'size/s'
+          s_max_size: '100'
+          m_label: 'size/m'
+          m_max_size: '500'
+          l_label: 'size/l'
+          l_max_size: '1000'
+          xl_label: 'size/xl'
+          fail_if_xl: 'false'
+          message_if_xl: 'This PR is too large. Please consider breaking it down into smaller PRs.'
+
+  # PR Description Checker
+  pr-description-check:
+    name: Check PR Description
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Verify PR Description
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr.body || pr.body.length < 20) {
+              core.setFailed('PR description is too short. Please provide more details about the changes.');
+              await github.rest.issues.createComment({
+                issue_number: pr.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '📝 **Dr. Lucy Automation Notice**\nYour PR description is too short. Please update it to include:\n- What changes were made\n- Why the changes were needed\n- How the changes were implemented\n\nA good description helps reviewers understand your PR more quickly!'
+              });
+            }
+
+  # Automated PR Review
+  pr-review:
+    name: Automated PR Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [pr-description-check]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Add Review Comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            await github.rest.issues.createComment({
+              issue_number: pr.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👩‍🔬 **Dr. Lucy Automation Review**\n\nThank you for your contribution! I\'ve automatically reviewed this PR and here are my findings:\n\n- This PR changes approximately **${{ steps.changes.outputs.files }}** files\n- I\'ll be monitoring this PR for updates and will help with the review process\n\nPlease make sure all tests pass and address any feedback from human reviewers!'
+            });
+
+  # Dependabot PR Management
+  dependabot-management:
+    name: Manage Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request_target'
+    steps:
+      - name: Approve & Auto-merge for Minor/Patch Updates
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Check if it's a minor or patch update by looking at the title
+            const isSafeUpdate = /bump .* from (.*) to (.*)/.test(pr.title);
+            if (isSafeUpdate) {
+              const updateMatch = pr.title.match(/bump .* from (.*) to (.*)/);
+              const fromVersion = updateMatch[1].split('.');
+              const toVersion = updateMatch[2].split('.');
+              
+              // If it's a patch or minor update, auto-approve and merge
+              if (fromVersion[0] === toVersion[0]) {
+                console.log('Safe update detected - approving and enabling auto-merge');
+                
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  event: 'APPROVE',
+                  body: '👩‍🔬 **Dr. Lucy Automation**\n\nThis minor/patch update has been automatically approved. If CI passes, it will be auto-merged.'
+                });
+                
+                // Enable auto-merge
+                try {
+                  await github.rest.pulls.updateBranch({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                    expected_head_sha: pr.head.sha
+                  });
+                  
+                  await github.rest.pulls.merge({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                    merge_method: 'squash'
+                  });
+                } catch (e) {
+                  console.log('Could not enable auto-merge: ' + e);
+                }
+              } else {
+                // Major version update needs manual review
+                await github.rest.issues.createComment({
+                  issue_number: pr.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: '⚠️ **Dr. Lucy Automation**\n\nThis is a major version update and requires manual review. Please check for breaking changes before merging.'
+                });
+                
+                await github.rest.issues.addLabels({
+                  issue_number: pr.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: ['major-update', 'needs-review']
+                });
+              }
+            }
+
+  # Issue Triage
+  issue-triage:
+    name: Triage New Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Initial Issue Triage
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            
+            // Add welcome comment
+            await github.rest.issues.createComment({
+              issue_number: issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👩‍🔬 **Dr. Lucy Automation**\n\nThank you for opening this issue! I\'ll help triage it.\n\nA team member will review this soon. In the meantime, please make sure you\'ve provided all necessary information.'
+            });
+            
+            // Analyze issue content and add labels
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            
+            const labels = [];
+            
+            // Check for bug reports
+            if (title.includes('bug') || 
+                title.includes('error') || 
+                title.includes('not working') ||
+                body.includes('expected behavior') && body.includes('actual behavior')) {
+              labels.push('bug');
+            }
+            
+            // Check for feature requests
+            if (title.includes('feature') || 
+                title.includes('enhancement') || 
+                title.includes('add') ||
+                body.includes('feature request')) {
+              labels.push('enhancement');
+            }
+            
+            // Check for questions
+            if (title.includes('how') || 
+                title.includes('?') || 
+                title.includes('question') ||
+                body.includes('i\'m trying to')) {
+              labels.push('question');
+            }
+            
+            // Add priority based on keywords
+            if (title.includes('urgent') || 
+                title.includes('critical') || 
+                title.includes('crash') ||
+                body.includes('urgent') ||
+                body.includes('critical')) {
+              labels.push('priority/high');
+            } else {
+              labels.push('priority/medium');
+            }
+            
+            // Add triage label
+            labels.push('triage');
+            
+            // Apply labels if any were determined
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                issue_number: issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labels
+              });
+            }
+
+  # Stale Issue Management
+  stale-management:
+    name: Manage Stale Issues & PRs
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 0 * * *'  # Only run on the daily schedule
+    steps:
+      - name: Mark and Close Stale Issues and PRs
+        uses: actions/stale@v8
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: '👩‍🔬 **Dr. Lucy Automation**\n\nThis issue has been marked as stale due to inactivity for 30 days. It will be closed in 7 days unless there is new activity.'
+          stale-pr-message: '👩‍🔬 **Dr. Lucy Automation**\n\nThis PR has been marked as stale due to inactivity for 30 days. It will be closed in 7 days unless there is new activity.'
+          close-issue-message: '👩‍🔬 **Dr. Lucy Automation**\n\nThis issue has been closed due to continued inactivity. Please reopen if this issue is still relevant.'
+          close-pr-message: '👩‍🔬 **Dr. Lucy Automation**\n\nThis PR has been closed due to continued inactivity. Please reopen if this PR is still relevant.'
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          exempt-issue-labels: 'bug,enhancement,in-progress'
+          exempt-pr-labels: 'wip,waiting-for-review'
+          days-before-stale: 30
+          days-before-close: 7
+

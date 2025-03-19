@@ -524,3 +524,33 @@ ASOOS employs several integration patterns to ensure seamless operation across t
 
 The ASOOS architecture provides a robust, secure, and scalable foundation for the Aixtiv Symphony ecosystem. By adhering to these architectural principles and guidelines, developers can create cohesive, maintainable, and high-quality components that work seamlessly within the larger system.
 
+## Dr. Lucy Automation Testing
+
+Dr. Lucy Automation is a next-generation AI-powered assistant dedicated to optimizing workflows, automating processes, and enhancing collaboration across teams. As a GitHub App, Dr. Lucy Automation helps manage repository activities and streamline development processes.
+
+### Key Capabilities
+
+- **Workflow Automation**: Manages GitHub Actions to streamline CI/CD pipelines, testing, and deployments
+- **Task Management**: Automates routine tasks like issue triage, pull request reviews, and release scheduling
+- **Intelligent Insights**: Provides actionable analytics from repository activity for smarter decision-making
+- **API Integrations**: Extends functionality with OpenAI and other APIs for creative and analytical tasks
+
+### Testing Process
+
+To validate Dr. Lucy Automation functionality, we test the following workflows:
+
+1. **Pull Request Automation**:
+   - Auto-labeling PRs based on size and content
+   - Providing automated code reviews with recommendations
+   - Checking PR description completeness
+
+2. **Issue Management**:
+   - Welcoming users who open new issues
+   - Automatically categorizing issues based on content
+   - Applying appropriate labels (bug, enhancement, priority)
+
+3. **Dependabot PR Handling**:
+   - Auto-approving and merging minor and patch updates
+   - Adding detailed information about dependency changes
+
+The automated workflows are defined in `.github/workflows/dr-lucy-automation.yml` and are triggered by relevant GitHub events such as pull request activities, issue activities, and Dependabot alerts.
