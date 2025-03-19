@@ -21,6 +21,21 @@ on:
     - cron: '0 0 * * *'  # Run daily at midnight
 
 jobs:
+  # Workflow failed notification
+  workflow-failed:
+    name: Workflow Failure Notification
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [pr-size-labeler, pr-description-check, pr-review, dependabot-management, issue-triage, stale-management, firebase-deployment]
+    steps:
+      - name: Notify Slack on Workflow Failure
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":rotating_light: *Dr. Lucy Automation Workflow Failed*\nWorkflow: ${{ github.workflow }}\nRepository: ${{ github.repository }}\nTriggered by: ${{ github.actor }}\nEvent: ${{ github.event_name }}\nSee details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   # PR Size Labeler - Automatically adds size labels to PRs
   pr-size-labeler:
     name: Label PR by Size
@@ -43,6 +58,15 @@ jobs:
           fail_if_xl: 'false'
           message_if_xl: 'This PR is too large. Please consider breaking it down into smaller PRs.'
 
+      # Notify Slack about PR size
+      - name: Notify Slack about PR Size
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":mag: *Dr. Lucy Automation* labeled PR #${{ github.event.pull_request.number }} by ${{ github.event.pull_request.user.login }} based on size.\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   # PR Description Checker
   pr-description-check:
     name: Check PR Description
@@ -65,6 +89,15 @@ jobs:
               });
             }
 
+      # Notify Slack about PR description check
+      - name: Notify Slack about PR Description Check
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":clipboard: *Dr. Lucy Automation* checked PR #${{ github.event.pull_request.number }} description.\nStatus: ${{ job.status }}\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   # Automated PR Review
   pr-review:
     name: Automated PR Review
@@ -113,6 +146,15 @@ jobs:
               body: '\U0001F469‍\U0001F52C **Dr. Lucy Automation Review**\n\nThank you for your contribution! I\'ve automatically reviewed this PR and here are my findings:\n\n- This PR changes approximately **${{ steps.changes.outputs.result }}** files\n- I\'ll be monitoring this PR for updates and will help with the review process\n\nPlease make sure all tests pass and address any feedback from human reviewers!'
             });
 
+      # Notify Slack about PR review
+      - name: Notify Slack about PR Review
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":eyes: *Dr. Lucy Automation* reviewed PR #${{ github.event.pull_request.number }} by ${{ github.event.pull_request.user.login }}.\nChanged Files: ${{ steps.changes.outputs.result }}\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   # Dependabot PR Management
   dependabot-management:
     name: Manage Dependabot PRs
@@ -189,7 +231,16 @@ jobs:
                 });
               }
             }
-
+            
+      # Notify Slack about Dependabot PR management
+      - name: Notify Slack about Dependabot Management
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":package: *Dr. Lucy Automation* processed Dependabot PR #${{ github.event.pull_request.number }}.\nTitle: ${{ github.event.pull_request.title }}\nAction: ${{ fromVersion[0] === toVersion[0] ? 'Auto-approved and merged' : 'Flagged for manual review' }}\nLink: ${{ github.event.pull_request.html_url }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   # Issue Triage
   issue-triage:
     name: Triage New Issues
@@ -274,6 +325,15 @@ jobs:
               });
             }
 
+      # Notify Slack about issue triage
+      - name: Notify Slack about Issue Triage
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":ticket: *Dr. Lucy Automation* triaged issue #${{ github.event.issue.number }} opened by ${{ github.event.issue.user.login }}.\nTitle: ${{ github.event.issue.title }}\nLabels: ${{ join(labels, ', ') }}\nLink: ${{ github.event.issue.html_url }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   # Stale Issue Management
   stale-management:
     name: Manage Stale Issues & PRs
@@ -303,7 +363,16 @@ jobs:
           exempt-pr-labels: 'wip,waiting-for-review'
           days-before-stale: 30
           days-before-close: 7
-  # Firebase deployment job
+
+      # Notify Slack about stale management
+      - name: Notify Slack about Stale Management
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":broom: *Dr. Lucy Automation* ran stale issue/PR management.\nStatus: ${{ job.status }}\nRepository: ${{ github.repository }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
   firebase-deployment:
     name: Firebase Deployment
     runs-on: ubuntu-latest
@@ -331,3 +400,13 @@ jobs:
           echo "Deploying to Firebase..."
           # Add your Firebase deployment commands here
           # Example: firebase deploy --only hosting
+
+      # Notify Slack about Firebase deployment
+      - name: Notify Slack about Firebase Deployment
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":rocket: *Dr. Lucy Automation* ran Firebase deployment.\nStatus: ${{ job.status }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\nTriggered by: ${{ github.actor }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
