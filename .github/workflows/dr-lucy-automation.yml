@@ -9,6 +9,26 @@ permissions:
 
 on:
   workflow_dispatch:  # Allow manual triggering of the workflow
+    inputs:
+      instructions:
+        description: 'Instructions from OpenAI for Dr. Lucy Automation'
+        required: true
+        type: string
+      action_type:
+        description: 'Type of action to perform (deploy, test, update, etc.)'
+        required: true
+        type: string
+        default: 'deploy'
+      target_environment:
+        description: 'Target environment for the operation'
+        required: true
+        type: string
+        default: 'staging'
+      push_to_live:
+        description: 'Whether to push changes to live environment'
+        required: false
+        type: boolean
+        default: false
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   issues:
@@ -26,7 +46,7 @@ jobs:
     name: Workflow Failure Notification
     runs-on: ubuntu-latest
     if: failure()
-    needs: [pr-size-labeler, pr-description-check, pr-review, dependabot-management, issue-triage, stale-management, firebase-deployment]
+    needs: [pr-size-labeler, pr-description-check, pr-review, dependabot-management, issue-triage, stale-management, firebase-deployment, openai-assignment]
     steps:
       - name: Notify Slack on Workflow Failure
         uses: slackapi/slack-github-action@v1.24.0
@@ -415,6 +435,197 @@ jobs:
         with:
           channel-id: 'git-lucy'
           slack-message: ":rocket: *Dr. Lucy Automation* ran Firebase deployment.\nStatus: ${{ job.status }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\nTriggered by: ${{ github.actor }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: \"A08EZ0320RX\" # Security Alert app in Coaching2100 workspace
+
+  # OpenAI Assignment - Process instructions from OpenAI
+  openai-assignment:
+    name: Process OpenAI Assignment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.instructions != null
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        
+      # Authenticate with Google Cloud using DRLA service account
+      - name: Authenticate with Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          install_components: 'firebase,kubectl,gke-gcloud-auth-plugin'
+
+      # Notify Slack that assignment has started
+      - name: Notify Slack about OpenAI Assignment Start
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":brain: *Dr. Lucy Automation* received an assignment from OpenAI.\\nAction Type: ${{ github.event.inputs.action_type }}\\nTarget Environment: ${{ github.event.inputs.target_environment }}\\nPush to Live: ${{ github.event.inputs.push_to_live }}\\nTriggered by: ${{ github.actor }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
+      
+      # Parse and process instructions
+      - name: Process OpenAI Instructions
+        id: process-instructions
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const instructions = process.env.INSTRUCTIONS;
+            console.log(`Processing instructions from OpenAI: ${instructions}`);
+            
+            // Parse the instructions and determine the required actions
+            let actionPlan = [];
+            try {
+              // Log the instructions for debugging
+              core.info(`Instructions: ${instructions}`);
+              
+              // Simple parsing example - could be more sophisticated in a real implementation
+              if (instructions.includes('deploy')) {
+                actionPlan.push('deploy');
+              }
+              if (instructions.includes('test')) {
+                actionPlan.push('test');
+              }
+              if (instructions.includes('update')) {
+                actionPlan.push('update');
+              }
+              
+              // Set output for use in subsequent steps
+              core.setOutput('action_plan', JSON.stringify(actionPlan));
+              core.setOutput('validated', 'true');
+            } catch (error) {
+              core.setFailed(`Error processing instructions: ${error.message}`);
+              core.setOutput('validated', 'false');
+            }
+        env:
+          INSTRUCTIONS: ${{ github.event.inputs.instructions }}
+      
+      # Setup application environment based on target
+      - name: Setup Environment
+        if: steps.process-instructions.outputs.validated == 'true'
+        run: |
+          echo "Setting up environment for ${{ github.event.inputs.target_environment }}"
+          
+          # Create environment-specific configuration
+          if [[ "${{ github.event.inputs.target_environment }}" == "production" ]]; then
+            echo "Setting up production environment"
+            # Add production-specific setup commands
+          elif [[ "${{ github.event.inputs.target_environment }}" == "staging" ]]; then
+            echo "Setting up staging environment"
+            # Add staging-specific setup commands
+          else
+            echo "Setting up development environment"
+            # Add development-specific setup commands
+          fi
+      
+      # Execute the planned actions
+      - name: Execute Assignment Actions
+        if: steps.process-instructions.outputs.validated == 'true'
+        id: execute-actions
+        run: |
+          echo "Executing actions based on OpenAI instructions"
+          ACTION_PLAN='${{ steps.process-instructions.outputs.action_plan }}'
+          
+          # Parse the JSON action plan
+          if [[ $ACTION_PLAN == *"deploy"* ]]; then
+            echo "Executing deployment actions"
+            # Add deployment commands here
+          fi
+          
+          if [[ $ACTION_PLAN == *"test"* ]]; then
+            echo "Executing test actions"
+            # Add test commands here
+          fi
+          
+          if [[ $ACTION_PLAN == *"update"* ]]; then
+            echo "Executing update actions"
+            # Add update commands here
+          fi
+      
+      # Push to live environment if requested and if we're in a push-capable action
+      - name: Push to Live Environment
+        if: steps.process-instructions.outputs.validated == 'true' && github.event.inputs.push_to_live == 'true'
+        run: |
+          echo "Pushing changes to live environment"
+          
+          # Verify we're allowed to push to live
+          if [[ "${{ github.event.inputs.target_environment }}" != "production" ]]; then
+            echo "Warning: Pushing to live from non-production environment"
+          fi
+          
+          # Example deployment commands:
+          # - For Firebase hosting
+          # firebase deploy --only hosting
+          
+          # - For GKE
+          # gcloud container clusters get-credentials my-cluster --zone us-central1-a
+          # kubectl apply -f k8s/deployment.yaml
+      
+      # Report results
+      - name: Report Assignment Results
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const jobStatus = process.env.JOB_STATUS;
+            
+            // Create a GitHub issue to document the assignment and results
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `OpenAI Assignment: ${process.env.ACTION_TYPE} on ${new Date().toISOString().split('T')[0]}`,
+              body: `# OpenAI Assignment Report
+
+              ## Instruction
+              \`\`\`
+              ${process.env.INSTRUCTIONS}
+              \`\`\`
+
+              ## Action Type
+              ${process.env.ACTION_TYPE}
+
+              ## Target Environment
+              ${process.env.TARGET}
+
+              ## Push to Live
+              ${process.env.PUSH_TO_LIVE}
+
+              ## Status
+              ${jobStatus}
+
+              ## Executed By
+              ${process.env.ACTOR}
+              
+              ## Timestamp
+              ${new Date().toISOString()}
+              `
+            });
+        env:
+          JOB_STATUS: ${{ job.status }}
+          INSTRUCTIONS: ${{ github.event.inputs.instructions }}
+          ACTION_TYPE: ${{ github.event.inputs.action_type }}
+          TARGET: ${{ github.event.inputs.target_environment }}
+          PUSH_TO_LIVE: ${{ github.event.inputs.push_to_live }}
+          ACTOR: ${{ github.actor }}
+      
+      # Notify Slack about assignment completion
+      - name: Notify Slack about OpenAI Assignment Completion
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'git-lucy'
+          slack-message: ":checkered_flag: *Dr. Lucy Automation* completed OpenAI assignment.\\nStatus: ${{ job.status }}\\nAction Type: ${{ github.event.inputs.action_type }}\\nTarget Environment: ${{ github.event.inputs.target_environment }}\\nPush to Live: ${{ github.event.inputs.push_to_live }}\\nTriggered by: ${{ github.actor }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
