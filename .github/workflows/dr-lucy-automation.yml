@@ -68,6 +68,20 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Count Changed Files
+        id: changes
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+            return files.length;
+
       - name: Add Review Comment
         uses: actions/github-script@v6
         with:
@@ -78,7 +92,7 @@ jobs:
               issue_number: pr.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👩‍🔬 **Dr. Lucy Automation Review**\n\nThank you for your contribution! I\'ve automatically reviewed this PR and here are my findings:\n\n- This PR changes approximately **${{ steps.changes.outputs.files }}** files\n- I\'ll be monitoring this PR for updates and will help with the review process\n\nPlease make sure all tests pass and address any feedback from human reviewers!'
+              body: '\U0001F469‍\U0001F52C **Dr. Lucy Automation Review**\n\nThank you for your contribution! I\'ve automatically reviewed this PR and here are my findings:\n\n- This PR changes approximately **${{ steps.changes.outputs.result }}** files\n- I\'ll be monitoring this PR for updates and will help with the review process\n\nPlease make sure all tests pass and address any feedback from human reviewers!'
             });
 
   # Dependabot PR Management
