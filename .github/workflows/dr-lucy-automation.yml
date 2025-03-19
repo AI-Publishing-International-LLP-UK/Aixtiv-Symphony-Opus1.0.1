@@ -1,6 +1,7 @@
 name: Dr. Lucy Automation
 
 # Define permissions at workflow level
+# This workflow uses the official DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com service account
 permissions:
   contents: write
   pull-requests: write
@@ -130,11 +131,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # Add DRLA Authentication
+      # Authenticate with Google Cloud using the official DrLucyAutomation service account
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          service_account: DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
           
       # Set up Google Cloud SDK
       - name: Set up Cloud SDK
@@ -186,11 +188,12 @@ jobs:
     if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request_target'
     steps:
       # Add DRLA Authentication
+      # Authenticate with Google Cloud using the official DrLucyAutomation service account
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
-          
+          service_account: DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
       # Set up Google Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -273,11 +276,12 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
       # Add DRLA Authentication
+      # Authenticate with Google Cloud using the official DrLucyAutomation service account
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
-          
+          service_account: DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
       # Set up Google Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -367,11 +371,12 @@ jobs:
     if: github.event.schedule == '0 0 * * *'  # Only run on the daily schedule
     steps:
       # Add DRLA Authentication
+      # Authenticate with Google Cloud using the official DrLucyAutomation service account
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
-          
+          service_account: DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
       # Set up Google Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -410,11 +415,12 @@ jobs:
           fetch-depth: 0
           
       # Add Firebase Authentication
+      # Authenticate with Firebase using a separate service account
+      # Note: This is separate from the DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com account
       - name: Authenticate with Firebase
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          
       # Set up Google Cloud SDK with Firebase
       - name: Set up Cloud SDK with Firebase
         uses: google-github-actions/setup-gcloud@v1
@@ -450,12 +456,13 @@ jobs:
         with:
           fetch-depth: 0
         
-      # Authenticate with Google Cloud using DRLA service account
+      # Authenticate with Google Cloud using the official DrLucyAutomation service account
       - name: Authenticate with Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          service_account: DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
           
       # Set up Google Cloud SDK
       - name: Set up Cloud SDK
@@ -519,15 +526,113 @@ jobs:
           # Create environment-specific configuration
           if [[ "${{ github.event.inputs.target_environment }}" == "production" ]]; then
             echo "Setting up production environment"
-            # Add production-specific setup commands
+            # Create production config files
+            cat > .env.production << EOF
+            API_ENDPOINT=https://api.coaching2100.com/v1
+            DATABASE_URL=https://api-for-warp-drive.firebaseio.com
+            STORAGE_BUCKET=api-for-warp-drive.appspot.com
+            ANALYTICS_ID=G-PROD12345
+            ENVIRONMENT=production
+            LOG_LEVEL=info
+            ENABLE_CACHING=true
+            EOF
+            
+            # Configure Firebase for production
+            cat > .firebaserc << EOF
+            {
+              "projects": {
+                "default": "api-for-warp-drive"
+              },
+              "targets": {
+                "api-for-warp-drive": {
+                  "hosting": {
+                    "production": [
+                      "coaching2100-prod"
+                    ]
+                  }
+                }
+              }
+            }
+            EOF
+            
+            # Create GKE configuration for production
+            gcloud container clusters get-credentials private-cluster-auto --region us-west1 --project api-for-warp-drive
+            
           elif [[ "${{ github.event.inputs.target_environment }}" == "staging" ]]; then
             echo "Setting up staging environment"
-            # Add staging-specific setup commands
+            # Create staging config files
+            cat > .env.staging << EOF
+            API_ENDPOINT=https://staging-api.coaching2100.com/v1
+            DATABASE_URL=https://api-for-warp-drive-staging.firebaseio.com
+            STORAGE_BUCKET=api-for-warp-drive-staging.appspot.com
+            ANALYTICS_ID=G-STAGING12345
+            ENVIRONMENT=staging
+            LOG_LEVEL=debug
+            ENABLE_CACHING=true
+            EOF
+            
+            # Configure Firebase for staging
+            cat > .firebaserc << EOF
+            {
+              "projects": {
+                "default": "api-for-warp-drive"
+              },
+              "targets": {
+                "api-for-warp-drive": {
+                  "hosting": {
+                    "staging": [
+                      "coaching2100-staging"
+                    ]
+                  }
+                }
+              }
+            }
+            EOF
+            
+            # Create GKE configuration for staging
+            gcloud container clusters get-credentials autopilot-cluster-1 --region us-west1 --project api-for-warp-drive
+            
           else
             echo "Setting up development environment"
-            # Add development-specific setup commands
+            # Create development config files
+            cat > .env.development << EOF
+            API_ENDPOINT=https://dev-api.coaching2100.com/v1
+            DATABASE_URL=https://api-for-warp-drive-dev.firebaseio.com
+            STORAGE_BUCKET=api-for-warp-drive-dev.appspot.com
+            ANALYTICS_ID=G-DEV12345
+            ENVIRONMENT=development
+            LOG_LEVEL=debug
+            ENABLE_CACHING=false
+            EOF
+            
+            # Configure Firebase for development
+            cat > .firebaserc << EOF
+            {
+              "projects": {
+                "default": "api-for-warp-drive"
+              },
+              "targets": {
+                "api-for-warp-drive": {
+                  "hosting": {
+                    "development": [
+                      "coaching2100-dev"
+                    ]
+                  }
+                }
+              }
+            }
+            EOF
+            
+            # Use Kind for local Kubernetes development
+            kind get clusters || kind create cluster --name gke-local
+            kubectl config use-context kind-gke-local
           fi
+          
+          # Set appropriate Node environment
+          export NODE_ENV=${{ github.event.inputs.target_environment }}
+          echo "NODE_ENV=${{ github.event.inputs.target_environment }}" >> $GITHUB_ENV
       
+      # Execute the planned actions
       # Execute the planned actions
       - name: Execute Assignment Actions
         if: steps.process-instructions.outputs.validated == 'true'
@@ -535,23 +640,142 @@ jobs:
         run: |
           echo "Executing actions based on OpenAI instructions"
           ACTION_PLAN='${{ steps.process-instructions.outputs.action_plan }}'
+          TARGET_ENV="${{ github.event.inputs.target_environment }}"
+          
+          # Install dependencies if needed
+          npm install
           
           # Parse the JSON action plan
           if [[ $ACTION_PLAN == *"deploy"* ]]; then
             echo "Executing deployment actions"
-            # Add deployment commands here
+            
+            # Build the application with environment-specific configuration
+            if [[ "$TARGET_ENV" == "production" ]]; then
+              echo "Building for production..."
+              npm run build:production
+              
+              # Deploy to Firebase hosting (production)
+              echo "Deploying to Firebase production hosting..."
+              firebase use api-for-warp-drive
+              firebase target:apply hosting production coaching2100-prod
+              firebase deploy --only hosting:production --message "Automated deployment by Dr. Lucy Automation"
+              
+              # Deploy to GKE (production)
+              if [[ -d "./kubernetes" ]]; then
+                echo "Deploying to GKE production cluster..."
+                kubectl apply -f ./kubernetes/production/
+              fi
+              
+            elif [[ "$TARGET_ENV" == "staging" ]]; then
+              echo "Building for staging..."
+              npm run build:staging
+              
+              # Deploy to Firebase hosting (staging)
+              echo "Deploying to Firebase staging hosting..."
+              firebase use api-for-warp-drive
+              firebase target:apply hosting staging coaching2100-staging
+              firebase deploy --only hosting:staging --message "Automated deployment by Dr. Lucy Automation"
+              
+              # Deploy to GKE (staging)
+              if [[ -d "./kubernetes" ]]; then
+                echo "Deploying to GKE staging cluster..."
+                kubectl apply -f ./kubernetes/staging/
+              fi
+              
+            else
+              echo "Building for development..."
+              npm run build:dev
+              
+              # Deploy to Firebase hosting (development)
+              echo "Deploying to Firebase development hosting..."
+              firebase use api-for-warp-drive
+              firebase target:apply hosting development coaching2100-dev
+              firebase deploy --only hosting:development --message "Automated deployment by Dr. Lucy Automation"
+              
+              # Deploy to Kind for local development
+              if [[ -d "./kubernetes" ]]; then
+                echo "Deploying to local Kind cluster..."
+                kubectl apply -f ./kubernetes/development/
+              fi
+            fi
           fi
           
           if [[ $ACTION_PLAN == *"test"* ]]; then
             echo "Executing test actions"
-            # Add test commands here
+            
+            # Install testing dependencies
+            npm install --no-save jest mocha chai puppeteer
+            
+            # Run appropriate tests based on environment
+            if [[ "$TARGET_ENV" == "production" ]]; then
+              echo "Running production tests..."
+              # Run integration and end-to-end tests against production API
+              NODE_ENV=production npm run test:integration
+              NODE_ENV=production npm run test:e2e
+              
+              # Run security and load tests
+              npm run test:security
+              npm run test:load
+              
+            elif [[ "$TARGET_ENV" == "staging" ]]; then
+              echo "Running staging tests..."
+              # Run all tests against staging API
+              NODE_ENV=staging npm run test:unit
+              NODE_ENV=staging npm run test:integration
+              NODE_ENV=staging npm run test:e2e
+              
+            else
+              echo "Running development tests..."
+              # Run basic unit and integration tests
+              NODE_ENV=development npm run test:unit
+              NODE_ENV=development npm run test:integration
+            fi
+            
+            # Generate and archive test reports
+            npm run test:report
           fi
           
           if [[ $ACTION_PLAN == *"update"* ]]; then
             echo "Executing update actions"
-            # Add update commands here
+            
+            # Update dependencies
+            echo "Updating dependencies..."
+            npm update
+            
+            # Apply database migrations if they exist
+            if [[ -d "./migrations" ]]; then
+              echo "Applying database migrations..."
+              
+              if [[ "$TARGET_ENV" == "production" ]]; then
+                # Run with extra caution on production
+                npm run migrate:production
+              elif [[ "$TARGET_ENV" == "staging" ]]; then
+                npm run migrate:staging
+              else
+                npm run migrate:development
+              fi
+            fi
+            
+            # Update Firebase functions
+            echo "Updating Firebase functions..."
+            if [[ -d "./functions" ]]; then
+              cd functions
+              npm install
+              cd ..
+              firebase deploy --only functions --message "Automated function update by Dr. Lucy Automation"
+            fi
+            
+            # Update configuration
+            echo "Updating application configuration..."
+            if [[ "$TARGET_ENV" == "production" ]]; then
+              # Update remote config in production
+              firebase deploy --only remoteconfig
+            fi
           fi
-      
+          
+          # Record the execution for reporting
+          echo "EXECUTED_ACTIONS=$ACTION_PLAN" >> $GITHUB_ENV
+      # Push to live environment if requested and if we're in a push-capable action
       # Push to live environment if requested and if we're in a push-capable action
       - name: Push to Live Environment
         if: steps.process-instructions.outputs.validated == 'true' && github.event.inputs.push_to_live == 'true'
@@ -563,14 +787,68 @@ jobs:
             echo "Warning: Pushing to live from non-production environment"
           fi
           
-          # Example deployment commands:
-          # - For Firebase hosting
-          # firebase deploy --only hosting
+          # Fetch production configuration
+          gcloud secrets versions access latest --secret="dr-lucy-production-config" > production-config.json
           
-          # - For GKE
-          # gcloud container clusters get-credentials my-cluster --zone us-central1-a
-          # kubectl apply -f k8s/deployment.yaml
-      
+          # Set up Firebase for production deployment
+          echo "Configuring Firebase for production deployment..."
+          firebase use api-for-warp-drive
+          firebase target:apply hosting production coaching2100-prod
+          
+          # Deploy to Firebase hosting production
+          echo "Deploying to Firebase production hosting..."
+          firebase deploy --only hosting:production --message "Live deployment by Dr. Lucy Automation"
+          
+          # Deploy to Firebase Firestore production rules and indexes
+          echo "Updating Firestore rules and indexes..."
+          firebase deploy --only firestore:rules,firestore:indexes --message "Live rules and indexes update by Dr. Lucy Automation"
+          
+          # Deploy to Firebase Functions
+          if [[ -d "./functions" ]]; then
+            echo "Deploying Firebase functions to production..."
+            firebase deploy --only functions --message "Live function deployment by Dr. Lucy Automation"
+          fi
+          
+          # Deploy to production GKE cluster
+          echo "Deploying to production GKE cluster..."
+          gcloud container clusters get-credentials private-cluster-auto --region us-west1 --project api-for-warp-drive
+          
+          # Apply Kubernetes configurations with production settings
+          if [[ -d "./kubernetes/production" ]]; then
+            kubectl apply -f ./kubernetes/production/namespace.yaml
+            kubectl apply -f ./kubernetes/production/configmap.yaml
+            kubectl apply -f ./kubernetes/production/secrets.yaml
+            kubectl apply -f ./kubernetes/production/deployment.yaml
+            kubectl apply -f ./kubernetes/production/service.yaml
+            kubectl apply -f ./kubernetes/production/ingress.yaml
+            
+            # Wait for deployment to complete
+            kubectl rollout status deployment/dr-lucy-api -n dr-lucy-production
+          fi
+          
+          # Update API gateway configurations if needed
+          if [[ -d "./api-gateway" ]]; then
+            echo "Updating API Gateway configurations..."
+            gcloud api-gateway apis deploy dr-lucy-api \
+              --api=dr-lucy-api \
+              --config=./api-gateway/api-config.yaml \
+              --project=api-for-warp-drive
+          fi
+          
+          # Update Cloud Run services if needed
+          if [[ -d "./cloud-run" ]]; then
+            echo "Updating Cloud Run services..."
+            gcloud run deploy dr-lucy-service \
+              --source ./cloud-run \
+              --platform managed \
+              --region us-west1 \
+              --project api-for-warp-drive
+          fi
+          
+          # Notify external systems about the deployment
+          echo "Sending deployment notifications to external systems..."
+          curl -X POST https://api.coaching2100.com/webhook/deployment \
+            -H "Content
       # Report results
       - name: Report Assignment Results
         if: always()
@@ -587,6 +865,10 @@ jobs:
               title: `OpenAI Assignment: ${process.env.ACTION_TYPE} on ${new Date().toISOString().split('T')[0]}`,
               body: `# OpenAI Assignment Report
 
+              ## Executed By Service Account
+              DrLucyAutomation@api-for-warp-drive.iam.gserviceaccount.com
+
+              ## Instruction
               ## Instruction
               \`\`\`
               ${process.env.INSTRUCTIONS}
