@@ -1,5 +1,12 @@
 name: Dr. Lucy Automation
 
+# Define permissions at workflow level
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write # Required for Google Cloud authentication
+
 on:
   workflow_dispatch:  # Allow manual triggering of the workflow
   pull_request:
@@ -66,6 +73,16 @@ jobs:
     needs: [pr-description-check]
     steps:
       - uses: actions/checkout@v3
+      
+      # Add DRLA Authentication
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
           fetch-depth: 0
       
@@ -102,6 +119,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request_target'
     steps:
+      # Add DRLA Authentication
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
       - name: Approve & Auto-merge for Minor/Patch Updates
         uses: actions/github-script@v6
         with:
@@ -170,6 +196,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
+      # Add DRLA Authentication
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
       - name: Initial Issue Triage
         uses: actions/github-script@v6
         with:
@@ -245,6 +280,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.schedule == '0 0 * * *'  # Only run on the daily schedule
     steps:
+      # Add DRLA Authentication
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.DRLA_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
       - name: Mark and Close Stale Issues and PRs
         uses: actions/stale@v8
         with:
@@ -259,4 +303,31 @@ jobs:
           exempt-pr-labels: 'wip,waiting-for-review'
           days-before-stale: 30
           days-before-close: 7
-
+  # Firebase deployment job
+  firebase-deployment:
+    name: Firebase Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      # Add Firebase Authentication
+      - name: Authenticate with Firebase
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          
+      # Set up Google Cloud SDK with Firebase
+      - name: Set up Cloud SDK with Firebase
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          install_components: 'firebase'
+          
+      # Example Firebase deployment step
+      - name: Deploy to Firebase
+        run: |
+          echo "Deploying to Firebase..."
+          # Add your Firebase deployment commands here
+          # Example: firebase deploy --only hosting
