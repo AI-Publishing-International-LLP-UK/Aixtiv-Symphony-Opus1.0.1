@@ -35,6 +35,7 @@ jobs:
           slack-message: ":rotating_light: *Dr. Lucy Automation Workflow Failed*\nWorkflow: ${{ github.workflow }}\nRepository: ${{ github.repository }}\nTriggered by: ${{ github.actor }}\nEvent: ${{ github.event_name }}\nSee details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
 
   # PR Size Labeler - Automatically adds size labels to PRs
   pr-size-labeler:
@@ -67,6 +68,7 @@ jobs:
           slack-message: ":mag: *Dr. Lucy Automation* labeled PR #${{ github.event.pull_request.number }} by ${{ github.event.pull_request.user.login }} based on size.\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   # PR Description Checker
   pr-description-check:
     name: Check PR Description
@@ -98,6 +100,7 @@ jobs:
           slack-message: ":clipboard: *Dr. Lucy Automation* checked PR #${{ github.event.pull_request.number }} description.\nStatus: ${{ job.status }}\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   # Automated PR Review
   pr-review:
     name: Automated PR Review
@@ -155,6 +158,7 @@ jobs:
           slack-message: ":eyes: *Dr. Lucy Automation* reviewed PR #${{ github.event.pull_request.number }} by ${{ github.event.pull_request.user.login }}.\nChanged Files: ${{ steps.changes.outputs.result }}\nTitle: ${{ github.event.pull_request.title }}\nLink: ${{ github.event.pull_request.html_url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   # Dependabot PR Management
   dependabot-management:
     name: Manage Dependabot PRs
@@ -241,6 +245,7 @@ jobs:
           slack-message: ":package: *Dr. Lucy Automation* processed Dependabot PR #${{ github.event.pull_request.number }}.\nTitle: ${{ github.event.pull_request.title }}\nAction: ${{ fromVersion[0] === toVersion[0] ? 'Auto-approved and merged' : 'Flagged for manual review' }}\nLink: ${{ github.event.pull_request.html_url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   # Issue Triage
   issue-triage:
     name: Triage New Issues
@@ -334,6 +339,7 @@ jobs:
           slack-message: ":ticket: *Dr. Lucy Automation* triaged issue #${{ github.event.issue.number }} opened by ${{ github.event.issue.user.login }}.\nTitle: ${{ github.event.issue.title }}\nLabels: ${{ join(labels, ', ') }}\nLink: ${{ github.event.issue.html_url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   # Stale Issue Management
   stale-management:
     name: Manage Stale Issues & PRs
@@ -373,6 +379,7 @@ jobs:
           slack-message: ":broom: *Dr. Lucy Automation* ran stale issue/PR management.\nStatus: ${{ job.status }}\nRepository: ${{ github.repository }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
   firebase-deployment:
     name: Firebase Deployment
     runs-on: ubuntu-latest
@@ -410,3 +417,4 @@ jobs:
           slack-message: ":rocket: *Dr. Lucy Automation* ran Firebase deployment.\nStatus: ${{ job.status }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\nTriggered by: ${{ github.actor }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_APP_ID: "A08EZ0320RX" # Security Alert app in Coaching2100 workspace
