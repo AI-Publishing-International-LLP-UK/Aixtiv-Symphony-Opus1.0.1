@@ -12,8 +12,17 @@ const admin = require('firebase-admin');
 const axios = require('axios');
 const { promisify } = require('util');
 const fs = require('fs').promises;
-const pThrottle = require('p-throttle').default; // For rate limiting API calls
-const pRetry = require('p-retry');       // For advanced retries
+// Dynamic import for ESM module p-throttle
+let pThrottle;
+let pRetry;
+(async () => {
+  // Dynamic import of the ESM modules
+  const pThrottleModule = await import('p-throttle');
+  pThrottle = pThrottleModule.default;
+  
+  const pRetryModule = await import('p-retry');
+  pRetry = pRetryModule.default;       // For advanced retries
+})();
 const pMap = require('p-map');           // For controlled parallel execution
 const winston = require('winston');      // For advanced logging
 require('dotenv').config();              // For environment variables
@@ -396,17 +405,38 @@ godaddyAxios.interceptors.response.use(
 );
 
 // Apply rate limiting to API calls
-const throttledFirebaseRequest = pThrottle(
-  async (axiosConfig) => firebaseAxios(axiosConfig),
-  config.get('performance.apiThrottleLimit'),
-  config.get('performance.apiThrottleInterval')
-);
+// Create throttled functions that will be initialized after pThrottle is loaded
+let throttledFirebaseRequest;
+let throttledGoDaddyRequest;
 
-const throttledGoDaddyRequest = pThrottle(
-  async (axiosConfig) => godaddyAxios(axiosConfig),
-  config.get('performance.apiThrottleLimit'),
-  config.get('performance.apiThrottleInterval')
-);
+// Function to create throttled request functions once pThrottle is available
+async function initializeThrottledRequests() {
+  if (!pThrottle) {
+    // If pThrottle isn't loaded yet, wait for it
+    const pThrottleModule = await import('p-throttle');
+    pThrottle = pThrottleModule.default;
+  }
+
+  // Get values from config and ensure they're numbers
+  const limit = parseInt(config.get('performance.apiThrottleLimit') || 5, 10);
+  const interval = parseInt(config.get('performance.apiThrottleInterval') || 1000, 10);
+
+  // Initialize throttled request functions
+  throttledFirebaseRequest = pThrottle({
+    limit,
+    interval
+  })(async (axiosConfig) => firebaseAxios(axiosConfig));
+
+  throttledGoDaddyRequest = pThrottle({
+    limit,
+    interval
+  })(async (axiosConfig) => godaddyAxios(axiosConfig));
+}
+
+// Initialize throttled requests
+initializeThrottledRequests().catch(error => {
+  console.error('Failed to initialize throttled requests:', error);
+});
 
 /**
  * Add a domain to Firebase Hosting
@@ -442,6 +472,10 @@ async function addDomainToFirebase(domain, platform = 'desktop') {
   };
 
   try {
+    // Ensure throttledFirebaseRequest is initialized
+    if (!throttledFirebaseRequest) {
+      await initializeThrottledRequests();
+    }
     const response = await throttledFirebaseRequest(requestConfig);
     logger.info(`Domain added to Firebase: ${domain}`);
     return {
@@ -482,6 +516,10 @@ async function checkFirebaseDomainStatus(domain, platform = 'desktop') {
   };
 
   try {
+    // Ensure throttledFirebaseRequest is initialized
+    if (!throttledFirebaseRequest) {
+      await initializeThrottledRequests();
+    }
     const response = await throttledFirebaseRequest(requestConfig);
     logger.debug(`Domain status checked: ${domain}`, { status: response.data.status });
     return {
@@ -509,6 +547,10 @@ async function checkFirebaseDomainStatus(domain, platform = 'desktop') {
  */
 async function getDomainFromGoDaddy(domain) {
   try {
+    // Ensure throttledGoDaddyRequest is initialized
+    if (!throttledGoDaddyRequest) {
+      await initializeThrottledRequests();
+    }
     const response = await throttledGoDaddyRequest({
       method: 'get',
       url: `/v1/domains/${domain}`
@@ -546,6 +588,10 @@ async function addDnsRecordsToGoDaddy(domain, records) {
       ttl: record.ttl || 3600
     }));
 
+    // Ensure throttledGoDaddyRequest is initialized
+    if (!throttledGoDaddyRequest) {
+      await initializeThrottledRequests();
+    }
     const response = await throttledGoDaddyRequest({
       method: 'patch',
       url: `/v1/domains/${domain}/records`,

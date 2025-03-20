@@ -20,6 +20,11 @@ spec:
         - name: NODE_ENV
           value: ${ENVIRONMENT}
         # Additional environment variables can be added here
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          timeoutSeconds: 240  # Increase this timeout to a higher value if necessary
+          tcpSocket:
+            port: 8080
       serviceAccountName: ${SERVICE_ACCOUNT}
-      timeoutSeconds: 300
-
+      timeoutSeconds: 600  # Increase the overall timeout if required

@@ -5,7 +5,7 @@ set -eo pipefail
 # Default values
 ENVIRONMENT="dev"
 PROJECT_ID="your-gcp-project-id"
-REGION="us-central1"
+REGION="us-west1"
 REPOSITORY="integration-gateway-images"
 SERVICE_ACCOUNT="integration-gateway-sa@${PROJECT_ID}.iam.gserviceaccount.com"
 SERVICE_NAME="integration-gateway"

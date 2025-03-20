@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}', '.']
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}', '.']
   
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}']
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}']
   
   # Substitute environment variables in service.yaml
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -13,9 +13,10 @@ steps:
     args:
       - '-c'
       - |
+        apt-get update && apt-get install -y gettext-base
         envsubst < deployments/cloud-run/service.yaml > service_substituted.yaml
     env:
-      - 'IMAGE_URL=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}'
+      - 'IMAGE_URL=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}'
       - 'ENVIRONMENT=${_ENVIRONMENT}'
       - 'SERVICE_ACCOUNT=${_SERVICE_ACCOUNT}'
   
@@ -30,7 +31,7 @@ steps:
       - '--region=${_REGION}'
       - '--platform=managed'
   
-  # Create revision tag for easier rollbacks
+  # Add tag to the latest revision
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -40,14 +41,26 @@ steps:
       - 'integration-gateway'
       - '--platform=managed'
       - '--region=${_REGION}'
-      - '--update-tags=${_ENVIRONMENT}=${SHORT_SHA}'
+      - '--set-tags=${_ENVIRONMENT}=LATEST'
+  
+  # Update traffic to the tagged revision
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'update-traffic'
+      - 'integration-gateway'
+      - '--platform=managed'
+      - '--region=${_REGION}'
+      - '--to-tags=${_ENVIRONMENT}=100'
 
 substitutions:
-  _REGION: us-central1
+  _REGION: us-west1
   _REPOSITORY: integration-gateway-images
   _ENVIRONMENT: dev
-  _SERVICE_ACCOUNT: integration-gateway-sa@${PROJECT_ID}.iam.gserviceaccount.com
+  _SERVICE_ACCOUNT: drlucyautomation@api-for-warp-drive.iam.gserviceaccount.com
+  _TAG: latest
 
 options:
   logging: CLOUD_LOGGING_ONLY
-

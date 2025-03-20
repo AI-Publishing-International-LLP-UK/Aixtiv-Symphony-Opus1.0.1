@@ -33,7 +33,7 @@ const logger = winston.createLogger({
   ]
 });
 
-  // Configuration
+// Configuration
 const config = {
   firebase: {
     projectId: process.env.FIREBASE_PROJECT_ID || 'api-for-warp-drive',
@@ -195,12 +195,23 @@ async function initializeFirebase() {
   }
 }
 
+// Initialize Firebase when module is loaded
+(async () => {
+  try {
+    await initializeFirebase();
+  } catch (error) {
+    logger.error(`Firebase initialization failed: ${error.message}`);
+  }
+})();
+
 /**
  * Get Firebase access token for API requests
  * @returns {Promise<string>} The access token
  */
 async function getAccessToken() {
   try {
+    // Ensure Firebase is initialized before getting token
+    await initializeFirebase();
     const token = await admin.app().options.credential.getAccessToken();
     return token.access_token;
   } catch (error) {
@@ -208,7 +219,6 @@ async function getAccessToken() {
     throw error;
   }
 }
-
 /**
  * Get all Firebase Hosting sites for a project
  * @param {string} projectId Firebase project ID
@@ -216,6 +226,8 @@ async function getAccessToken() {
  */
 async function getProjectSites(projectId = config.firebase.projectId) {
   try {
+    // Ensure Firebase is initialized
+    await initializeFirebase();
     logger.info(`Getting Firebase Hosting sites for project: ${projectId}`);
     
     const accessToken = await getAccessToken();
@@ -236,7 +248,6 @@ async function getProjectSites(projectId = config.firebase.projectId) {
     throw error;
   }
 }
-
 /**
  * Get domain count for a specific site
  * @param {string} siteId Firebase Hosting site ID
@@ -244,6 +255,8 @@ async function getProjectSites(projectId = config.firebase.projectId) {
  */
 async function getSiteDomainCount(siteId) {
   try {
+    // Ensure Firebase is initialized
+    await initializeFirebase();
     logger.debug(`Getting domain count for site: ${siteId}`);
     
     const accessToken = await getAccessToken();
@@ -262,13 +275,15 @@ async function getSiteDomainCount(siteId) {
     return -1; // Indicate error
   }
 }
-
 /**
  * Get domain counts for all sites in the project
  * @param {boolean} useCache Whether to use cached counts
  * @returns {Promise<Object>} Map of site IDs to domain counts
  */
 async function getAllSiteDomainCounts(useCache = true) {
+  // Ensure Firebase is initialized
+  await initializeFirebase();
+  
   // Check if cache is valid
   const now = Date.now();
   if (useCache && now - siteCountCache.timestamp < config.firebase.siteCountCacheTTL) {
@@ -348,6 +363,8 @@ function categorizeDomain(domain) {
  */
 async function selectSiteForDomain(domain, preferredCategory = null) {
   try {
+    // Ensure Firebase is initialized
+    await initializeFirebase();
     logger.info(`Selecting site for domain: ${domain}`);
     
     // Step 1: Determine category
@@ -419,6 +436,8 @@ async function distributeDomains(domains) {
   }
   
   try {
+    // Ensure Firebase is initialized
+    await initializeFirebase();
     logger.info(`Distributing ${domains.length} domains across sites`);
     
     const distribution = {};
@@ -458,6 +477,8 @@ async function distributeDomains(domains) {
  */
 async function getRecommendedSite(domainType) {
   try {
+    // Ensure Firebase is initialized
+    await initializeFirebase();
     const category = domainType || 'specialty';
     const sites = config.firebase.siteCategoryMap[category] || [];
     
