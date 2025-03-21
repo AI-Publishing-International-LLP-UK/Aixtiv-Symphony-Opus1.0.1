@@ -1,0 +1,479 @@
+#!/usr/bin/env groovy
+
+/**
+ * Dr. Lucy Automation - Main Jenkins Pipeline
+ *
+ * This Jenkinsfile defines a comprehensive CI/CD pipeline for Dr. Lucy Automation
+ * to orchestrate the build, test, and deployment processes across various environments.
+ *
+ * Features:
+ * - Parameterized builds to control execution flow
+ * - Multi-environment deployment support (dev, staging, production)
+ * - Integration with cloud services (GCP, Firebase)
+ * - Automated testing across multiple levels
+ * - Notification system for build status
+ * - Security scanning and compliance checks
+ */
+
+// Pipeline Parameters
+properties([
+    parameters([
+        // Environment selection
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['development', 'staging', 'production'],
+            description: 'Target deployment environment'
+        ),
+        // Branch/tag to build
+        string(
+            name: 'GIT_BRANCH',
+            defaultValue: 'main',
+            description: 'Git branch or tag to build from'
+        ),
+        // Control which stages to run
+        booleanParam(
+            name: 'SKIP_TESTS',
+            defaultValue: false,
+            description: 'Skip test execution'
+        ),
+        booleanParam(
+            name: 'ENABLE_SECURITY_SCAN',
+            defaultValue: true,
+            description: 'Run security scanning'
+        ),
+        booleanParam(
+            name: 'DEPLOY',
+            defaultValue: true,
+            description: 'Execute deployment stage'
+        ),
+        // Release configuration
+        string(
+            name: 'VERSION',
+            defaultValue: '',
+            description: 'Release version (leave empty for auto-versioning)'
+        ),
+        // Service Account Selection
+        choice(
+            name: 'SERVICE_ACCOUNT',
+            choices: ['drla-service-account', 'firebase-service-account'],
+            description: 'Service account to use for deployment'
+        )
+    ])
+])
+
+// Pipeline Environment Variables
+def environment = params.ENVIRONMENT
+def version = params.VERSION ?: "v${BUILD_NUMBER}-${new Date().format('yyyyMMdd-HHmmss')}"
+def serviceAccount = params.SERVICE_ACCOUNT
+def deploymentTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+
+// Node Configuration - Use a node with the appropriate tools installed
+pipeline {
+    agent {
+        label 'dr-lucy-agent'
+    }
+    
+    // Define tools required for the pipeline
+    tools {
+        nodejs 'NodeJS 18'
+        git 'Default'
+    }
+    
+    // Configure pipeline options
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        ansiColor('xterm')
+    }
+    
+    // Setup environment variables
+    environment {
+        // Project identifiers
+        PROJECT_ID = 'api-for-warp-drive'
+        APP_NAME = 'dr-lucy-automation'
+        
+        // GCP credentials and configuration
+        GOOGLE_CLOUD_KEYFILE = credentials("${params.SERVICE_ACCOUNT}")
+        
+        // Environment-specific configurations
+        DEPLOY_CONFIG = "./deployments/${environment}/config.yaml"
+        
+        // Notification configuration
+        SLACK_CHANNEL = 'git-lucy'
+    }
+    
+    // Pipeline stages
+    stages {
+        // Authentication and initialization
+        stage('Initialize') {
+            steps {
+                echo "🔐 Authenticating and initializing build environment"
+                echo "Building version: ${version} for environment: ${environment}"
+                
+                // Set up authentication with Google Cloud
+                withCredentials([file(credentialsId: "${params.SERVICE_ACCOUNT}", variable: 'KEYFILE')]) {
+                    sh """
+                        gcloud auth activate-service-account --key-file=\$KEYFILE
+                        gcloud config set project \$PROJECT_ID
+                    """
+                }
+                
+                // Print build information
+                script {
+                    def buildInfo = """
+                    ╔══════════════════════════════════════════════╗
+                    ║            DR. LUCY AUTOMATION               ║
+                    ╠══════════════════════════════════════════════╣
+                    ║ Environment:    ${environment}               
+                    ║ Version:        ${version}                   
+                    ║ Service Acct:   ${serviceAccount}            
+                    ║ Timestamp:      ${deploymentTimestamp}       
+                    ║ Skip Tests:     ${params.SKIP_TESTS}         
+                    ║ Security Scan:  ${params.ENABLE_SECURITY_SCAN}
+                    ║ Deploy:         ${params.DEPLOY}             
+                    ╚══════════════════════════════════════════════╝
+                    """
+                    echo buildInfo
+                }
+            }
+        }
+        
+        // Code checkout and preparation
+        stage('Checkout') {
+            steps {
+                echo "📥 Checking out code from repository"
+                
+                // Clean workspace and checkout code
+                cleanWs()
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "${params.GIT_BRANCH}"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout']],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: 'https://github.com/AI-Publishing-International-LLP-UK/Aixtiv-Symphony-Opus1.0.1.git'
+                    ]]
+                ])
+                
+                // Set up environment-specific configuration
+                sh """
+                    if [ -f "${DEPLOY_CONFIG}" ]; then
+                        cp "${DEPLOY_CONFIG}" .env
+                        echo "Configured for ${environment} environment"
+                    else
+                        echo "Warning: Configuration file for ${environment} not found!"
+                    fi
+                """
+            }
+        }
+        
+        // Install dependencies
+        stage('Dependencies') {
+            steps {
+                echo "📦 Installing project dependencies"
+                
+                // Install Node.js dependencies
+                sh """
+                    npm ci
+                    npm list --depth=0
+                """
+                
+                // Install additional tools if needed
+                sh """
+                    # Install Firebase CLI if needed
+                    if ! command -v firebase &> /dev/null; then
+                        npm install -g firebase-tools
+                    fi
+                    
+                    # Install other required tools
+                    if ! command -v serverless &> /dev/null; then
+                        npm install -g serverless
+                    fi
+                """
+            }
+        }
+        
+        // Linting and static code analysis
+        stage('Lint') {
+            steps {
+                echo "🔍 Running code quality checks and linting"
+                
+                // Run ESLint for JavaScript/TypeScript
+                sh "npm run lint || echo 'Linting issues found!'"
+                
+                // Additional static code analysis
+                sh """
+                    # Run additional code quality tools
+                    if [ -f "sonar-project.properties" ]; then
+                        echo "Running SonarQube analysis"
+                        sonar-scanner
+                    fi
+                """
+            }
+        }
+        
+        // Unit and integration testing
+        stage('Test') {
+            when {
+                expression { return !params.SKIP_TESTS }
+            }
+            steps {
+                echo "🧪 Running automated tests"
+                
+                // Run unit tests with coverage
+                sh "npm test -- --coverage"
+                
+                // Integration tests if available
+                script {
+                    if (fileExists('integration-tests')) {
+                        sh "npm run test:integration"
+                    }
+                }
+                
+                // Archive test results
+                junit allowEmptyResults: true, testResults: 'test-results/**/*.xml'
+                
+                // Archive coverage results
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'coverage/lcov-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Coverage Report'
+                ])
+            }
+        }
+        
+        // Security scanning
+        stage('Security Scan') {
+            when {
+                expression { return params.ENABLE_SECURITY_SCAN }
+            }
+            steps {
+                echo "🛡️ Running security scans and vulnerability checks"
+                
+                // Run npm audit to check for vulnerable dependencies
+                sh "npm audit --audit-level=moderate || echo 'Security vulnerabilities found!'"
+                
+                // Run OWASP Dependency-Check
+                dependencyCheck(
+                    additionalArguments: '--scan ./ --suppression dependency-check-suppression.xml --format ALL',
+                    odcInstallation: 'OWASP-Dependency-Check'
+                )
+                
+                // Publish security results
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                
+                // Run other security tools if needed
+                sh """
+                    # Run Snyk scan if available
+                    if command -v snyk &> /dev/null; then
+                        snyk test || echo 'Snyk vulnerabilities found!'
+                    fi
+                """
+            }
+        }
+        
+        // Build application
+        stage('Build') {
+            steps {
+                echo "🔨 Building application artifacts"
+                
+                // Set version information
+                sh """
+                    # Create version file
+                    echo "export const VERSION = '${version}';" > src/version.js
+                    echo "export const BUILD_TIME = '${deploymentTimestamp}';" >> src/version.js
+                    echo "export const ENVIRONMENT = '${environment}';" >> src/version.js
+                """
+                
+                // Build the application
+                sh """
+                    npm run build
+                    
+                    # Package artifacts
+                    mkdir -p artifacts
+                    tar -czf artifacts/${APP_NAME}-${version}.tar.gz dist/
+                """
+                
+                // Archive artifacts
+                archiveArtifacts artifacts: "artifacts/${APP_NAME}-${version}.tar.gz", fingerprint: true
+            }
+        }
+        
+        // Deployment preparation
+        stage('Prepare Deployment') {
+            when {
+                expression { return params.DEPLOY }
+            }
+            steps {
+                echo "📋 Preparing deployment to ${environment}"
+                
+                // Generate deployment configuration
+                sh """
+                    mkdir -p deployments/tmp
+                    
+                    # Generate deployment manifest
+                    cat > deployments/tmp/deploy-manifest.yaml << EOF
+                    version: ${version}
+                    environment: ${environment}
+                    timestamp: ${deploymentTimestamp}
+                    buildNumber: ${BUILD_NUMBER}
+                    serviceAccount: ${serviceAccount}
+                    EOF
+                    
+                    # Process environment-specific templates
+                    if [ -d "deployments/${environment}/templates" ]; then
+                        for template in deployments/${environment}/templates/*.yaml; do
+                            envsubst < \$template > deployments/tmp/\$(basename \$template)
+                            echo "Processed template: \$template"
+                        done
+                    fi
+                """
+                
+                // Validate deployment configuration
+                sh """
+                    # Validate configurations
+                    for config in deployments/tmp/*.yaml; do
+                        echo "Validating: \$config"
+                        yamllint \$config || echo "Warning: YAML validation issues in \$config"
+                    done
+                """
+            }
+        }
+        
+        // Deploy to selected environment
+        stage('Deploy') {
+            when {
+                expression { return params.DEPLOY }
+            }
+            steps {
+                echo "🚀 Deploying to ${environment} environment"
+                
+                // Environment-specific deployment steps
+                script {
+                    switch(environment) {
+                        case 'development':
+                            // Deploy to development environment
+                            sh """
+                                # Deploy to Firebase hosting development
+                                firebase use development
+                                firebase deploy --only hosting --token \$FIREBASE_TOKEN
+                                
+                                # Deploy to development GKE cluster if needed
+                                gcloud container clusters get-credentials dev-cluster --zone us-west1-a
+                                kubectl apply -f deployments/tmp/kubernetes-dev.yaml
+                            """
+                            break
+                            
+                        case 'staging':
+                            // Deploy to staging environment
+                            sh """
+                                # Deploy to Cloud Run
+                                gcloud run deploy ${APP_NAME}-staging \\
+                                    --image gcr.io/${PROJECT_ID}/${APP_NAME}:${version} \\
+                                    --platform managed \\
+                                    --region us-west1 \\
+                                    --allow-unauthenticated
+                                
+                                # Deploy to Firebase hosting staging
+                                firebase use staging
+                                firebase deploy --token \$FIREBASE_TOKEN
+                            """
+                            break
+                            
+                        case 'production':
+                            // Deploy to production with approval
+                            timeout(time: 15, unit: 'MINUTES') {
+                                input message: "Deploy to production environment?", ok: "Deploy"
+                            }
+                            
+                            sh """
+                                # Deploy to Cloud Run
+                                gcloud run deploy ${APP_NAME} \\
+                                    --image gcr.io/${PROJECT_ID}/${APP_NAME}:${version} \\
+                                    --platform managed \\
+                                    --region us-west1 \\
+                                    --allow-unauthenticated
+                                
+                                # Deploy to Firebase hosting production
+                                firebase use production
+                                firebase deploy --token \$FIREBASE_TOKEN
+                                
+                                # Create deployment tag
+                                git tag -a "deploy-${version}" -m "Production deployment ${version} on ${deploymentTimestamp}"
+                                git push origin "deploy-${version}"
+                            """
+                            break
+                            
+                        default:
+                            error "Unknown environment: ${environment}"
+                    }
+                }
+                
+                // Record deployment information
+                sh """
+                    # Record deployment details
+                    cat > deployment-info.json << EOF
+                    {
+                        "version": "${version}",
+                        "environment": "${environment}",
+                        "buildNumber": "${BUILD_NUMBER}",
+                        "timestamp": "${deploymentTimestamp}",
+                        "gitCommit": "\$(git rev-parse HEAD)",
+                        "gitBranch": "${params.GIT_BRANCH}"
+                    }
+                    EOF
+                """
+                
+                // Archive deployment information
+                archiveArtifacts artifacts: "deployment-info.json", fingerprint: true
+            }
+        }
+        
+        // Verify deployment
+        stage('Verify') {
+            when {
+                expression { return params.DEPLOY }
+            }
+            steps {
+                echo "✅ Verifying deployment"
+                
+                // Verify deployment based on environment
+                script {
+                    switch(environment) {
+                        case 'development':
+                            // Verify development deployment
+                            sh """
+                                # Check application health
+                                curl -f https://dev.drlucyautomation.com/health || exit 1
+                                
+                                # Verify GKE deployment
+                                kubectl rollout status deployment/${APP_NAME} -n development
+                            """
+                            break
+                            
+                        case 'staging':
+                            // Verify staging deployment
+                            sh """
+                                # Get Cloud Run URL
+                                CLOUD_RUN_URL=\$(gcloud run services describe ${APP_NAME}-staging --format='value(status.url)')
+                                
+                                # Check application health
+                                curl -f \$CLOUD_RUN_URL/health || exit 1
+                                
+                                # Run synthetic tests
+                                if [ -f "tests/e2e/staging.test.js" ]; then
+                                    npm run test:e2e:staging
+                                fi
+                            """
+                            break
+                            
+                        case 'production':
+                            // Verify production deployment
+                            sh """
+                                
+
