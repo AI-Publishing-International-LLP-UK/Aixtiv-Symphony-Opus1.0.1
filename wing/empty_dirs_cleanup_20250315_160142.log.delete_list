@@ -1,0 +1,954 @@
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/professor-lee-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-sabina-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-roark-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-memoria-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-match-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-maria-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-lucy-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-grant-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-cypriot-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-claude-01
+/Users/as/aixtiv-symphony-opus1.0.1/wing/agencies/core-agency/dataset-r1/squadron01/dr-burby-01
+/Users/as/aixtiv-symphony-opus1.0.1/vls/solutions/dr-lucy-flight-memory/services
+/Users/as/aixtiv-symphony-opus1.0.1/vls/solutions/dr-lucy-flight-memory/interfaces
+/Users/as/aixtiv-symphony-opus1.0.1/vls/solutions/dr-lucy-flight-memory/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/vls/solutions/dr-lucy-flight-memory/core
+/Users/as/aixtiv-symphony-opus1.0.1/vls/logs
+/Users/as/aixtiv-symphony-opus1.0.1/visualization-centers/locations/2100-vision-centers/tours
+/Users/as/aixtiv-symphony-opus1.0.1/visualization-centers/locations/2100-vision-centers/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/visualization-centers/locations/2100-vision-centers/installations
+/Users/as/aixtiv-symphony-opus1.0.1/tools/cli/plugins
+/Users/as/aixtiv-symphony-opus1.0.1/tools/cli/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/tools/cli/commands
+/Users/as/aixtiv-symphony-opus1.0.1/security/threat-detection
+/Users/as/aixtiv-symphony-opus1.0.1/security/encryption
+/Users/as/aixtiv-symphony-opus1.0.1/security/data-protection
+/Users/as/aixtiv-symphony-opus1.0.1/security/compliance
+/Users/as/aixtiv-symphony-opus1.0.1/security/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/security/authentication/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/security/authentication/providers
+/Users/as/aixtiv-symphony-opus1.0.1/security/authentication/multi-factor
+/Users/as/aixtiv-symphony-opus1.0.1/security/audit
+/Users/as/aixtiv-symphony-opus1.0.1/legal/trademarks
+/Users/as/aixtiv-symphony-opus1.0.1/legal/privacy
+/Users/as/aixtiv-symphony-opus1.0.1/legal/patents
+/Users/as/aixtiv-symphony-opus1.0.1/legal/licensing
+/Users/as/aixtiv-symphony-opus1.0.1/legal/contracts
+/Users/as/aixtiv-symphony-opus1.0.1/legal/compliance
+/Users/as/aixtiv-symphony-opus1.0.1/internationalization/translations/processes
+/Users/as/aixtiv-symphony-opus1.0.1/internationalization/translations/languages
+/Users/as/aixtiv-symphony-opus1.0.1/internationalization/translations/categories
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/internal-systems
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/external-services
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/data-exchange
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/integrations/api-gateways
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/user-profiles
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/uiux-pilot-panel
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/settings
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/public-portal
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/notifications
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/marketplace
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/editor
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/dashboard
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/web/analytics-dashboard
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/mobile/react-native
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/mobile/ios
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/mobile/flutter
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/mobile/android
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/tokens/typography
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/tokens/spacing
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/tokens/colors
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/tokens/animations
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/themes/light
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/themes/dark
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/themes/custom
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/patterns
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/icons
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/components/templates
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/components/organisms
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/components/molecules
+/Users/as/aixtiv-symphony-opus1.0.1/frontend/design-system/components/atoms
+/Users/as/aixtiv-symphony-opus1.0.1/e-commerce/store/orders
+/Users/as/aixtiv-symphony-opus1.0.1/e-commerce/store/checkout
+/Users/as/aixtiv-symphony-opus1.0.1/e-commerce/store/catalog
+/Users/as/aixtiv-symphony-opus1.0.1/documentation/technical/tutorials
+/Users/as/aixtiv-symphony-opus1.0.1/documentation/technical/troubleshooting
+/Users/as/aixtiv-symphony-opus1.0.1/documentation/technical/sdk-guides
+/Users/as/aixtiv-symphony-opus1.0.1/documentation/technical/api-references
+/Users/as/aixtiv-symphony-opus1.0.1/devops/security
+/Users/as/aixtiv-symphony-opus1.0.1/devops/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/devops/infrastructure
+/Users/as/aixtiv-symphony-opus1.0.1/devops/disaster-recovery
+/Users/as/aixtiv-symphony-opus1.0.1/devops/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/devops/ci-cd
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/operations/workflow
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/operations/billing
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/operations/audit
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/operations/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/integration/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/integration/external-services
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/integration/events
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/core-entities/users
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/core-entities/solutions
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/core-entities/flights
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/core-entities/agents
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/admin/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/admin/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/data/schema/admin/backoffice
+/Users/as/aixtiv-symphony-opus1.0.1/data/cloud/gcp
+/Users/as/aixtiv-symphony-opus1.0.1/data/cloud/firebase
+/Users/as/aixtiv-symphony-opus1.0.1/data/cloud/blockchain
+/Users/as/aixtiv-symphony-opus1.0.1/cr-agents/agents/cr30
+/Users/as/aixtiv-symphony-opus1.0.1/cr-agents/agents/cr20
+/Users/as/aixtiv-symphony-opus1.0.1/cr-agents/agents/cr10
+/Users/as/aixtiv-symphony-opus1.0.1/cr-agents/agents/cr0
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/verification/governance
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/verification/audit
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/verification/attestation
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/orchestration/workflows
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/orchestration/triggers
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/orchestration/handlers
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/blockchain/verification
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/blockchain/transactions
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/blockchain/contracts
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/actions/verification
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/actions/processing
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/actions/orchestration
+/Users/as/aixtiv-symphony-opus1.0.1/core-protocols/s2do/actions/communication
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/wallets
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/tokens
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/s2do/verification
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/s2do/transactions
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/s2do/contracts
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/networks
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/identity
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/governance
+/Users/as/aixtiv-symphony-opus1.0.1/blockchain/contracts-dev
+/Users/as/aixtiv-symphony-opus1.0.1/backend/job-queue
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/secrets
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/patterns
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/gateways
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/docs/general
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/binding
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration-gateways/adapters/service-adapters
+/Users/as/aixtiv-symphony-opus1.0.1/backend/integration
+/Users/as/aixtiv-symphony-opus1.0.1/backend/event-bus
+/Users/as/aixtiv-symphony-opus1.0.1/backend/cache
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/rest/validation
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/rest/routes
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/rest/middleware
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/rest/controllers
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/grpc/services
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/grpc/proto
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/grpc/client
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/graphql/schema
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/graphql/resolvers
+/Users/as/aixtiv-symphony-opus1.0.1/backend/api/graphql/directives
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/visualization
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/reporting
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/real-time
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/ml-analytics
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/metrics/user
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/metrics/technical
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/metrics/operational
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/metrics/business
+/Users/as/aixtiv-symphony-opus1.0.1/analytics/data-processing
+/Users/as/aixtiv-symphony-opus1.0.1/aixtiv-admin/anthology-ai-publishing
+/Users/as/aixtiv-symphony-opus1.0.1/aixtiv-admin/aixtiv-admin-core
+/Users/as/aixtiv-symphony-opus1.0.1/ai-publishing/monetization
+/Users/as/aixtiv-symphony-opus1.0.1/ai-publishing/editorial
+/Users/as/aixtiv-symphony-opus1.0.1/ai-publishing/distribution
+/Users/as/aixtiv-symphony-opus1.0.1/ai-publishing/content-creation
+/Users/as/aixtiv-symphony-opus1.0.1/ai-publishing/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/training
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/research/digital-twin
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/orchestration
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/models
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/inference
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/evaluation
+/Users/as/aixtiv-symphony-opus1.0.1/ai-core/datasets
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/pages/learning-path
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/pages/course-detail
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/pages/course-catalog
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/pages/assessment
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/daily-integration/video-room
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/daily-integration/transcription
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/daily-integration/screen-sharing
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/daily-integration/recording
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/components/progress
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/components/course-player
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/components/course-catalog
+/Users/as/aixtiv-symphony-opus1.0.1/academy/frontend/components/assessment
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/simulation/scenarios
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/simulation/evaluation
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/simulation/environments
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/pilot-training/squadron03
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/pilot-training/squadron02
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/pilot-training/squadron01
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/models/vision
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/models/multimodal
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/models/language
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/evaluation/validation
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/evaluation/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/training/evaluation/metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/orchestration/workflows
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/orchestration/triggers
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/orchestration/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/orchestration/activities
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/jet-port/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/jet-port/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/jet-port/execution
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/jet-port/dispatching
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/flight-memory/recording
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/flight-memory/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/flight-memory/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/flight-memory/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/rix/dataset-r4/squadron04/dr-lucy
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/rix/dataset-r4/squadron04/dr-grant
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/engage-agency/dataset-r3/squadron03/dr-lucy-03
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/engage-agency/dataset-r3/squadron03/dr-burby-03
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/co-pilots/dataset-r6/squadron06/cp01a
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/co-pilots/dataset-r6/squadron06/cp00
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/c-rx/dataset-r5/squadron05/cr10
+/Users/as/aixtiv-symphony-opus1.0.1/ wing/agencies/c-rx/dataset-r5/squadron05/cr0
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/professor-lee-q4d-lenz/semantic-search
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/professor-lee-q4d-lenz/personalization
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/professor-lee-q4d-lenz/lenz-models
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/professor-lee-q4d-lenz/cultural-empathy
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-sabina-dream-commander/visualization
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-sabina-dream-commander/prediction
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-sabina-dream-commander/integration
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-sabina-dream-commander/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-roark-wish-vision/wish-capture
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-roark-wish-vision/wish-analysis
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-roark-wish-vision/vision-creation
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-roark-wish-vision/execution
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/editing
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/distribution
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/derivatives/customer-delight
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/derivatives/brand-diagnostic
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/derivatives/brand-builder
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-memoria-anthology/content-generation
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-match-bid-suite/proposal-generator
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-match-bid-suite/opportunity-finder
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-match-bid-suite/bid-preparation
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-match-bid-suite/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-maria-support/translation
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-maria-support/internationalization
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-maria-support/cultural-adaptation
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-maria-support/accessibility
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-grant-cybersecurity/threat-detection
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-grant-cybersecurity/compliance
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-grant-cybersecurity/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-grant-cybersecurity/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-cypriot-rewards/reward-definitions
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-cypriot-rewards/redemption
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-cypriot-rewards/gamification
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-cypriot-rewards/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-claude-orchestrator/task-assignment
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-claude-orchestrator/performance-monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-claude-orchestrator/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-claude-orchestrator/agent-management
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-burby-s2do-blockchain/verification
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-burby-s2do-blockchain/s2do
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-burby-s2do-blockchain/governance
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/solutions/dr-burby-s2do-blockchain/blockchain
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/products/team
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/products/professional
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/products/individual
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/products/enterprise
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/interfaces/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/interfaces/sdk
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/interfaces/extensions
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/interfaces/api
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/components/utilities
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/components/ui
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/components/services
+/Users/as/aixtiv-symphony-opus1.0.1/ vls/components/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/partner-locations/universities
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/partner-locations/government
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/partner-locations/corporate
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/mobile-experiences/roadshow
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/mobile-experiences/pop-up
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/locations/mobile-experiences/conference
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/localization/translations
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/localization/regional-compliance
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/localization/cultural-adaptation
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/virtual-tours/web
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/virtual-tours/vr
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/virtual-tours/ar
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/interactive-demos/solution-demos
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/interactive-demos/scenario-demos
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/interactive-demos/agent-demos
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/2100-vision-search/interfaces
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/2100-vision-search/engines
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/digital-presence/2100-vision-search/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/analytics/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/analytics/engagement
+/Users/as/aixtiv-symphony-opus1.0.1/ visualization-centers/analytics/conversion
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/languages/python
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/languages/javascript
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/languages/java
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/languages/go
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/examples
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/sdk/documentation
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/monitoring/visualization
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/monitoring/metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/monitoring/logging
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/monitoring/alerts
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/developer-portal/support
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/developer-portal/sandbox
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/developer-portal/documentation
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/developer-portal/apis
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/admin-panel/user-management
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/admin-panel/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/admin-panel/dashboards
+/Users/as/aixtiv-symphony-opus1.0.1/ tools/admin-panel/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/ security/threat-detection/response
+/Users/as/aixtiv-symphony-opus1.0.1/ security/threat-detection/prevention
+/Users/as/aixtiv-symphony-opus1.0.1/ security/threat-detection/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ security/threat-detection/intelligence
+/Users/as/aixtiv-symphony-opus1.0.1/ security/secure-development/vulnerability-scanning
+/Users/as/aixtiv-symphony-opus1.0.1/ security/secure-development/dependency-management
+/Users/as/aixtiv-symphony-opus1.0.1/ security/secure-development/code-review
+/Users/as/aixtiv-symphony-opus1.0.1/ security/penetration-testing/tools
+/Users/as/aixtiv-symphony-opus1.0.1/ security/penetration-testing/reports
+/Users/as/aixtiv-symphony-opus1.0.1/ security/penetration-testing/methodology
+/Users/as/aixtiv-symphony-opus1.0.1/ security/incident-response/recovery
+/Users/as/aixtiv-symphony-opus1.0.1/ security/incident-response/mitigation
+/Users/as/aixtiv-symphony-opus1.0.1/ security/incident-response/detection
+/Users/as/aixtiv-symphony-opus1.0.1/ security/incident-response/analysis
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/secure-storage
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/keys-management
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/key-management
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/data-in-transit
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/data-at-rest
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/certificates
+/Users/as/aixtiv-symphony-opus1.0.1/ security/encryption/algorithms
+/Users/as/aixtiv-symphony-opus1.0.1/ security/data-protection/tokenization
+/Users/as/aixtiv-symphony-opus1.0.1/ security/data-protection/retention
+/Users/as/aixtiv-symphony-opus1.0.1/ security/data-protection/masking
+/Users/as/aixtiv-symphony-opus1.0.1/ security/data-protection/anonymization
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/standards
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/soc2
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/reporting
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/regulations
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/iso27001
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/hipaa
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/gdpr
+/Users/as/aixtiv-symphony-opus1.0.1/ security/compliance/certifications
+/Users/as/aixtiv-symphony-opus1.0.1/ security/authorization/rbac
+/Users/as/aixtiv-symphony-opus1.0.1/ security/authorization/policies
+/Users/as/aixtiv-symphony-opus1.0.1/ security/authorization/permissions
+/Users/as/aixtiv-symphony-opus1.0.1/ security/authorization/abac
+/Users/as/aixtiv-symphony-opus1.0.1/ security/audit/trails
+/Users/as/aixtiv-symphony-opus1.0.1/ security/audit/reporting
+/Users/as/aixtiv-symphony-opus1.0.1/ security/audit/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ security/audit/logging
+/Users/as/aixtiv-symphony-opus1.0.1/ security/audit/analysis
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/tools/translation-management
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/tools/terminology-management
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/tools/quality-assurance
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/localization/numbers
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/localization/date-time
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/localization/currency
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/localization/addresses
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/cultural-adaptation/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/cultural-adaptation/imagery
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/cultural-adaptation/content
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/cultural-adaptation/colors
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/compliance/regional-regulations
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/compliance/data-sovereignty
+/Users/as/aixtiv-symphony-opus1.0.1/ internationalization/compliance/accessibility
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/webhooks/outgoing
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/webhooks/management
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/webhooks/incoming
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/webhooks/events
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/internal-systems/microservices
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/internal-systems/frontend-backend
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/internal-systems/data-services
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/internal-systems/ai-components
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/external-services/storage-services
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/external-services/payment-providers
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/external-services/communication
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/external-services/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/external-services/ai-services
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/data-exchange/validation
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/data-exchange/transformations
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/data-exchange/synchronization
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/data-exchange/formats
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/authentication/saml
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/authentication/openid
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/authentication/oauth
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/authentication/custom-providers
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/api-gateways/security
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/api-gateways/routing
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/api-gateways/rate-limiting
+/Users/as/aixtiv-symphony-opus1.0.1/ integrations/api-gateways/caching
+/Users/as/aixtiv-symphony-opus1.0.1/ integration/gateway/primary/us-west1
+/Users/as/aixtiv-symphony-opus1.0.1/ integration/gateway/failover/us-central1
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/notebooks/vertex-workbench
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/notebooks/jupyter
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/notebooks/colab
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/kubernetes/rays
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/kubernetes/kind
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/kubernetes/kge
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/docker/swarm
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/docker/containers
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/docker/compose
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/collaboration/workspaces
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/collaboration/version-control
+/Users/as/aixtiv-symphony-opus1.0.1/ infrastructure/collaboration/shared-docs
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/user-profiles/view
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/user-profiles/preferences
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/user-profiles/history
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/user-profiles/edit
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/styles/tailwind
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/styles/scss/variables
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/styles/scss/mixins
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/styles/scss/functions
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/styles/css
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/contexts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/auth
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/shared/api
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/settings/security
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/settings/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/settings/billing
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/settings/account
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/react-components/visualizations
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/react-components/ui
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/react-components/layout
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/react-components/data
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/contexts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/public-portal/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/notifications/templates
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/notifications/preferences
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/notifications/inbox
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/notifications/delivery
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/visualization-center/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/visualization-center/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/visualization-center/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/visualization-center/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/visualization-center/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/styles
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/public
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/context
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/main-portal/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/interactive-labs
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/daily-integration/streaming
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/daily-integration/recording
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/daily-integration/collaboration
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/daily-integration/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/course-player
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/next-apps/academy/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/contexts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/marketplace/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/editor/publishing
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/editor/media
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/editor/content
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/editor/collaboration
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/contexts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/dashboard/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/authentication/social-auth
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/authentication/signup
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/authentication/password-reset
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/authentication/login
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/analytics-dashboard/user-engagement
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/analytics-dashboard/revenue
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/analytics-dashboard/overview
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/analytics-dashboard/content-performance
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/layouts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/contexts
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/web/admin/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/state-management/store
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/state-management/selectors
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/state-management/reducers
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/state-management/effects
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/state-management/actions
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/src
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/screens
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/navigation
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/hooks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/react-native/assets
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/views
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/controllers
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/Frameworks
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/Assets
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/ios/AIXTIVApp
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/screens
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/providers
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/navigation
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/flutter/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/libraries
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/fragments
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/assets
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/app
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/mobile/android/activities
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/internationalization/translations
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/internationalization/rtl-support
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/internationalization/localization
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/internationalization/date-formats
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/windows
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/tauri/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/tauri/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/tauri/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/tauri/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/qt/windows
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/qt/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/qt/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/qt/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/macos
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/flutter/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/flutter/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/flutter/screens
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/flutter/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/utils
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/services
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/renderer
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/preload
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/pages
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/main
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/components
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/desktop/electron/common
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/accessibility/screen-readers
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/accessibility/keyboard-navigation
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/accessibility/color-contrast
+/Users/as/aixtiv-symphony-opus1.0.1/ frontend/accessibility/aria
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/subscriptions/plans
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/subscriptions/management
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/subscriptions/billing
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/products/training
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/products/tools
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/products/support
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/products/solutions
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/integrations/payment-gateways
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/integrations/marketing
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/integrations/fulfillment
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/integrations/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/crm/interactions
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/crm/customer-profiles
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/crm/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/automation/marketing
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/automation/fulfillment
+/Users/as/aixtiv-symphony-opus1.0.1/ e-commerce/automation/customer-service
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/user/user-guides
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/user/tutorials
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/user/release-notes
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/user/faq
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/training/workshops
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/training/tutorials
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/training/courses
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/training/certification
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/tools/videos
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/tools/screenshots
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/tools/documentation-generator
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/tools/diagrams
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/system/requirements
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/system/maintenance
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/system/installation
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/system/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/developer/getting-started
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/developer/customization
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/developer/best-practices
+/Users/as/aixtiv-symphony-opus1.0.1/ documentation/developer/architecture
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/security/secrets-management
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/security/scanning
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/security/compliance
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/security/auditing
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/monitoring/metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/monitoring/logging
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/monitoring/dashboards
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/monitoring/alerting
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/infrastructure/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/infrastructure/scaling
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/infrastructure/provisioning
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/infrastructure/networking
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/disaster-recovery/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/disaster-recovery/restore
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/disaster-recovery/failover
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/disaster-recovery/backup
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/configuration/variables
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/configuration/validation
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/configuration/templates
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/configuration/environments
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/ci-cd/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/ci-cd/pipelines
+/Users/as/aixtiv-symphony-opus1.0.1/ devops/ci-cd/artifacts
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/namespaces/user-data
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/namespaces/knowledge
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/namespaces/agents
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/indexes/similarity
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/indexes/semantic-search
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/indexes/recommendation
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/embeddings/text
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/embeddings/multimodal
+/Users/as/aixtiv-symphony-opus1.0.1/ data/vector-db/embeddings/image
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/rss-feeds/news
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/rss-feeds/industry
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/rss-feeds/custom
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/google-drive/permissions
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/google-drive/folders
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/google-drive/automation
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/cloud-storage/uploads
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/cloud-storage/backups
+/Users/as/aixtiv-symphony-opus1.0.1/ data/storage/cloud-storage/assets
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/rules
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/indexes
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/collections/users
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/collections/solutions
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/collections/flights
+/Users/as/aixtiv-symphony-opus1.0.1/ data/firestore/collections/agents
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/vertex-ai
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/regions/us-west1
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/regions/us-central1
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/pubsub
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/functions
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/gcp/bigquery
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/firebase/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/firebase/realtime
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/firebase/functions
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/firebase/firestore
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/firebase/auth
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/blockchain/smart-contracts
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/blockchain/minting
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/blockchain/ledger/on-cloud
+/Users/as/aixtiv-symphony-opus1.0.1/ data/cloud/blockchain/ledger/off-cloud
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/verification/validation
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/verification/proof
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/verification/audit
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/transactions/verification
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/transactions/token
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/transactions/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/contracts/verification
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/contracts/token
+/Users/as/aixtiv-symphony-opus1.0.1/ data/blockchain/contracts/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/utilities/networking
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/utilities/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/utilities/logging
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/utilities/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/tasks/scheduling
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/tasks/reporting
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/tasks/execution
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/tasks/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/integrations/wing
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/integrations/vls
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/integrations/frontend
+/Users/as/aixtiv-symphony-opus1.0.1/ cr-agents/integrations/backend
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/vector-store/search
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/vector-store/indexing
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/vector-store/embeddings
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/retrieval/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/retrieval/ranking
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/retrieval/filtering
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/persistence/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/persistence/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/persistence/lifecycle
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/context/retrieval
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/context/capture
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/memory-system/context/adaptation
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/visualization/graphics
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/visualization/dashboards
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/visualization/charts
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/recommendation/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/recommendation/personalization
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/recommendation/engines
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/prediction/training
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/prediction/models
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/prediction/evaluation
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/analysis/processors
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/analysis/extractors
+/Users/as/aixtiv-symphony-opus1.0.1/ core-protocols/intelligence-engine/analysis/classifiers
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-west1/services
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-west1/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-west1/functions
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-central1/services
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-central1/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/ config/regions/us-central1/functions
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/wallets/transaction-handling
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/wallets/security
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/wallets/integration
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/wallets/custody
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/tokens/semi-fungible
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/tokens/non-fungible
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/tokens/mint-burn
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/tokens/management
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/tokens/fungible
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/security/encryption
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/security/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/security/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/operations/upgrades
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/operations/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/operations/maintenance
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/networks/solana
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/networks/polygon
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/networks/interoperability
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/networks/ethereum
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/networks/custom-ledger
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/integrations/services
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/integrations/external-chains
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/integrations/apis
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/infrastructure/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/infrastructure/nodes
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/infrastructure/consensus
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/identity/verification
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/identity/privacy
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/identity/permissions
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/identity/credentials
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/governance/voting
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/governance/proposals
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/governance/execution
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/governance/dao
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/contracts-dev/upgrades
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/contracts-dev/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/contracts-dev/templates
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/contracts-dev/auditing
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/applications/verification
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/applications/token
+/Users/as/aixtiv-symphony-opus1.0.1/ blockchain/applications/authorization
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/user/profile
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/user/preferences
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/user/permissions
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/user/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/ranking
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/query
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/providers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/indexing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/indexers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/filtering
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/search/analyzers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/publishing/workflow
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/publishing/review
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/publishing/monetization
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/publishing/distribution
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/payment/subscriptions
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/payment/processing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/payment/invoicing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/payment/billing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/orchestration/workflows
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/orchestration/triggers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/orchestration/activities
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/templates
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/sms
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/push
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/providers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/in-app
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/email
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/notification/channels
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/content/versioning
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/content/processing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/content/management
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/content/delivery
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/blockchain/wallet-integration
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/blockchain/token-management
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/blockchain/smart-contracts
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/blockchain/ledger-interface
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/authentication/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/authentication/middleware
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/authentication/controllers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/analytics/reporting
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/analytics/processing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/analytics/dashboards
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/analytics/collection
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/ai-orchestration/pipeline
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/ai-orchestration/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/ai-orchestration/model-management
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/services/ai-orchestration/inference
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/monitoring/tracing
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/monitoring/metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/monitoring/logging
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/monitoring/alerts
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/job-queue/workers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/job-queue/schedulers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/job-queue/retry-mechanisms
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/job-queue/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/integration/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/integration/transformers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/integration/connectors
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/integration/adapters
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/triggers/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/triggers/firestore
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/triggers/auth
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/scheduled/weekly
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/scheduled/monthly
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/scheduled/daily
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/http/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/http/integrations
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/functions/http/api
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/event-bus/subscribers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/event-bus/publishers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/event-bus/handlers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/event-bus/channels
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/deployment/scripts
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/deployment/pipelines
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/deployment/environments
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/deployment/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/cache/warm-up
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/cache/strategies
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/cache/providers
+/Users/as/aixtiv-symphony-opus1.0.1/ backend/cache/invalidation
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/visualization/interactive
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/visualization/embedded
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/visualization/dashboards
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/visualization/charts
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reports/scheduled
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reports/interactive
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reports/exports
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reports/ad-hoc
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reporting/scheduled
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reporting/export
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reporting/custom
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/reporting/automated
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/real-time/streaming
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/real-time/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/real-time/event-processing
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/real-time/alerting
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/ml-analytics/trend-analysis
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/ml-analytics/prescriptive
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/ml-analytics/predictive
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/ml-analytics/anomaly-detection
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/machine-learning/training
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/machine-learning/prediction
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/machine-learning/models
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/machine-learning/evaluation
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/integrations/visualization-tools
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/integrations/export-destinations
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/integrations/data-sources
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/data-processing/transformation
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/data-processing/storage
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/data-processing/retrieval
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/data-processing/integration
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/data-processing/collection
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/dashboards/operations
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/dashboards/marketing
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/dashboards/executives
+/Users/as/aixtiv-symphony-opus1.0.1/ analytics/dashboards/development
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/personalization/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/personalization/rules
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/personalization/audience-segments
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/monetization/subscription
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/monetization/royalties
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/monetization/pay-per-view
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/monetization/licensing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/monetization/advertising
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/integrations/social-media
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/integrations/crm
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/integrations/cms
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/integrations/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/editorial/version-control
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/editorial/review-system
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/editorial/quality-assurance
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/editorial/collaboration
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/distribution/targeting
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/distribution/syndication
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/distribution/scheduling
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/distribution/channels
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/distribution/analytics
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-management/publishing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-management/editing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-management/authoring
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-management/approval
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-generation/workflows
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-generation/templates
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-generation/models
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-creation/video-generation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-creation/text-generation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-creation/multi-modal
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-creation/image-generation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/content-creation/audio-generation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/analytics/revenue-tracking
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/analytics/performance-metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/analytics/content-effectiveness
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-publishing/analytics/audience-insights
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/training/pipelines
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/training/monitoring
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/training/hyperparameter-tuning
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/training/distributed
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/research/prototyping
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/research/papers
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/research/innovation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/research/experimentation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/orchestration/workflows
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/orchestration/scheduling
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/orchestration/resource-management
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/orchestration/integration
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/models/versioning
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/models/repository
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/models/registry
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/inference/serving
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/inference/scaling
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/inference/optimization
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/inference/engines
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/evaluation/validation
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/evaluation/testing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/evaluation/metrics
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/evaluation/benchmarks
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/datasets/synthetic
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/datasets/preprocessing
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/datasets/management
+/Users/as/aixtiv-symphony-opus1.0.1/ ai-core/datasets/augmentation
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/other-services/lms
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/other-services/credential
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/other-services/content
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/daily/webhooks
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/daily/configuration
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/integrations/daily/callbacks
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/curriculum/prerequisites
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/curriculum/learning-paths
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/curriculum/competencies
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/content/resources
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/content/modules
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/content/lessons
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/assessments/quizzes
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/assessments/projects
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/courses/assessments/exams
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/session-management/scheduling
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/session-management/recording
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/session-management/attendance
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/recording-storage/compression
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/recording-storage/cataloging
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/recording-storage/access-control
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/daily-api/room-management
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/daily-api/recording
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/daily-api/authentication
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/analytics/progress
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/analytics/engagement
+/Users/as/aixtiv-symphony-opus1.0.1/ academy/backend/analytics/effectiveness

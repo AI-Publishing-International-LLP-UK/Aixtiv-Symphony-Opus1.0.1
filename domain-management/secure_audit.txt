@@ -1,0 +1,164 @@
+==== 🛡 AI Secure Audit: macOS Security & Network Check ====
+
+🔌 Active Network Interfaces:
+lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> mtu 16384
+	options=1203<RXCSUM,TXCSUM,TXSTATUS,SW_TIMESTAMP>
+--
+gif0: flags=8010<POINTOPOINT,MULTICAST> mtu 1280
+stf0: flags=0<> mtu 1280
+anpi1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+anpi0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+anpi2: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+en4: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+en5: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+en6: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+en1: flags=8822<BROADCAST,SMART,SIMPLEX,MULTICAST> mtu 1500
+	options=460<TSO4,TSO6,CHANNEL_IO>
+--
+en2: flags=8822<BROADCAST,SMART,SIMPLEX,MULTICAST> mtu 1500
+	options=460<TSO4,TSO6,CHANNEL_IO>
+--
+en3: flags=8822<BROADCAST,SMART,SIMPLEX,MULTICAST> mtu 1500
+	options=460<TSO4,TSO6,CHANNEL_IO>
+--
+utun0: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 1500
+	inet6 fe80::450:4309:345e:2cdd%utun0 prefixlen 64 scopeid 0x10 
+--
+utun1: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 1380
+	inet6 fe80::672b:7146:aaff:db06%utun1 prefixlen 64 scopeid 0x11 
+--
+ap1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=6460<TSO4,TSO6,CHANNEL_IO,PARTIAL_CSUM,ZEROINVERT_CSUM>
+--
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=6460<TSO4,TSO6,CHANNEL_IO,PARTIAL_CSUM,ZEROINVERT_CSUM>
+--
+awdl0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=6460<TSO4,TSO6,CHANNEL_IO,PARTIAL_CSUM,ZEROINVERT_CSUM>
+--
+llw0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+--
+utun2: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 2000
+	inet6 fe80::7a14:a87a:2ad:8d5e%utun2 prefixlen 64 scopeid 0x14 
+--
+utun3: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 1000
+	inet6 fe80::ce81:b1c:bd2c:69e%utun3 prefixlen 64 scopeid 0x15 
+--
+en7: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500 constrained
+	options=400<CHANNEL_IO>
+--
+en9: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=404<VLAN_MTU,CHANNEL_IO>
+--
+en8: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=404<VLAN_MTU,CHANNEL_IO>
+
+🌐 Proxy Configuration (System-wide):
+[An asterisk (*) denotes that a network service is disabled.]
+** Error: Unable to find item in network database.
+** Error: Unable to find item in network database.
+** Error: Unable to find item in network database.
+An asterisk (*) denotes that a network service is disabled. is not a recognized network service.
+** Error: The parameters were not valid.
+[iPhone USB USB]
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+There aren't any DNS Servers set on iPhone USB USB.
+[Wi-Fi]
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+There aren't any DNS Servers set on Wi-Fi.
+[Malwarebytes]
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+Enabled: No
+Server: 
+Port: 0
+Authenticated Proxy Enabled: 0
+There aren't any DNS Servers set on Malwarebytes.
+
+🧠 DNS Settings:
+  nameserver[0] : fe80::a84a:28ff:fe50:9064%en7
+  nameserver[1] : 172.20.10.1
+  nameserver[0] : fe80::a84a:28ff:fe50:9064%en7
+  nameserver[1] : 172.20.10.1
+
+📡 Open Ports & Listening Services:
+COMMAND   PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+remoted   317 root    8u  IPv6 0x2224741de098c9be      0t0  TCP [fe80:17::58fe:93ff:fe95:7f05]:50331 (LISTEN)
+rapportd  610   as    8u  IPv4 0xf7e13f4ca7b605ae      0t0  TCP *:49152 (LISTEN)
+rapportd  610   as    9u  IPv6 0x48ae94ba3b3ea5a6      0t0  TCP *:49152 (LISTEN)
+Messenger 651   as   85u  IPv4 0x211cdd72815897c3      0t0  TCP 127.0.0.1:3103 (LISTEN)
+Messenger 651   as   88u  IPv6 0xf17d14e3f6107f04      0t0  TCP [::1]:3103 (LISTEN)
+ControlCe 657   as    8u  IPv4 0x229d421a1de9ef1c      0t0  TCP *:7000 (LISTEN)
+ControlCe 657   as    9u  IPv6 0xc2a72f9a2c7c4cac      0t0  TCP *:7000 (LISTEN)
+ControlCe 657   as   10u  IPv4 0xa0bfee43d3b1c513      0t0  TCP *:5000 (LISTEN)
+ControlCe 657   as   11u  IPv6 0x6cb6b519293c731c      0t0  TCP *:5000 (LISTEN)
+stable    825   as    9u  IPv4 0xd5d2a4a5ef333066      0t0  TCP 127.0.0.1:9277 (LISTEN)
+
+🚀 Login Items and Launch Agents:
+--- LaunchAgents (User):
+com.google.GoogleUpdater.wake.plist
+com.google.keystone.agent.plist
+com.google.keystone.xpcservice.plist
+--- LaunchAgents (System):
+com.malwarebytes.mbam.frontend.agent.plist
+com.norton.userinit.plist
+--- LaunchDaemons (System):
+com.docker.socket.plist
+com.docker.vmnetd.plist
+com.malwarebytes.mbam.rtprotection.daemon.plist
+com.malwarebytes.mbam.settings.daemon.plist
+com.norton.init.plist
+com.norton.update.plist
+
+🔩 Loaded Kernel Extensions (KEXTs):
+Index Refs Address            Size       Wired      Name (Version) UUID <Linked Against>
+
+🧷 Gatekeeper Status:
+assessments enabled
+
+🗂 Configuration Profiles:
+There are no configuration profiles installed for user 'as'
+
+✅ Scan Complete. Please review any suspicious entries above.
+Tip: If you'd like a saved copy, run this with > secure_audit.txt at the end.

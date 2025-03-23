@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <!-- Gradient for the background -->
+    <linearGradient id="wishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3182CE;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#2C5282;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- Gradient for the vision side -->
+    <linearGradient id="visionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#48BB78;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#2F855A;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Main circular shape -->
+  <circle cx="100" cy="100" r="90" fill="url(#wishGradient)"/>
+  
+  <!-- Text for Wish side -->
+  <text x="100" y="110" text-anchor="middle" font-size="24" font-weight="bold" fill="white">
+    WISH
+  </text>
+  
+  <!-- Hidden Vision side (ready to be revealed) -->
+  <g transform="translate(100, 100) rotate(180) translate(-100, -100)">
+    <circle cx="100" cy="100" r="90" fill="url(#visionGradient)"/>
+    <text x="100" y="110" text-anchor="middle" font-size="24" font-weight="bold" fill="white">
+      VISION
+    </text>
+  </g>
+  
+  <!-- Subtle hint of flippability -->
+  <path d="M50,40 Q100,20 150,40" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="3"/>
+  <path d="M50,160 Q100,180 150,160" fill="none" stroke="white" stroke-opacity="0.5" stroke-width="3"/>
+</svg>
