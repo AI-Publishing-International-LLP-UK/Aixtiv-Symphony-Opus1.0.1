@@ -2,6 +2,16 @@
   "projects": {
     "default": "api-for-warp-drive"
   },
+  "targets": {
+    "api-for-warp-drive": {
+      "hosting": {
+        "coaching2100": [
+          "coaching2100"
+        ]
+      }
+    }
+  },
+  "etags": {},
   "functions": {
     "region": "us-west1"
   }
