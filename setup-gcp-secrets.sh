@@ -38,7 +38,10 @@ fetch_secret "lucy-claude-01" "LUCY_CLAUDE_KEY"
 fetch_secret "pineconeconnect" "PINECONE_KEY"
 fetch_secret "new-admin-anthropic" "NEW_ANTHROPIC_KEY"
 fetch_secret "oauth-credentials" "OAUTH_CREDENTIALS"
+<<<<<<< HEAD
 fetch_secret "langchain02" "LANGCHAIN_02_KEY"
+=======
+>>>>>>> 1737b51 (feat: activate CI/CD/CTT pipeline for aixtiv-cli deployment)
 
 echo -e "\n${BLUE}==== Summary ====${NC}"
 echo -e "To use these secrets in other scripts or applications:"

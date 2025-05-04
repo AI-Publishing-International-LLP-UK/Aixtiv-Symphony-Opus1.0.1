@@ -1,0 +1,130 @@
+const winston = require('winston');
+const { format } = require('winston');
+const { combine, timestamp, printf, colorize, errors } = format;
+
+// Custom log format
+const logFormat = printf(({ level, message, timestamp, stack }) => {
+  return `${timestamp} ${level}: ${message}${stack ? '\n' + stack : ''}`;
+});
+
+// Create a logger with multiple transports
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: combine(
+    errors({ stack: true }),
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    colorize(),
+    logFormat
+  ),
+  transports: [
+    // Console transport
+    new winston.transports.Console({
+      format: combine(
+        colorize(),
+        logFormat
+      )
+    }),
+    
+    // File transport for errors
+    new winston.transports.File({
+      filename: process.env.LOG_DIRECTORY 
+        ? `${process.env.LOG_DIRECTORY}/error.log` 
+        : './logs/error.log',
+      level: 'error'
+    }),
+    
+    // File transport for combined logs
+    new winston.transports.File({
+      filename: process.env.LOG_DIRECTORY 
+        ? `${process.env.LOG_DIRECTORY}/combined.log` 
+        : './logs/combined.log'
+    })
+  ]
+});
+
+// Custom error handling class
+class DrMemoriaError extends Error {
+  constructor(message, code = 'INTERNAL_ERROR', details = {}) {
+    super(message);
+    this.name = 'DrMemoriaError';
+    this.code = code;
+    this.details = details;
+    
+    // Capture stack trace
+    Error.captureStackTrace(this, this.constructor);
+  }
+
+  // Log the error with additional context
+  log() {
+    logger.error(this.message, {
+      code: this.code,
+      details: this.details,
+      stack: this.stack
+    });
+    return this;
+  }
+
+  // Convert to a standardized error response
+  toResponse() {
+    return {
+      success: false,
+      error: {
+        code: this.code,
+        message: this.message,
+        details: this.details
+      }
+    };
+  }
+}
+
+// Error handling middleware for Firebase Functions
+function errorHandler(fn) {
+  return async (data, context) => {
+    try {
+      return await fn(data, context);
+    } catch (error) {
+      // Log the original error
+      logger.error('Unhandled function error', {
+        error: error,
+        data,
+        context
+      });
+
+      // Transform to Dr. Memoria Error if not already
+      const drError = error instanceof DrMemoriaError 
+        ? error 
+        : new DrMemoriaError(
+            error.message, 
+            'UNHANDLED_ERROR', 
+            { originalError: error.toString() }
+          );
+
+      // Log the error
+      drError.log();
+
+      // Throw as Firebase Functions error
+      throw new functions.https.HttpsError(
+        drError.code === 'INTERNAL_ERROR' ? 'internal' : 'unknown', 
+        drError.message, 
+        drError.details
+      );
+    }
+  };
+}
+
+// Error types
+const ERROR_TYPES = {
+  AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+  PERMISSION_DENIED: 'PERMISSION_DENIED',
+  EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
+  INTERNAL_ERROR: 'INTERNAL_ERROR'
+};
+
+module.exports = {
+  logger,
+  DrMemoriaError,
+  errorHandler,
+  ERROR_TYPES
+};

@@ -1,0 +1,843 @@
+// src/infrastructure/discovery/ServiceDiscovery.ts
+
+import { EventEmitter } from 'events';
+
+/**
+ * Service health status
+ */
+export enum ServiceStatus {
+  UNKNOWN = 'unknown',
+  HEALTHY = 'healthy',
+  DEGRADED = 'degraded',
+  UNHEALTHY = 'unhealthy',
+  STARTING = 'starting',
+  STOPPING = 'stopping',
+  STOPPED = 'stopped'
+}
+
+/**
+ * Service registration information
+ */
+export interface ServiceRegistration {
+  id: string;
+  name: string;
+  version: string;
+  description?: string;
+  status: ServiceStatus;
+  endpoints: ServiceEndpoint[];
+  metadata: Record<string, any>;
+  tenantId?: string; // Optional tenant ID for tenant-specific services
+  tags?: string[];
+  registeredAt: number;
+  lastHeartbeat: number;
+  ttl: number; // Time-to-live in seconds
+}
+
+/**
+ * Service endpoint information
+ */
+export interface ServiceEndpoint {
+  id: string;
+  name: string;
+  protocol: 'http' | 'https' | 'grpc' | 'ws' | 'wss' | 'tcp' | 'udp';
+  host: string;
+  port: number;
+  path?: string;
+  healthCheck?: {
+    path?: string;
+    interval: number; // in milliseconds
+    timeout: number; // in milliseconds
+    retries: number;
+  };
+  metadata?: Record<string, any>;
+  secure?: boolean;
+  weight?: number; // For load balancing
+}
+
+/**
+ * Service query options
+ */
+export interface ServiceQueryOptions {
+  name?: string;
+  version?: string;
+  status?: ServiceStatus;
+  tenantId?: string;
+  tags?: string[];
+  protocol?: string;
+  limit?: number;
+  includeMetadata?: boolean;
+  requireHealthy?: boolean;
+  sortBy?: 'name' | 'registeredAt' | 'lastHeartbeat' | 'weight';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Service discovery events
+ */
+export interface ServiceDiscoveryEvents {
+  'service:registered': (service: ServiceRegistration) => void;
+  'service:updated': (service: ServiceRegistration) => void;
+  'service:deregistered': (serviceId: string) => void;
+  'service:expired': (serviceId: string) => void;
+  'service:statusChanged': (serviceId: string, status: ServiceStatus, previousStatus: ServiceStatus) => void;
+  'discovery:error': (error: Error) => void;
+}
+
+/**
+ * Service discovery interface
+ */
+export interface ServiceDiscovery {
+  /**
+   * Register a service with the discovery system
+   */
+  registerService(service: Omit<ServiceRegistration, 'registeredAt' | 'lastHeartbeat'>): Promise<string>;
+  
+  /**
+   * Deregister a service
+   */
+  deregisterService(serviceId: string): Promise<boolean>;
+  
+  /**
+   * Update a service registration
+   */
+  updateService(serviceId: string, updates: Partial<ServiceRegistration>): Promise<ServiceRegistration>;
+  
+  /**
+   * Send a heartbeat for a service to indicate it's still alive
+   */
+  heartbeat(serviceId: string): Promise<boolean>;
+  
+  /**
+   * Get information about a specific service
+   */
+  getService(serviceId: string): Promise<ServiceRegistration | null>;
+  
+  /**
+   * Query for services matching certain criteria
+   */
+  queryServices(options?: ServiceQueryOptions): Promise<ServiceRegistration[]>;
+  
+  /**
+   * Find healthy endpoints for a specific service
+   */
+  findServiceEndpoints(
+    serviceName: string,
+    options?: {
+      version?: string;
+      protocol?: string;
+      tenantId?: string;
+      limit?: number;
+      random?: boolean;
+    }
+  ): Promise<ServiceEndpoint[]>;
+  
+  /**
+   * Watch for changes to services
+   */
+  watchServices(
+    options: ServiceQueryOptions & { 
+      onAdd?: (service: ServiceRegistration) => void;
+      onUpdate?: (service: ServiceRegistration) => void;
+      onRemove?: (serviceId: string) => void;
+    }
+  ): Promise<{ cancel: () => void }>;
+  
+  /**
+   * Change the status of a service
+   */
+  setServiceStatus(serviceId: string, status: ServiceStatus): Promise<boolean>;
+  
+  /**
+   * Add or update tags for a service
+   */
+  setServiceTags(serviceId: string, tags: string[]): Promise<boolean>;
+  
+  /**
+   * Add or update metadata for a service
+   */
+  setServiceMetadata(serviceId: string, metadata: Record<string, any>): Promise<boolean>;
+  
+  /**
+   * Check health of all registered services
+   */
+  checkServicesHealth(): Promise<Record<string, ServiceStatus>>;
+  
+  /**
+   * Get statistics about registered services
+   */
+  getStatistics(): Promise<{
+    totalServices: number;
+    healthyServices: number;
+    unhealthyServices: number;
+    servicesByName: Record<string, number>;
+    endpointsByProtocol: Record<string, number>;
+  }>;
+  
+  /**
+   * Reset or clear the service registry (mainly for testing)
+   */
+  reset(): Promise<void>;
+  
+  // Event handling methods
+  on<E extends keyof ServiceDiscoveryEvents>(
+    event: E, 
+    listener: ServiceDiscoveryEvents[E]
+  ): this;
+  
+  off<E extends keyof ServiceDiscoveryEvents>(
+    event: E, 
+    listener: ServiceDiscoveryEvents[E]
+  ): this;
+}
+
+/**
+ * Multi-tenant service discovery implementation
+ * Supports service registration and discovery per tenant
+ */
+export class MultiTenantServiceDiscovery extends EventEmitter implements ServiceDiscovery {
+  private services: Map<string, ServiceRegistration>;
+  private heartbeatIntervals: Map<string, NodeJS.Timeout>;
+  private healthCheckIntervals: Map<string, NodeJS.Timeout>;
+  private watches: Map<string, {
+    query: ServiceQueryOptions;
+    callbacks: {
+      onAdd?: (service: ServiceRegistration) => void;
+      onUpdate?: (service: ServiceRegistration) => void;
+      onRemove?: (serviceId: string) => void;
+    };
+  }>;
+  
+  constructor() {
+    super();
+    this.services = new Map();
+    this.heartbeatIntervals = new Map();
+    this.healthCheckIntervals = new Map();
+    this.watches = new Map();
+    
+    // Set up automatic expiration checking
+    setInterval(() => this.checkExpiredServices(), 5000);
+  }
+  
+  /**
+   * Register a service with the discovery system
+   */
+  async registerService(
+    service: Omit<ServiceRegistration, 'registeredAt' | 'lastHeartbeat'>
+  ): Promise<string> {
+    const now = Date.now();
+    const serviceId = service.id || `svc_${now}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const registration: ServiceRegistration = {
+      ...service,
+      id: serviceId,
+      status: service.status || ServiceStatus.STARTING,
+      registeredAt: now,
+      lastHeartbeat: now,
+      ttl: service.ttl || 30 // Default 30 second TTL
+    };
+    
+    this.services.set(serviceId, registration);
+    
+    // Set up automatic heartbeat if requested
+    if (service.ttl > 0) {
+      const interval = Math.max(1000, (service.ttl * 1000) / 3); // Heartbeat at 1/3 of the TTL
+      const heartbeatInterval = setInterval(() => {
+        this.heartbeat(serviceId).catch(err => {
+          console.error(`Error sending heartbeat for service ${serviceId}:`, err);
+          clearInterval(heartbeatInterval);
+          this.heartbeatIntervals.delete(serviceId);
+        });
+      }, interval);
+      
+      this.heartbeatIntervals.set(serviceId, heartbeatInterval);
+    }
+    
+    // Set up health check intervals if configured
+    this.setupHealthChecks(registration);
+    
+    // Notify watches
+    this.notifyWatches('add', registration);
+    
+    // Emit event
+    this.emit('service:registered', registration);
+    
+    return serviceId;
+  }
+  
+  /**
+   * Deregister a service
+   */
+  async deregisterService(serviceId: string): Promise<boolean> {
+    if (!this.services.has(serviceId)) {
+      return false;
+    }
+    
+    // Clear any intervals
+    if (this.heartbeatIntervals.has(serviceId)) {
+      clearInterval(this.heartbeatIntervals.get(serviceId)!);
+      this.heartbeatIntervals.delete(serviceId);
+    }
+    
+    if (this.healthCheckIntervals.has(serviceId)) {
+      clearInterval(this.healthCheckIntervals.get(serviceId)!);
+      this.healthCheckIntervals.delete(serviceId);
+    }
+    
+    // Remove service
+    this.services.delete(serviceId);
+    
+    // Notify watches
+    this.notifyWatches('remove', { id: serviceId } as ServiceRegistration);
+    
+    // Emit event
+    this.emit('service:deregistered', serviceId);
+    
+    return true;
+  }
+  
+  /**
+   * Update a service registration
+   */
+  async updateService(
+    serviceId: string,
+    updates: Partial<ServiceRegistration>
+  ): Promise<ServiceRegistration> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      throw new Error(`Service with ID ${serviceId} not found`);
+    }
+    
+    // Check if status is changing
+    const statusChanged = updates.status && updates.status !== service.status;
+    const previousStatus = service.status;
+    
+    // Update the service
+    const updatedService: ServiceRegistration = {
+      ...service,
+      ...updates,
+      id: serviceId, // Ensure ID doesn't change
+      lastHeartbeat: Date.now()
+    };
+    
+    this.services.set(serviceId, updatedService);
+    
+    // Reconfigure health checks if endpoints changed
+    if (updates.endpoints) {
+      if (this.healthCheckIntervals.has(serviceId)) {
+        clearInterval(this.healthCheckIntervals.get(serviceId)!);
+        this.healthCheckIntervals.delete(serviceId);
+      }
+      
+      this.setupHealthChecks(updatedService);
+    }
+    
+    // Notify watches
+    this.notifyWatches('update', updatedService);
+    
+    // Emit events
+    this.emit('service:updated', updatedService);
+    
+    if (statusChanged) {
+      this.emit('service:statusChanged', serviceId, updatedService.status, previousStatus);
+    }
+    
+    return updatedService;
+  }
+  
+  /**
+   * Send a heartbeat for a service to indicate it's still alive
+   */
+  async heartbeat(serviceId: string): Promise<boolean> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      return false;
+    }
+    
+    service.lastHeartbeat = Date.now();
+    this.services.set(serviceId, service);
+    
+    return true;
+  }
+  
+  /**
+   * Get information about a specific service
+   */
+  async getService(serviceId: string): Promise<ServiceRegistration | null> {
+    return this.services.get(serviceId) || null;
+  }
+  
+  /**
+   * Query for services matching certain criteria
+   */
+  async queryServices(options: ServiceQueryOptions = {}): Promise<ServiceRegistration[]> {
+    let results = Array.from(this.services.values());
+    
+    // Apply filters
+    if (options.name) {
+      results = results.filter(svc => svc.name === options.name);
+    }
+    
+    if (options.version) {
+      results = results.filter(svc => svc.version === options.version);
+    }
+    
+    if (options.status) {
+      results = results.filter(svc => svc.status === options.status);
+    }
+    
+    if (options.tenantId) {
+      results = results.filter(svc => svc.tenantId === options.tenantId);
+    }
+    
+    if (options.tags && options.tags.length > 0) {
+      results = results.filter(svc => 
+        svc.tags && options.tags!.every(tag => svc.tags!.includes(tag))
+      );
+    }
+    
+    if (options.protocol) {
+      results = results.filter(svc => 
+        svc.endpoints.some(endpoint => endpoint.protocol === options.protocol)
+      );
+    }
+    
+    if (options.requireHealthy) {
+      results = results.filter(svc => 
+        svc.status === ServiceStatus.HEALTHY || svc.status === ServiceStatus.DEGRADED
+      );
+    }
+    
+    // Apply sorting
+    if (options.sortBy) {
+      const sortOrder = options.sortOrder === 'desc' ? -1 : 1;
+      
+      results.sort((a, b) => {
+        switch (options.sortBy) {
+          case 'name':
+            return sortOrder * a.name.localeCompare(b.name);
+          case 'registeredAt':
+            return sortOrder * (a.registeredAt - b.registeredAt);
+          case 'lastHeartbeat':
+            return sortOrder * (a.lastHeartbeat - b.lastHeartbeat);
+          case 'weight':
+            // Use the average weight of endpoints if available
+            const aWeight = a.endpoints.reduce((sum, ep) => sum + (ep.weight || 1), 0) / a.endpoints.length;
+            const bWeight = b.endpoints.reduce((sum, ep) => sum + (ep.weight || 1), 0) / b.endpoints.length;
+            return sortOrder * (aWeight - bWeight);
+          default:
+            return 0;
+        }
+      });
+    }
+    
+    // Apply limit
+    if (options.limit && options.limit > 0) {
+      results = results.slice(0, options.limit);
+    }
+    
+    // Remove metadata if not requested
+    if (!options.includeMetadata) {
+      results = results.map(svc => ({
+        ...svc,
+        metadata: {}
+      }));
+    }
+    
+    return results;
+  }
+  
+  /**
+   * Find healthy endpoints for a specific service
+   */
+  async findServiceEndpoints(
+    serviceName: string,
+    options: {
+      version?: string;
+      protocol?: string;
+      tenantId?: string;
+      limit?: number;
+      random?: boolean;
+    } = {}
+  ): Promise<ServiceEndpoint[]> {
+    // Query for matching services
+    const services = await this.queryServices({
+      name: serviceName,
+      version: options.version,
+      protocol: options.protocol,
+      tenantId: options.tenantId,
+      requireHealthy: true
+    });
+    
+    if (services.length === 0) {
+      return [];
+    }
+    
+    // Collect all endpoints from matching services
+    let endpoints = services.flatMap(svc => svc.endpoints);
+    
+    // Filter by protocol if specified
+    if (options.protocol) {
+      endpoints = endpoints.filter(ep => ep.protocol === options.protocol);
+    }
+    
+    // Sort by weight (higher weight = higher priority)
+    endpoints.sort((a, b) => (b.weight || 1) - (a.weight || 1));
+    
+    // Randomize if requested
+    if (options.random) {
+      // Fisher-Yates shuffle
+      for (let i = endpoints.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [endpoints[i], endpoints[j]] = [endpoints[j], endpoints[i]];
+      }
+    }
+    
+    // Apply limit
+    if (options.limit && options.limit > 0) {
+      endpoints = endpoints.slice(0, options.limit);
+    }
+    
+    return endpoints;
+  }
+  
+  /**
+   * Watch for changes to services
+   */
+  async watchServices(
+    options: ServiceQueryOptions & { 
+      onAdd?: (service: ServiceRegistration) => void;
+      onUpdate?: (service: ServiceRegistration) => void;
+      onRemove?: (serviceId: string) => void;
+    }
+  ): Promise<{ cancel: () => void }> {
+    const watchId = `watch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    this.watches.set(watchId, {
+      query: options,
+      callbacks: {
+        onAdd: options.onAdd,
+        onUpdate: options.onUpdate,
+        onRemove: options.onRemove
+      }
+    });
+    
+    // Return a cancellation function
+    return {
+      cancel: () => {
+        this.watches.delete(watchId);
+      }
+    };
+  }
+  
+  /**
+   * Change the status of a service
+   */
+  async setServiceStatus(serviceId: string, status: ServiceStatus): Promise<boolean> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      return false;
+    }
+    
+    const previousStatus = service.status;
+    
+    if (status === previousStatus) {
+      return true; // No change needed
+    }
+    
+    await this.updateService(serviceId, { status });
+    
+    return true;
+  }
+  
+  /**
+   * Add or update tags for a service
+   */
+  async setServiceTags(serviceId: string, tags: string[]): Promise<boolean> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      return false;
+    }
+    
+    await this.updateService(serviceId, { tags });
+    
+    return true;
+  }
+  
+  /**
+   * Add or update metadata for a service
+   */
+  async setServiceMetadata(
+    serviceId: string,
+    metadata: Record<string, any>
+  ): Promise<boolean> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      return false;
+    }
+    
+    // Merge with existing metadata
+    const updatedMetadata = {
+      ...service.metadata,
+      ...metadata
+    };
+    
+    await this.updateService(serviceId, { metadata: updatedMetadata });
+    
+    return true;
+  }
+  
+  /**
+   * Check health of all registered services
+   */
+  async checkServicesHealth(): Promise<Record<string, ServiceStatus>> {
+    const results: Record<string, ServiceStatus> = {};
+    
+    // For each service, perform health checks
+    for (const [id, service] of this.services.entries()) {
+      // Implement actual health check logic here
+      // For now, we'll just check if the service has expired
+      const isExpired = this.isServiceExpired(service);
+      
+      if (isExpired) {
+        results[id] = ServiceStatus.UNHEALTHY;
+        await this.setServiceStatus(id, ServiceStatus.UNHEALTHY);
+      } else {
+        results[id] = service.status;
+      }
+    }
+    
+    return results;
+  }
+  
+  /**
+   * Get statistics about registered services
+   */
+  async getStatistics(): Promise<{
+    totalServices: number;
+    healthyServices: number;
+    unhealthyServices: number;
+    servicesByName: Record<string, number>;
+    endpointsByProtocol: Record<string, number>;
+  }> {
+    const services = Array.from(this.services.values());
+    
+    const servicesByName: Record<string, number> = {};
+    const endpointsByProtocol: Record<string, number> = {};
+    
+    let healthyServices = 0;
+    let unhealthyServices = 0;
+    
+    for (const service of services) {
+      // Count by service name
+      servicesByName[service.name] = (servicesByName[service.name] || 0) + 1;
+      
+      // Count endpoints by protocol
+      for (const endpoint of service.endpoints) {
+        endpointsByProtocol[endpoint.protocol] = (endpointsByProtocol[endpoint.protocol] || 0) + 1;
+      }
+      
+      // Count healthy/unhealthy
+      if (service.status === ServiceStatus.HEALTHY) {
+        healthyServices++;
+      } else if (service.status === ServiceStatus.UNHEALTHY) {
+        unhealthyServices++;
+      }
+    }
+    
+    return {
+      totalServices: services.length,
+      healthyServices,
+      unhealthyServices,
+      servicesByName,
+      endpointsByProtocol
+    };
+  }
+  
+  /**
+   * Reset or clear the service registry (mainly for testing)
+   */
+  async reset(): Promise<void> {
+    // Clear all intervals
+    for (const interval of this.heartbeatIntervals.values()) {
+      clearInterval(interval);
+    }
+    
+    for (const interval of this.healthCheckIntervals.values()) {
+      clearInterval(interval);
+    }
+    
+    // Clear all data
+    this.services.clear();
+    this.heartbeatIntervals.clear();
+    this.healthCheckIntervals.clear();
+    this.watches.clear();
+  }
+  
+  /**
+   * Set up health check intervals for a service
+   */
+  private setupHealthChecks(service: ServiceRegistration): void {
+    // Find endpoints with health checks
+    const endpointsWithHealthChecks = service.endpoints.filter(
+      endpoint => endpoint.healthCheck && endpoint.healthCheck.interval > 0
+    );
+    
+    if (endpointsWithHealthChecks.length === 0) {
+      return;
+    }
+    
+    // Set up interval for health checks
+    const minInterval = Math.min(
+      ...endpointsWithHealthChecks.map(ep => ep.healthCheck!.interval)
+    );
+    
+    const healthCheckInterval = setInterval(() => {
+      this.performHealthChecks(service.id).catch(err => {
+        console.error(`Error performing health checks for service ${service.id}:`, err);
+      });
+    }, minInterval);
+    
+    this.healthCheckIntervals.set(service.id, healthCheckInterval);
+  }
+  
+  /**
+   * Perform health checks for a service
+   */
+  private async performHealthChecks(serviceId: string): Promise<boolean> {
+    const service = this.services.get(serviceId);
+    
+    if (!service) {
+      return false;
+    }
+    
+    // In a real implementation, this would make HTTP requests or other checks
+    // For now, we'll just simulate health checks
+    const allHealthy = Math.random() > 0.1; // 90% chance of being healthy
+    
+    if (!allHealthy && service.status === ServiceStatus.HEALTHY) {
+      await this.setServiceStatus(serviceId, ServiceStatus.DEGRADED);
+    } else if (allHealthy && service.status !== ServiceStatus.HEALTHY) {
+      await this.setServiceStatus(serviceId, ServiceStatus.HEALTHY);
+    }
+    
+    return allHealthy;
+  }
+  
+  /**
+   * Check if a service has expired based on its TTL
+   */
+  private isServiceExpired(service: ServiceRegistration): boolean {
+    const now = Date.now();
+    const expirationTime = service.lastHeartbeat + (service.ttl * 1000);
+    return now > expirationTime;
+  }
+  
+  /**
+   * Check for and handle expired services
+   */
+  private async checkExpiredServices(): Promise<void> {
+    const now = Date.now();
+    
+    for (const [id, service] of this.services.entries()) {
+      if (this.isServiceExpired(service)) {
+        // Service has expired
+        console.log(`Service ${id} (${service.name}) has expired`);
+        
+        if (service.status !== ServiceStatus.UNHEALTHY) {
+          // Update status to unhealthy
+          await this.setServiceStatus(id, ServiceStatus.UNHEALTHY);
+        }
+        
+        // Emit expired event
+        this.emit('service:expired', id);
+      }
+    }
+  }
+  
+  /**
+   * Notify watches about changes to services
+   */
+  private notifyWatches(
+    changeType: 'add' | 'update' | 'remove',
+    service: ServiceRegistration
+  ): void {
+    for (const watch of this.watches.values()) {
+      // Check if service matches the watch query
+      const matchesQuery = this.serviceMatchesQuery(service, watch.query);
+      
+      if (matchesQuery) {
+        switch (changeType) {
+          case 'add':
+            if (watch.callbacks.onAdd) {
+              watch.callbacks.onAdd(service);
+            }
+            break;
+          case 'update':
+            if (watch.callbacks.onUpdate) {
+              watch.callbacks.onUpdate(service);
+            }
+            break;
+          case 'remove':
+            if (watch.callbacks.onRemove) {
+              watch.callbacks.onRemove(service.id);
+            }
+            break;
+        }
+      }
+    }
+  }
+  
+  /**
+   * Check if a service matches a query
+   */
+  private serviceMatchesQuery(
+    service: ServiceRegistration,
+    query: ServiceQueryOptions
+  ): boolean {
+    if (query.name && service.name !== query.name) {
+      return false;
+    }
+    
+    if (query.version && service.version !== query.version) {
+      return false;
+    }
+    
+    if (query.status && service.status !== query.status) {
+      return false;
+    }
+    
+    if (query.tenantId && service.tenantId !== query.tenantId) {
+      return false;
+    }
+    
+    if (query.tags && query.tags.length > 0) {
+      if (!service.tags || !query.tags.every(tag => service.tags!.includes(tag))) {
+        return false;
+      }
+    }
+    
+    if (query.protocol) {
+      if (!service.endpoints.some(ep => ep.protocol === query.protocol)) {
+        return false;
+      }
+    }
+    
+    if (query.requireHealthy) {
+      if (service.status !== ServiceStatus.HEALTHY && service.status !== ServiceStatus.DEGRADED) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+}
+
+export default {
+  ServiceStatus,
+  MultiTenantServiceDiscovery
+};

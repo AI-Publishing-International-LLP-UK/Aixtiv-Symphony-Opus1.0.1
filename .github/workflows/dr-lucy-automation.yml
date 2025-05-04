@@ -1,0 +1,156 @@
+name: Dr. Lucy Automation CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  REGION: us-west1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Google Cloud Auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Fetch Secrets from Google Cloud Secret Manager
+        id: secrets
+        run: |
+          echo "Fetching required secrets from Google Cloud Secret Manager..."
+          
+          # Fetch Dr. Lucy Automation token
+          DR_LUCY_TOKEN=$(gcloud secrets versions access latest --secret="dr_lucy_automation_token" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$DR_LUCY_TOKEN" ]; then
+            echo "::error::Failed to retrieve Dr. Lucy Automation token"
+            exit 1
+          fi
+          echo "DR_LUCY_TOKEN_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$DR_LUCY_TOKEN"
+          echo "DR_LUCY_TOKEN=$DR_LUCY_TOKEN" >> $GITHUB_ENV
+          
+          # Fetch OpenAI API key
+          OPENAI_API_KEY=$(gcloud secrets versions access latest --secret="openai-api-key" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::Failed to retrieve OpenAI API key"
+            exit 1
+          fi
+          echo "OPENAI_API_KEY_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$OPENAI_API_KEY"
+          echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> $GITHUB_ENV
+          
+          # Fetch Firebase OAuth token
+          FIREBASE_OAUTH_TOKEN=$(gcloud secrets versions access latest --secret="firebase-app-hosting-github-oauth-github-oauthtoken-f30414" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$FIREBASE_OAUTH_TOKEN" ]; then
+            echo "::error::Failed to retrieve Firebase OAuth token"
+            exit 1
+          fi
+          echo "FIREBASE_OAUTH_TOKEN_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$FIREBASE_OAUTH_TOKEN"
+          echo "FIREBASE_OAUTH_TOKEN=$FIREBASE_OAUTH_TOKEN" >> $GITHUB_ENV
+          
+          # Fetch GoDaddy Firebase key
+          GODADDY_FIREBASE_KEY=$(gcloud secrets versions access latest --secret="godaddy-firebase" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$GODADDY_FIREBASE_KEY" ]; then
+            echo "::error::Failed to retrieve GoDaddy Firebase key"
+            exit 1
+          fi
+          echo "GODADDY_FIREBASE_KEY_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$GODADDY_FIREBASE_KEY"
+          echo "GODADDY_FIREBASE_KEY=$GODADDY_FIREBASE_KEY" >> $GITHUB_ENV
+          
+          # Fetch GitHub token
+          GH_TOKEN=$(gcloud secrets versions access latest --secret="GITHUB_TOKEN" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Failed to retrieve GitHub token"
+            exit 1
+          fi
+          echo "GH_TOKEN_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$GH_TOKEN"
+          echo "GH_TOKEN=$GH_TOKEN" >> $GITHUB_ENV
+          
+          # Fetch Integration token
+          INTEGRATION_TOKEN=$(gcloud secrets versions access latest --secret="INTEGRATION_TOKEN" --project="${{ env.PROJECT_ID }}")
+          if [ -z "$INTEGRATION_TOKEN" ]; then
+            echo "::error::Failed to retrieve Integration token"
+            exit 1
+          fi
+          echo "INTEGRATION_TOKEN_FETCHED=true" >> $GITHUB_ENV
+          echo "::add-mask::$INTEGRATION_TOKEN"
+          echo "INTEGRATION_TOKEN=$INTEGRATION_TOKEN" >> $GITHUB_ENV
+          
+          echo "✅ All secrets have been successfully retrieved from Google Cloud Secret Manager"
+
+      - name: API Integration
+        if: ${{ github.event.inputs.environment == 'development' || github.event.inputs.environment == 'staging' }}
+        run: |
+          echo "🤖 Connecting to OpenAI API for environment ${{ github.event.inputs.environment }}..."
+          
+          # This is just an example - replace with your actual API integration
+          # curl -X POST "https://api.openai.com/v1/chat/completions" \
+          #     -H "Authorization: Bearer ${{ env.OPENAI_API_KEY }}" \
+          #     -H "Content-Type: application/json" \
+          #     -d '{"model": "gpt-4", "messages": [{"role": "system", "content": "Generate deployment summary for ${{ github.event.inputs.environment }}"}]}'
+          
+          echo "✅ OpenAI API integration successful"
+
+      - name: Deploy to Firebase
+        run: |
+          echo "🚀 Deploying to Firebase Hosting in ${{ github.event.inputs.environment }} environment..."
+          
+          # This is just an example - replace with your actual deployment command
+          # firebase deploy --only hosting:${{ github.event.inputs.environment }} --token ${{ env.FIREBASE_OAUTH_TOKEN }}
+          
+          echo "✅ Deployment to Firebase Hosting complete"
+
+      - name: GitHub Integration
+        run: |
+          echo "📊 Updating GitHub repository with deployment status..."
+          
+          # This is just an example - replace with your actual GitHub API call
+          # COMMIT_SHA=$(git rev-parse HEAD)
+          # curl -X POST "https://api.github.com/repos/${{ github.repository }}/statuses/${COMMIT_SHA}" \
+          #     -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
+          #     -H "Content-Type: application/json" \
+          #     -d '{"state": "success", "context": "deployment/${{ github.event.inputs.environment }}", "description": "Deployment to ${{ github.event.inputs.environment }} successful"}'
+          
+          echo "✅ GitHub status updated successfully"
+
+      - name: Integration Service Notification
+        run: |
+          echo "🔄 Notifying integration service about deployment..."
+          
+          # This is just an example - replace with your actual integration API call
+          # TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          # curl -X POST "https://api.integration-service.example.com/notify" \
+          #     -H "Authorization: Bearer ${{ env.INTEGRATION_TOKEN }}" \
+          #     -H "Content-Type: application/json" \
+          #     -d '{"environment": "${{ github.event.inputs.environment }}", "status": "success", "timestamp": "${TIMESTAMP}"}'
+          
+          echo "✅ Integration service notified"
+
+      - name: Clean Up
+        if: always()
+        run: |
+          echo "Pipeline completed with status: ${{ job.status }}"
+

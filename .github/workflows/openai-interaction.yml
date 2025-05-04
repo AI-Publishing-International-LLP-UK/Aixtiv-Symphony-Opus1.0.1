@@ -1,0 +1,9 @@
+name: OpenAI Interaction Trigger
+
+on:
+  workflow_dispatch:  # This allows you to trigger the workflow manually via GitHub Actions UI
+    inputs:
+      prompt:
+        description: 'Prompt to send to OpenAI'
+        required: true
+        type: string

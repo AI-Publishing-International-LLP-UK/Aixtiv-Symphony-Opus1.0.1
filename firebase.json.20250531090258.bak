@@ -1,0 +1,77 @@
+{
+  "hosting": [
+    {
+      "target": "drclaude-live",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "/claude-code-generate",
+          "function": "claudeCodeGenerate"
+        },
+        {
+          "source": "/context-storage",
+          "function": "contextStorage"
+        },
+        {
+          "source": "/model-metrics",
+          "function": "modelMetrics"
+        },
+        {
+          "source": "/projects/delegate",
+          "function": "dr-claude"
+        },
+        {
+          "source": "/dr-claude-health",
+          "function": "dr-claude"
+        }
+      ]
+    },
+    {
+      "target": "asoos.2100.cool",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "/claude-code-generate",
+          "function": "claudeCodeGenerate"
+        },
+        {
+          "source": "/context-storage",
+          "function": "contextStorage"
+        },
+        {
+          "source": "/model-metrics",
+          "function": "modelMetrics"
+        },
+        {
+          "source": "/projects/delegate",
+          "function": "dr-claude"
+        },
+        {
+          "source": "/dr-claude-health",
+          "function": "dr-claude"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "coaching2100-com",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs22"
+  }
+}

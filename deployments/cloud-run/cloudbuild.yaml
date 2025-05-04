@@ -1,0 +1,66 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}', '.']
+  
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}']
+  
+  # Substitute environment variables in service.yaml
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y gettext-base
+        envsubst < deployments/cloud-run/service.yaml > service_substituted.yaml
+    env:
+      - 'IMAGE_URL=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${_TAG}'
+      - 'ENVIRONMENT=${_ENVIRONMENT}'
+      - 'SERVICE_ACCOUNT=${_SERVICE_ACCOUNT}'
+  
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'replace'
+      - 'service_substituted.yaml'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+  
+  # Add tag to the latest revision
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'update-traffic'
+      - 'integration-gateway'
+      - '--platform=managed'
+      - '--region=${_REGION}'
+      - '--set-tags=${_ENVIRONMENT}=LATEST'
+  
+  # Update traffic to the tagged revision
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'update-traffic'
+      - 'integration-gateway'
+      - '--platform=managed'
+      - '--region=${_REGION}'
+      - '--to-tags=${_ENVIRONMENT}=100'
+
+substitutions:
+  _REGION: us-west1
+  _REPOSITORY: integration-gateway-images
+  _ENVIRONMENT: dev
+  _SERVICE_ACCOUNT: drlucyautomation@api-for-warp-drive.iam.gserviceaccount.com
+  _TAG: latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
