@@ -39,9 +39,13 @@ fetch_secret "pineconeconnect" "PINECONE_KEY"
 fetch_secret "new-admin-anthropic" "NEW_ANTHROPIC_KEY"
 fetch_secret "oauth-credentials" "OAUTH_CREDENTIALS"
 <<<<<<< HEAD
+<<<<<<< HEAD
 fetch_secret "langchain02" "LANGCHAIN_02_KEY"
 =======
 >>>>>>> 1737b51 (feat: activate CI/CD/CTT pipeline for aixtiv-cli deployment)
+=======
+fetch_secret "langchain02" "LANGCHAIN_02_KEY"
+>>>>>>> 4b73274 (Add environment variable validator and LangChain secrets integration)
 
 echo -e "\n${BLUE}==== Summary ====${NC}"
 echo -e "To use these secrets in other scripts or applications:"

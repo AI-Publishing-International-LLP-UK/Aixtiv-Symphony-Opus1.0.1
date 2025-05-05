@@ -21,7 +21,8 @@
     "agent:monitor": "bash monitoring/agent-monitor.sh",
     "agent:report": "node scripts/generate-agent-report.js",
     "agent:cleanup": "node scripts/cleanup-agent-logs.js",
-    "firebase": "firebase"
+    "firebase": "firebase",
+    "validate-env": "node lib/utils/envValidator.js"
   },
   "dependencies": {
     "@google-cloud/secret-manager": "^6.0.1",
