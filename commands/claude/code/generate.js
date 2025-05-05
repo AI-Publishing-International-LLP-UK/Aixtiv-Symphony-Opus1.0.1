@@ -30,11 +30,14 @@ const { debugDisplay } = require('../../../lib/debug-display');
 const telemetry = require('../../../lib/telemetry');
 
 module.exports = async function generateCode(options) {
+<<<<<<< HEAD
   // Record knowledge access for telemetry
   telemetry.recordKnowledgeAccess('ai-model');
   // Capture internal reasoning
   const internalThought = `Processing generateCode command with parameters: ${JSON.stringify(arguments[0])}`;
 
+=======
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   const { task, language, outputFile, context } = parseOptions(options);
 
   // Log the code generation request with agent attribution

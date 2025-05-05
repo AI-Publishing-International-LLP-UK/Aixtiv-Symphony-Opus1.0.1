@@ -43,8 +43,12 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
+<<<<<<< HEAD
           workload_identity_provider: 'projects/api-for-warp-drive/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'drClaude@api-for-warp-drive.iam.gserviceaccount.com'
+=======
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
 
       - name: Setup Firebase CLI
         run: npm install -g firebase-tools

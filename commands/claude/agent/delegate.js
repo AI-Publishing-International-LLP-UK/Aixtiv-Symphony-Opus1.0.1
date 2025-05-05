@@ -166,6 +166,7 @@ module.exports = async function delegateProjectToAgent(options) {
               error: error.message,
             });
 
+<<<<<<< HEAD
             // Display debug information
   debugDisplay({
     thought: internalThought,
@@ -174,6 +175,9 @@ module.exports = async function delegateProjectToAgent(options) {
   });
   
   return {
+=======
+            return {
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
               status: 'created',
               project_id: projectId,
               created_at: new Date().toISOString(),
@@ -256,6 +260,7 @@ module.exports = async function delegateProjectToAgent(options) {
       console.error('\nCurrent endpoint: ' + PROJECT_DELEGATE_ENDPOINT);
     }
 
+<<<<<<< HEAD
     // Display debug information
   debugDisplay({
     thought: internalThought,
@@ -264,6 +269,9 @@ module.exports = async function delegateProjectToAgent(options) {
   });
   
   process.exit(1);
+=======
+    process.exit(1);
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   }
 };
 

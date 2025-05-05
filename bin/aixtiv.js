@@ -30,6 +30,7 @@ function formatDate(date) {
   return date.toISOString().split('T')[0];
 }
 
+<<<<<<< HEAD
 // Import command modules
 const claudeCommands = require('../commands/claude');
 const registerDomainCommands = require('../commands/domain');
@@ -61,6 +62,8 @@ program
   .option('-c, --context <context>', 'Additional context for generation')
   .action(claudeCommands.code);
 
+=======
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
 // Display banner
 console.log(chalk.cyan(figlet.textSync('Aixtiv CLI', { horizontalLayout: 'full' })));
 console.log(chalk.blue(`v${packageJson.version} - SallyPort Security Management`));
@@ -111,6 +114,12 @@ try {
 // SERPEW Commands (temporarily commented out)
 // const registerSerpewCommands = require('../commands/serpew');
 
+<<<<<<< HEAD
+=======
+// Configure program
+program.version(packageJson.version).description('Aixtiv CLI for SallyPort security management');
+
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
 // Project commands
 program
   .command('init')

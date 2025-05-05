@@ -165,8 +165,14 @@ function displayDomains(domains) {
       chalk.cyan('Type'),
       chalk.cyan('Status'),
       chalk.cyan('Expiry Date'),
+<<<<<<< HEAD
     ],
     colWidths: [25, 30, 15, 15, 15],
+=======
+      chalk.cyan('Firebase Project'),
+    ],
+    colWidths: [30, 15, 15, 15, 25],
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   });
 
   domains.forEach((domain) => {
@@ -178,6 +184,10 @@ function displayDomains(domains) {
       domain.type,
       status,
       domain.expiryDate || 'N/A',
+<<<<<<< HEAD
+=======
+      domain.firebaseProject || 'N/A',
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
     ]);
   });
 

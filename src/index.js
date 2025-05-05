@@ -195,8 +195,16 @@ app.post('/agents', auth_1.authenticateToken, (req, res) => {
 });
 // Error handling middleware
 app.use((err, req, res, next) => {
+<<<<<<< HEAD
     console.error(err.stack);
     res.status(500).json({ error: 'Internal server error' });
+=======
+  console.error('Application error:', err);
+  res.status(500).json({
+    error: err.message,
+    timestamp: new Date().toISOString(),
+  });
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
 });
 // 404 handler
 app.use((req, res) => {

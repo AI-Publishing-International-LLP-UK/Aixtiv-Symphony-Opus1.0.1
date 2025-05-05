@@ -198,8 +198,18 @@ function generateCode(task, language = 'javascript') {
     languageTemplates['javascript'] ||
     createGenericFallback(task, normalizedLanguage);
 
+<<<<<<< HEAD
   // Return result object
   
+=======
+  // Display debug information
+  debugDisplay({
+    thought: internalThought,
+    result: result,
+    command: 'claude:return',
+  });
+
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   return {
     code: codeTemplate,
     explanation: `This is a local fallback implementation for "${task}" in ${normalizedLanguage}. The Claude API could not be reached, so a basic template was used.`,
@@ -220,9 +230,20 @@ function createGenericFallback(task, language) {
     .toLowerCase();
 
   if (language === 'python') {
+<<<<<<< HEAD
     // Return Python template
   
   return `def ${normalizedTask}_function():
+=======
+    // Display debug information
+    debugDisplay({
+      thought: internalThought,
+      result: result,
+      command: 'claude:return',
+    });
+
+    return `def ${normalizedTask}_function():
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
     """
     Implementation for: ${task}
     
@@ -237,7 +258,17 @@ function createGenericFallback(task, language) {
   }
 
   // Default to JavaScript
+<<<<<<< HEAD
   
+=======
+  // Display debug information
+  debugDisplay({
+    thought: internalThought,
+    result: result,
+    command: 'claude:return',
+  });
+
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   return `/**
  * ${task}
  * @returns {any} Result of the function

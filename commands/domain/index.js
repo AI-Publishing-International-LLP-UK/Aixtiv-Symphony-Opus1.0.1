@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
  * Domain Management Command Module for Aixtiv CLI
  * 
  * This enterprise-grade module integrates domain management functionality into the Aixtiv CLI,
@@ -9,6 +10,13 @@
  * @author AI Publishing International LLP
  * @copyright 2025 AI Publishing International LLP
  * @version 1.0.0
+=======
+ * Domain Management Commands for Aixtiv CLI
+ *
+ * Registers domain management commands with the CLI application
+ *
+ * © 2025 AI Publishing International LLP
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
  */
 
 // Standard library imports
@@ -626,6 +634,7 @@ function registerDomainCommands(program) {
     .action(commands.import);
   
   // Domain verify command
+<<<<<<< HEAD
   program
     .command('domain:verify <godaddy-file>')
     .description('Verify domain ownership against GoDaddy domains')
@@ -635,6 +644,54 @@ function registerDomainCommands(program) {
   program
     .command('domain:ssl-check')
     .description('Check SSL certificates for domains')
+=======
+  domainCommand
+    .command('verify <domain>')
+    .description("Verify a domain's DNS and Firebase configuration")
+    .option('-d, --dns-only', 'Verify DNS records only')
+    .option('-f, --firebase-only', 'Verify Firebase hosting only')
+    .option('-s, --ssl-only', 'Verify SSL certificate only')
+    .action(async (domain, options) => {
+      const { verifyDomain } = require('./manage');
+      await verifyDomain(domain, options);
+    });
+
+  // Domain remove command
+  domainCommand
+    .command('remove <domain>')
+    .description('Remove a domain from the Aixtiv Symphony ecosystem')
+    .option('-f, --force', 'Force removal without confirmation')
+    .action(async (domain, options) => {
+      const { removeDomain } = require('./manage');
+      await removeDomain(domain, options);
+    });
+
+  // Domain Firebase setup command
+  domainCommand
+    .command('firebase-setup <domain>')
+    .description('Set up Firebase Hosting for a domain')
+    .option('-p, --project <projectId>', 'Firebase project ID')
+    .option('-s, --site <siteId>', 'Firebase Hosting site ID')
+    .action(async (domain, options) => {
+      const { setupFirebase } = require('./manage');
+      await setupFirebase(domain, options);
+    });
+
+  // Domain GoDaddy setup command
+  domainCommand
+    .command('godaddy-setup <domain>')
+    .description('Set up domain in GoDaddy')
+    .option('-n, --nameservers <nameservers>', 'Custom nameservers (comma-separated)')
+    .action(async (domain, options) => {
+      const { setupGoDaddy } = require('./manage');
+      await setupGoDaddy(domain, options);
+    });
+
+  // SSL certificate check command
+  domainCommand
+    .command('ssl-check [domain]')
+    .description('Check SSL certificate status for domain(s)')
+>>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
     .option('-a, --all', 'Check all domains')
     .option('-d, --domain <domain>', 'Check specific domain')
     .option('--debug', 'Show debug information')
