@@ -12,9 +12,16 @@
     "test:agents": "jest --config jest.config.js ./tests/agents",
     "test:api": "newman run ./tests/postman/ASOOS_API_Postman_Collection.json --environment ./tests/postman/environment.json",
     "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint --fix bin src lib commands server.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "postbuild": "npm run lint"
+    "postbuild": "npm run lint",
+    "agent:monitor": "bash monitoring/agent-monitor.sh",
+    "agent:report": "node scripts/generate-agent-report.js",
+    "agent:cleanup": "node scripts/cleanup-agent-logs.js",
+    "firebase": "firebase"
   },
   "dependencies": {
     "@google-cloud/secret-manager": "^6.0.1",
