@@ -1,0 +1,122 @@
+{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "521.0.0",
+      "run.googleapis.com/ingress": "all",
+      "run.googleapis.com/ingress-status": "all",
+      "run.googleapis.com/operation-id": "1a7466fd-eaf0-4e13-8833-8da93b78cbfb",
+      "run.googleapis.com/urls": "[\"https://integration-gateway-production-859242575175.us-west1.run.app\",\"https://integration-gateway-production-yutylytffa-uw.a.run.app\"]",
+      "serving.knative.dev/creator": "pr@coaching2100.com",
+      "serving.knative.dev/lastModifier": "pr@coaching2100.com"
+    },
+    "creationTimestamp": "2025-05-16T02:40:51.798921Z",
+    "generation": 13,
+    "labels": {
+      "cloud.googleapis.com/location": "us-west1"
+    },
+    "name": "integration-gateway-production",
+    "namespace": "859242575175",
+    "resourceVersion": "AAY1PTEOaFo",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/859242575175/services/integration-gateway-production",
+    "uid": "4693c0e2-c387-44a3-855a-2dc47a4cf7b5"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/maxScale": "10",
+          "autoscaling.knative.dev/minScale": "1",
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "521.0.0",
+          "run.googleapis.com/startup-cpu-boost": "true"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "jvyceoxmzc",
+          "run.googleapis.com/startupProbeType": "Default"
+        }
+      },
+      "spec": {
+        "containerConcurrency": 80,
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "NODE_ENV",
+                "value": "production"
+              },
+              {
+                "name": "PROJECT_ID",
+                "value": "api-for-warp-drive"
+              }
+            ],
+            "image": "gcr.io/api-for-warp-drive/integration-gateway:fixed",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1024Mi"
+              }
+            },
+            "startupProbe": {
+              "failureThreshold": 1,
+              "periodSeconds": 240,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 240
+            }
+          }
+        ],
+        "serviceAccountName": "859242575175-compute@developer.gserviceaccount.com",
+        "timeoutSeconds": 300
+      }
+    },
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "https://integration-gateway-production-yutylytffa-uw.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2025-05-16T09:13:12.568922Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2025-05-16T09:13:11.303913Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2025-05-16T09:13:12.538187Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "integration-gateway-production-00013-nxt",
+    "latestReadyRevisionName": "integration-gateway-production-00013-nxt",
+    "observedGeneration": 13,
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "integration-gateway-production-00013-nxt"
+      }
+    ],
+    "url": "https://integration-gateway-production-yutylytffa-uw.a.run.app"
+  }
+}

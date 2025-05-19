@@ -1,0 +1,66 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+functions/lib/
+**/lib/**/*.js
+**/lib/**/*.js.map
+
+# Environment and sensitive files
+.env
+.env.*
+.env.secrets
+*.pem
+*.key
+service-account-key.json
+**/secrets.json
+secrets_output/
+*-secret
+*.secret
+
+# Local development
+config/local*
+local-*
+*.local
+
+# Deployment and automation files
+deployment-details.json
+automate_deployment.exp
+*.deploy.exp
+Dockerfile.fixed
+
+# Logs and debugging
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log*
+error_analysis_output/
+
+# IDE and editor
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.tmp

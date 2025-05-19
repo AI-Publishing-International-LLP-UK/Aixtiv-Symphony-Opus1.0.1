@@ -1,0 +1,20 @@
+{
+  "name": "Atlassian",
+  "site": "https://aixtiv.atlassian.net",
+  "products": {
+    "jira": {
+      "enabled": true,
+      "project_keys": ["AIXTIV", "SYM", "DEV"]
+    },
+    "confluence": {
+      "enabled": true,
+      "spaces": ["AIXTIV", "DEV", "DOCS"]
+    },
+    "bitbucket": {
+      "enabled": true,
+      "workspace": "aixtiv"
+    }
+  },
+  "auth_type": "api_token",
+  "secret_file": "atlassian-cicd"
+}

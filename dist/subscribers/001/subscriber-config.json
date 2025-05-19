@@ -1,0 +1,65 @@
+{
+  "subscriber_id": "001",
+  "name": "Owner Subscriber",
+  "email": "owner@google.com",
+  "tier": "enterprise",
+  "status": "active",
+  "created_at": "2025-05-04T22:14:00Z",
+  "role": "owner",
+  "authentication": {
+    "type": "google",
+    "domain": "google.com",
+    "oauth": true,
+    "sso_enabled": true
+  },
+  "namespace": "sub-001",
+  "region": "us-west1",
+  "resources": {
+    "cpu": "8",
+    "memory": "16Gi",
+    "storage": "500Gi"
+  },
+  "integrations": [
+    {
+      "type": "cms",
+      "enabled": true,
+      "config": {
+        "platform": "wordpress",
+        "url": "https://wordpress.google.com"
+      }
+    },
+    {
+      "type": "lms",
+      "enabled": true,
+      "config": {
+        "platform": "custom",
+        "url": "https://learning.google.com"
+      }
+    },
+    {
+      "type": "crm",
+      "enabled": true,
+      "config": {
+        "platform": "salesforce",
+        "url": "https://crm.google.com"
+      }
+    }
+  ],
+  "api": {
+    "rate_limit": 10000,
+    "endpoints": {
+      "base_url": "https://api.anthology.aixtiv.dev/subscriber/001",
+      "content": "/content",
+      "publish": "/publish",
+      "users": "/users",
+      "analytics": "/analytics"
+    }
+  },
+  "permissions": [
+    "anthology:admin",
+    "anthology:publish",
+    "anthology:manage-users",
+    "anthology:view-analytics",
+    "anthology:manage-integrations"
+  ]
+}
