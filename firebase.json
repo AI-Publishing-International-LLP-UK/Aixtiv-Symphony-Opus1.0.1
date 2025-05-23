@@ -26,6 +26,33 @@
           "function": "drClaude"
         }
       ]
+    },
+    {
+      "target": "asoos.2100.cool",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "/claude-code-generate",
+          "function": "claudeCodeGenerate"
+        },
+        {
+          "source": "/context-storage",
+          "function": "contextStorage"
+        },
+        {
+          "source": "/model-metrics",
+          "function": "modelMetrics"
+        },
+        {
+          "source": "/projects/delegate",
+          "function": "drClaude"
+        },
+        {
+          "source": "/dr-claude-health",
+          "function": "drClaude"
+        }
+      ]
     }
   ],
   "functions": {
