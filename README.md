@@ -276,7 +276,7 @@ Key features:
 - Interactive secret creation
 - Scheduled rotation capabilities
 
-For detailed information, see the [GCP Secret Manager Integration documentation](docs/GCP_SECRET_MANAGER.md).
+For detailed information, see the [GCP Secret Manager Integration documentation](docs/PINECONE_INTEGRATION.md).
 
 ### 🚨 Dream Commander
 
