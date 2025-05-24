@@ -3,8 +3,11 @@
   "targets": {
     "api-for-warp-drive": {
       "hosting": {
+        "drclaude-live": [
+          "drclaude-live"
+        ],
         "asoos.2100.cool": [
-          "2100-cool"
+          "asoos-2100-cool"
         ]
       }
     }

@@ -26,6 +26,8 @@ const universalDispatcherFunctions = require('./universalDispatcherFunctions');
 const memoryFunctions = require('./memoryFunctions');
 const agentTriggerFunctions = require('./firebase_agent_trigger');
 const pineconeIntegrationFunctions = require('./pineconeIntegrationFunctions');
+const { syncMessage } = require('./syncMessage');
+const { delegateToClaude } = require('./delegateToClaude');
 
 // Configuration for functions
 const runtimeOpts = {
@@ -140,3 +142,7 @@ exports.deleteFromPinecone = pineconeIntegrationFunctions.deleteFromPinecone;
 exports.onPineconeChatHistoryCreated = pineconeIntegrationFunctions.onChatHistoryCreated;
 exports.onPineconePromptRunCreated = pineconeIntegrationFunctions.onPromptRunCreated;
 exports.ensurePineconeIndexes = pineconeIntegrationFunctions.ensurePineconeIndexes;
+
+// Export Message Sync and Claude Delegation functions
+exports.syncMessage = syncMessage;
+exports.delegateToClaude = delegateToClaude;
