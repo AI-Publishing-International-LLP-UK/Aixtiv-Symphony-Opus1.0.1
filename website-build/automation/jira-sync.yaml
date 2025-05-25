@@ -1,0 +1,116 @@
+# Jira-GitHub Integration Configuration
+# For C2100-PR/website-build repository
+
+jira:
+  instance:
+    url: "https://c2100pcr.atlassian.net"
+    # API token and account credentials should be stored as environment variables or secrets
+    # and not directly in this configuration file
+    auth:
+      type: "api-token"
+      username: "${JIRA_USERNAME}"
+      api_token: "${JIRA_API_TOKEN}"
+  
+  # Project settings
+  project:
+    key: "C2100"  # Replace with your actual Jira project key
+    issue_types:
+      - name: "Bug"
+        workflow: "bug-workflow"
+      - name: "Task"
+        workflow: "task-workflow"
+      - name: "Story"
+        workflow: "story-workflow"
+      - name: "Epic"
+        workflow: "epic-workflow"
+
+github:
+  repository:
+    owner: "C2100-PR"
+    name: "website-build"
+    url: "https://github.com/C2100-PR/website-build"
+  
+  # Authentication for GitHub (use GitHub secrets in actual implementation)
+  auth:
+    type: "oauth"
+    client_id: "${GITHUB_CLIENT_ID}"
+    client_secret: "${GITHUB_CLIENT_SECRET}"
+    # Alternative authentication method
+    # type: "personal-access-token"
+    # token: "${GITHUB_PAT}"
+
+  # Webhook configuration
+  webhook:
+    # Events to track from GitHub
+    events:
+      - push
+      - pull_request
+      - branch
+      - issue_comment
+    
+    # Secret for securing webhooks
+    secret: "${WEBHOOK_SECRET}"
+    
+    # Endpoint where GitHub will send webhook events
+    endpoint: "https://c2100pcr.atlassian.net/rest/devinfo/0.10/webhook"
+
+# Integration settings
+integration:
+  # Smart commits configuration
+  smart_commits:
+    enabled: true
+    # Supported commands in commit messages
+    commands:
+      - comment
+      - time
+      - transition
+    
+    # Regular expression pattern for Jira ticket references in commit messages
+    issue_key_pattern: "([A-Z]+-\\d+)"
+  
+  # Branch naming convention
+  branch_naming:
+    pattern: "^(feature|bugfix|hotfix)/([A-Z]+-\\d+)-.*$"
+    examples:
+      - "feature/C2100-123-add-login-page"
+      - "bugfix/C2100-456-fix-header-alignment"
+  
+  # Development workflow integration
+  development:
+    # Update Jira issues based on GitHub events
+    update_issues:
+      on_branch_create: true
+      on_pull_request_open: true
+      on_pull_request_merge: true
+      on_commit_push: true
+    
+    # Status mapping from GitHub events to Jira workflow statuses
+    status_mapping:
+      branch_created:
+        transition_to: "In Progress"
+      pr_opened:
+        transition_to: "In Review"
+      pr_merged:
+        transition_to: "Done"
+  
+  # Issue linking
+  issue_links:
+    # Connect GitHub PRs to Jira issues
+    connect_prs_to_issues: true
+    # Link related issues
+    enable_issue_linking: true
+
+# Sync settings
+sync:
+  # Synchronization frequency (in minutes)
+  frequency: 15
+  
+  # Fields to sync between GitHub and Jira
+  fields:
+    - github_pr_title: "summary"
+    - github_pr_description: "description"
+    - github_labels: "labels"
+  
+  # Conflict resolution strategy
+  conflict_resolution: "jira-wins"
+
