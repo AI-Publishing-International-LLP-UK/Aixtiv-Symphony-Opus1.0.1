@@ -1,0 +1,331 @@
+"""
+Multi-Modal Content Generator module for Dr. Memoria's Anthology system.
+Generates multi-modal content combining text, images, and video.
+"""
+
+import logging
+from typing import Dict, Any, Optional, List, Tuple
+from datetime import datetime
+
+from models import CreativeWork, ContentType, WorkStatus, UserPreference, Contribution
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+class MultiModalContentGenerator:
+    """Generates multi-modal content combining text, images, and video"""
+    
+    def __init__(
+        self,
+        content_generator: 'ContentGenerator',
+        user_preferences: Dict[str, UserPreference] = None
+    ):
+        self.content_generator = content_generator
+        self.user_preferences = user_preferences or {}
+    
+    async def generate_multi_modal_content(
+        self,
+        work: CreativeWork,
+        target_modes: List[str],
+        user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Generate multi-modal content from a base work
+        
+        Args:
+            work: Base creative work
+            target_modes: List of target modes (e.g., "text", "image", "video", "audio")
+            user_id: Optional user ID for preferences
+            
+        Returns:
+            Dict with multi-modal content
+        """
+        result = {
+            "work_id": work.id,
+            "title": work.title,
+            "modes": {}
+        }
+        
+        # Consolidate base content
+        base_content = self.content_generator._consolidate_content(work)
+        
+        # Get user preferences if available
+        user_prefs = None
+        if user_id and user_id in self.user_preferences:
+            user_prefs = self.user_preferences[user_id]
+        
+        # Generate content for each mode
+        for mode in target_modes:
+            try:
+                mode_result = await self._generate_mode_content(
+                    base_content, mode, user_prefs
+                )
+                result["modes"][mode] = mode_result
+            except Exception as e:
+                logger.error(f"Error generating {mode} content: {e}")
+                result["modes"][mode] = {
+                    "error": str(e)
+                }
+        
+        return result
+    
+    async def _generate_mode_content(
+        self,
+        content: str,
+        mode: str,
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate content for a specific mode"""
+        provider = await self.content_generator._get_provider()
+        
+        mode_generators = {
+            "text": self._generate_text_content,
+            "image": self._generate_image_content,
+            "video": self._generate_video_content,
+            "audio": self._generate_audio_content,
+            "infographic": self._generate_infographic_content
+        }
+        
+        if mode.lower() in mode_generators:
+            generator = mode_generators[mode.lower()]
+            return await generator(content, provider, user_prefs)
+        else:
+            return {
+                "error": f"Unsupported mode: {mode}"
+            }
+    
+    async def _generate_text_content(
+        self,
+        content: str,
+        provider: 'LLMProvider',
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate text content"""
+        style_guide = ""
+        if user_prefs and "text_style" in user_prefs.style_preferences:
+            style_guide = f"\nStyle preferences: {user_prefs.style_preferences['text_style']}"
+        
+        prompt = f"""
+        Transform the following content into a well-formatted text document.
+        
+        Format with:
+        - Clear introduction
+        - Well-structured body with headings and subheadings
+        - Concise conclusion
+        - Key takeaways or action items
+        {style_guide}
+        
+        Content to transform:
+        {content}
+        
+        Return the formatted text content only.
+        """
+        
+        formatted_text = await provider.generate_content(prompt, max_tokens=2000)
+        
+        return {
+            "content": formatted_text,
+            "mode": "text",
+            "format": "markdown"
+        }
+    
+    async def _generate_image_content(
+        self,
+        content: str,
+        provider: 'LLMProvider',
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate image prompt content"""
+        style_guide = ""
+        if user_prefs and "image_style" in user_prefs.style_preferences:
+            style_guide = f"\nStyle preferences: {user_prefs.style_preferences['image_style']}"
+        
+        prompt = f"""
+        Create 3-5 detailed image prompts based on the following content.
+        Each prompt should be suitable for an AI image generation system.
+        
+        Guidelines:
+        - Include visual details (style, composition, lighting, colors)
+        - Focus on key concepts from the content
+        - Make each image prompt unique and complementary to others
+        - Include a brief description of how each image relates to the content
+        {style_guide}
+        
+        Content to visualize:
+        {content[:1500]}
+        
+        Return as JSON with an array of objects, each with "prompt" and "description" fields.
+        """
+        
+        image_prompts_text = await provider.generate_content(prompt, max_tokens=1500)
+        
+        # Parse JSON response
+        try:
+            image_prompts = json.loads(image_prompts_text)
+        except json.JSONDecodeError:
+            # If not valid JSON, create a basic structure
+            image_prompts = [
+                {
+                    "prompt": "Image visualizing the main concept from the content",
+                    "description": "Represents the key idea from the provided content"
+                }
+            ]
+        
+        return {
+            "prompts": image_prompts,
+            "mode": "image",
+            "format": "prompt"
+        }
+    
+    async def _generate_video_content(
+        self,
+        content: str,
+        provider: 'LLMProvider',
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate video script content"""
+        style_guide = ""
+        if user_prefs and "video_style" in user_prefs.style_preferences:
+            style_guide = f"\nStyle preferences: {user_prefs.style_preferences['video_style']}"
+        
+        prompt = f"""
+        Create a video script based on the following content.
+        
+        Include:
+        - Opening hook
+        - Clear narration
+        - Visual descriptions
+        - B-roll suggestions
+        - Call to action
+        {style_guide}
+        
+        Content to transform:
+        {content[:1500]}
+        
+        Return as JSON with "script" (full script), "scenes" (array of scene descriptions), 
+        "duration" (estimated minutes), and "visual_notes" (filming/editing suggestions).
+        """
+        
+        video_content_text = await provider.generate_content(prompt, max_tokens=2000)
+        
+        # Parse JSON response
+        try:
+            video_content = json.loads(video_content_text)
+        except json.JSONDecodeError:
+            # If not valid JSON, create a basic structure
+            video_content = {
+                "script": video_content_text,
+                "scenes": [],
+                "duration": "3-5 minutes",
+                "visual_notes": "Standard filming with clear audio"
+            }
+        
+        return {
+            "content": video_content,
+            "mode": "video",
+            "format": "script"
+        }
+    
+    async def _generate_audio_content(
+        self,
+        content: str,
+        provider: 'LLMProvider',
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate audio script content"""
+        style_guide = ""
+        if user_prefs and "audio_style" in user_prefs.style_preferences:
+            style_guide = f"\nStyle preferences: {user_prefs.style_preferences['audio_style']}"
+        
+        prompt = f"""
+        Create an audio script (podcast or narration) based on the following content.
+        
+        Include:
+        - Clear introduction
+        - Conversational tone
+        - Natural speaking rhythm (avoid complex sentences)
+        - Audio cues where relevant
+        - Closing summary
+        {style_guide}
+        
+        Content to transform:
+        {content[:1500]}
+        
+        Return as JSON with "script" (full script), "duration" (estimated minutes), 
+        "segments" (array of timed segments), and "audio_notes" (voice tone, music suggestions).
+        """
+        
+        audio_content_text = await provider.generate_content(prompt, max_tokens=1500)
+        
+        # Parse JSON response
+        try:
+            audio_content = json.loads(audio_content_text)
+        except json.JSONDecodeError:
+            # If not valid JSON, create a basic structure
+            audio_content = {
+                "script": audio_content_text,
+                "duration": "3-5 minutes",
+                "segments": [],
+                "audio_notes": "Clear, conversational delivery"
+            }
+        
+        return {
+            "content": audio_content,
+            "mode": "audio",
+            "format": "script"
+        }
+    
+    async def _generate_infographic_content(
+        self,
+        content: str,
+        provider: 'LLMProvider',
+        user_prefs: Optional[UserPreference] = None
+    ) -> Dict[str, Any]:
+        """Generate infographic content"""
+        style_guide = ""
+        if user_prefs and "infographic_style" in user_prefs.style_preferences:
+            style_guide = f"\nStyle preferences: {user_prefs.style_preferences['infographic_style']}"
+        
+        prompt = f"""
+        Create an infographic outline based on the following content.
+        
+        Include:
+        - Title and subtitle
+        - Key statistics or data points
+        - Visual element descriptions
+        - Flow or organization
+        - Color scheme suggestions
+        {style_guide}
+        
+        Content to transform:
+        {content[:1500]}
+        
+        Return as JSON with "title", "sections" (array of content sections), 
+        "data_points" (key statistics), "visual_elements" (descriptions of charts, icons, etc.),
+        and "design_notes" (color scheme, style suggestions).
+        """
+        
+        infographic_content_text = await provider.generate_content(prompt, max_tokens=1500)
+        
+        # Parse JSON response
+        try:
+            infographic_content = json.loads(infographic_content_text)
+        except json.JSONDecodeError:
+            # If not valid JSON, create a basic structure
+            infographic_content = {
+                "title": "Infographic: Key Concepts",
+                "sections": [],
+                "data_points": [],
+                "visual_elements": [],
+                "design_notes": "Clean, modern design with clear typography"
+            }
+        
+        return {
+            "content": infographic_content,
+            "mode": "infographic",
+            "format": "outline"
+        }
+
+            

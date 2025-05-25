@@ -51,6 +51,10 @@
         {
           "source": "/dr-claude-health",
           "function": "drClaude"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
         }
       ]
     }
