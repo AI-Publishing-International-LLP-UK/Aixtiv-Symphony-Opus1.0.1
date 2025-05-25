@@ -447,6 +447,17 @@ npm publish
 - Primary Region: US-WEST1-B
 - Backup Region: US-CENTRAL1 (Iowa)
 
+## Build Architecture 🏗️
+
+Aixtiv Symphony follows a standardized build architecture:
+
+- `public/` directory serves as the Firebase hosting target
+- `build/` directory contains build artifacts
+- Multiple hosting targets configured in `firebase.json`
+- Modular deployment approach without nested repositories
+
+For detailed build architecture guidelines, including why we don't use a `website-build` submodule, see [Build Architecture](BUILD_ARCHITECTURE.md). **Note: `website-build` should NOT be a submodule and any nested Git repository should be removed.**
+
 ## Golden Standards Compliance
 
 - 24/7 Monitoring
