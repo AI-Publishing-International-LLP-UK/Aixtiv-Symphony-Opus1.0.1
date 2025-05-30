@@ -1,0 +1,3 @@
+[submodule "aixtiv-cli"]
+	path = aixtiv-cli
+	url = https://github.com/AI-Publishing-International-LLP-UK/aixtiv-cli.git
