@@ -19,6 +19,26 @@
           "doctors-live"
         ]
       }
+    },
+    "hosting": {
+      "aixtiv-com": [
+        "aixtiv-com"
+      ],
+      "coaching2100-com": [
+        "coaching2100-com"
+      ],
+      "2100-cool": [
+        "2100-cool"
+      ],
+      "asoos-2100-cool": [
+        "asoos-2100-cool"
+      ],
+      "xn--caf-dma-example-com": [
+        "xn--caf-dma-example-com"
+      ],
+      "xn--preprate-cza-org": [
+        "xn--preprate-cza-org"
+      ]
     }
   },
   "etags": {}
