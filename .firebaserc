@@ -1,13 +1,22 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "app-2100-cool"
+  },
   "targets": {
     "api-for-warp-drive": {
       "hosting": {
-        "drclaude-live": [
-          "drclaude-live"
-        ],
         "asoos.2100.cool": [
           "asoos-2100-cool"
+        ],
+        "coaching2100-com": [
+          "coaching2100-com"
+        ]
+      }
+    },
+    "app-2100-cool": {
+      "hosting": {
+        "doctors-live": [
+          "doctors-live"
         ]
       }
     }

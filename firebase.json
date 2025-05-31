@@ -19,11 +19,11 @@
         },
         {
           "source": "/projects/delegate",
-          "function": "drClaude"
+          "function": "dr-claude"
         },
         {
           "source": "/dr-claude-health",
-          "function": "drClaude"
+          "function": "dr-claude"
         }
       ]
     },
@@ -46,12 +46,23 @@
         },
         {
           "source": "/projects/delegate",
-          "function": "drClaude"
+          "function": "dr-claude"
         },
         {
           "source": "/dr-claude-health",
-          "function": "drClaude"
+          "function": "dr-claude"
         },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "coaching2100-com",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
         {
           "source": "**",
           "destination": "/index.html"
