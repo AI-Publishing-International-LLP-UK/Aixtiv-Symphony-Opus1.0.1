@@ -215,7 +215,7 @@ async function connectDomainToFirebase(domain, siteId) {
     log(`Connecting domain ${domain} to Firebase hosting site ${siteId}`);
     
     const { stdout, stderr } = await execAsync(
-      `firebase hosting:sites:update ${siteId} --project ${CONFIG.PROJECT_ID} --domains="${domain}"`
+      `firebase hosting:sites:update ${siteId} --project ${CONFIG.PROJECT_ID} --add-domain="${domain}"`
     );
     
     if (stderr && stderr.includes('Error')) {

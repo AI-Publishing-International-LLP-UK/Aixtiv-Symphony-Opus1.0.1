@@ -5,11 +5,23 @@
   "targets": {
     "api-for-warp-drive": {
       "hosting": {
-        "asoos.2100.cool": [
-          "asoos-2100-cool"
-        ],
         "coaching2100-com": [
           "coaching2100-com"
+        ],
+        "aixtiv-com": [
+          "aixtiv-com"
+        ],
+        "2100-cool": [
+          "2100-cool"
+        ],
+        "asoos-2100-cool": [
+          "asoos-2100-cool"
+        ],
+        "xn--preprate-cza-org": [
+          "xn--preprate-cza-org"
+        ],
+        "xn--caf-dma-example-com": [
+          "xn--caf-dma-example-com"
         ]
       }
     },
