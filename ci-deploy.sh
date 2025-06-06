@@ -17,6 +17,7 @@ REGION="us-west1"
 SERVICE_NAME="integration-gateway-mcp"
 IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
 DOMAIN="drclaude.live"
+CLOUD_BUILD_CONFIG="${2:-cloudbuild.yaml}"  # Default or user-specified config
 
 # Logging function
 log() {
@@ -92,11 +93,14 @@ setup_gcloud() {
 build_and_push() {
     info "Building and pushing Docker image..."
     
-    # Create Dockerfile if it doesn't exist
+# Create Dockerfile if it doesn't exist
     if [[ ! -f "Dockerfile" ]]; then
         info "Creating Dockerfile..."
         cat > Dockerfile << 'EOF'
 FROM node:18-alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
 
 # Set working directory
 WORKDIR /app
@@ -132,10 +136,22 @@ EOF
     
     # Build the image using Cloud Build for better caching and security
     info "Building image with Cloud Build..."
-    gcloud builds submit \
-        --tag="$IMAGE_NAME" \
-        --project="$PROJECT_ID" \
-        --timeout=20m || error_exit "Failed to build image"
+    
+    # Check if custom cloud build config exists
+    if [[ -f "$CLOUD_BUILD_CONFIG" ]]; then
+        info "Using custom Cloud Build config: $CLOUD_BUILD_CONFIG"
+        gcloud builds submit \
+            --config="$CLOUD_BUILD_CONFIG" \
+            --substitutions="_IMAGE_NAME=$IMAGE_NAME" \
+            --project="$PROJECT_ID" \
+            --timeout=20m || error_exit "Failed to build image with custom config"
+    else
+        info "Using default Cloud Build (no config file found: $CLOUD_BUILD_CONFIG)"
+        gcloud builds submit \
+            --tag="$IMAGE_NAME" \
+            --project="$PROJECT_ID" \
+            --timeout=20m || error_exit "Failed to build image"
+    fi
     
     success "Docker image built and pushed: $IMAGE_NAME"
 }
@@ -151,14 +167,23 @@ setup_secrets() {
             --replication-policy="automatic" \
             --data-file=- \
             --project="$PROJECT_ID" || error_exit "Failed to create MCP JWT secret"
+    else
+        info "MCP JWT secret already exists"
     fi
     
     # Check for other required secrets
     local secrets=("OPENAI_API_KEY" "ANTHROPIC_API_KEY")
     for secret in "${secrets[@]}"; do
         if ! gcloud secrets describe "$secret" --project="$PROJECT_ID" &>/dev/null; then
-            warn "Secret $secret not found. Please create it manually:"
-            warn "echo 'your-secret-value' | gcloud secrets create $secret --data-file=-"
+            warn "Secret $secret not found. Creating placeholder..."
+            echo "placeholder-please-update" | gcloud secrets create "$secret" \
+                --replication-policy="automatic" \
+                --data-file=- \
+                --project="$PROJECT_ID" || warn "Failed to create $secret"
+            warn "Please update $secret with actual value:"
+            warn "echo 'your-actual-secret' | gcloud secrets versions add $secret --data-file=-"
+        else
+            info "Secret $secret already exists"
         fi
     done
     
@@ -180,17 +205,10 @@ deploy_service() {
         --cpu=2 \
         --timeout=300 \
         --concurrency=100 \
-        --min-instances=1 \
+        --min-instances=0 \
         --max-instances=10 \
-        --set-env-vars="
-PORT=8080,
-NODE_ENV=production,
-MCP_ISSUER=https://$DOMAIN,
-GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
-        --set-secrets="
-MCP_JWT_SECRET=mcp-jwt-secret:latest,
-OPENAI_API_KEY=OPENAI_API_KEY:latest,
-ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
+        --set-env-vars="PORT=8080,NODE_ENV=production,MCP_ISSUER=https://$DOMAIN,GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
+        --set-secrets="MCP_JWT_SECRET=mcp-jwt-secret:latest,OPENAI_API_KEY=OPENAI_API_KEY:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
         --project="$PROJECT_ID" || error_exit "Failed to deploy service"
     
     # Get the service URL
@@ -228,22 +246,44 @@ setup_domain() {
 run_tests() {
     info "Running post-deployment tests..."
     
-    # Test MCP discovery endpoint
-    info "Testing MCP discovery endpoint..."
-    if curl -f -s "https://$DOMAIN/.well-known/mcp" > /dev/null; then
-        success "MCP discovery endpoint is accessible"
-    else
-        warn "MCP discovery endpoint test failed"
+    # Get the actual service URL for testing
+    local TEST_URL="$SERVICE_URL"
+    if [[ -z "$SERVICE_URL" ]]; then
+        TEST_URL=$(gcloud run services describe "$SERVICE_NAME" \
+            --platform=managed \
+            --region="$REGION" \
+            --format="value(status.url)" \
+            --project="$PROJECT_ID" 2>/dev/null)
     fi
     
-    # Test OAuth registration endpoint
-    info "Testing OAuth registration endpoint..."
-    if curl -f -s -X POST "https://$DOMAIN/oauth/register" \
-        -H "Content-Type: application/json" \
-        -d '{"client_name":"test","redirect_uris":["https://example.com"]}' > /dev/null; then
-        success "OAuth registration endpoint is accessible"
+    if [[ -n "$TEST_URL" ]]; then
+        # Test health endpoint first
+        info "Testing health endpoint..."
+        if curl -f -s "$TEST_URL/health" > /dev/null; then
+            success "Health endpoint is accessible"
+        else
+            warn "Health endpoint test failed"
+        fi
+        
+        # Test MCP discovery endpoint
+        info "Testing MCP discovery endpoint..."
+        if curl -f -s "$TEST_URL/.well-known/mcp" > /dev/null; then
+            success "MCP discovery endpoint is accessible"
+        else
+            warn "MCP discovery endpoint test failed"
+        fi
+        
+        # Test OAuth registration endpoint
+        info "Testing OAuth registration endpoint..."
+        if curl -f -s -X POST "$TEST_URL/oauth/register" \
+            -H "Content-Type: application/json" \
+            -d '{"client_name":"test","redirect_uris":["https://example.com"]}' > /dev/null; then
+            success "OAuth registration endpoint is accessible"
+        else
+            warn "OAuth registration endpoint test failed"
+        fi
     else
-        warn "OAuth registration endpoint test failed"
+        warn "Could not determine service URL for testing"
     fi
     
     success "Post-deployment tests completed"
@@ -412,6 +452,9 @@ EOF
 # Main deployment function
 main() {
     log "START" "🚀 Starting MCP Authorization Service Deployment" "$GREEN"
+    if [[ -n "$CLOUD_BUILD_CONFIG" && "$CLOUD_BUILD_CONFIG" != "cloudbuild.yaml" ]]; then
+        info "Using Cloud Build config: $CLOUD_BUILD_CONFIG"
+    fi
     echo
     
     # Run all deployment steps
@@ -449,16 +492,35 @@ case "${1:-}" in
         setup_gcloud
         deploy_service
         ;;
+    "full")
+        # Run full deployment with optional config
+        main
+        ;;
     "")
         # Run full deployment
         main
         ;;
+    *.yaml|*.yml)
+        # If first argument is a yaml file, treat it as cloud build config and run full deployment
+        CLOUD_BUILD_CONFIG="$1"
+        info "Using Cloud Build config: $CLOUD_BUILD_CONFIG"
+        main
+        ;;
     *)
-        echo "Usage: $0 [test|build|deploy]"
-        echo "  test:   Run post-deployment tests only"
-        echo "  build:  Build and push Docker image only"
-        echo "  deploy: Deploy to Cloud Run only"
-        echo "  (no args): Run full deployment pipeline"
+        echo "Usage: $0 [command] [cloud-build-config.yaml]"
+        echo "Commands:"
+        echo "  test                    Run post-deployment tests only"
+        echo "  build [config.yaml]     Build and push Docker image only"
+        echo "  deploy                  Deploy to Cloud Run only"
+        echo "  full [config.yaml]      Run full deployment pipeline"
+        echo "  config.yaml             Run full deployment with specified Cloud Build config"
+        echo "  (no args)               Run full deployment pipeline with default settings"
+        echo ""
+        echo "Examples:"
+        echo "  $0                      # Full deployment with defaults"
+        echo "  $0 cicd-cttt.yaml      # Full deployment with custom Cloud Build config"
+        echo "  $0 build cloudbuild.yaml # Build only with custom config"
+        echo "  $0 test                 # Run tests only"
         exit 1
         ;;
 esac
