@@ -207,7 +207,7 @@ deploy_service() {
         --concurrency=100 \
         --min-instances=0 \
         --max-instances=10 \
-        --set-env-vars="PORT=8080,NODE_ENV=production,MCP_ISSUER=https://$DOMAIN,GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
+        --set-env-vars="NODE_ENV=production,MCP_ISSUER=https://$DOMAIN,GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
         --set-secrets="MCP_JWT_SECRET=mcp-jwt-secret:latest,OPENAI_API_KEY=OPENAI_API_KEY:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
         --project="$PROJECT_ID" || error_exit "Failed to deploy service"
     
@@ -247,8 +247,8 @@ run_tests() {
     info "Running post-deployment tests..."
     
     # Get the actual service URL for testing
-    local TEST_URL="$SERVICE_URL"
-    if [[ -z "$SERVICE_URL" ]]; then
+    local TEST_URL="${SERVICE_URL:-}"
+    if [[ -z "$TEST_URL" ]]; then
         TEST_URL=$(gcloud run services describe "$SERVICE_NAME" \
             --platform=managed \
             --region="$REGION" \

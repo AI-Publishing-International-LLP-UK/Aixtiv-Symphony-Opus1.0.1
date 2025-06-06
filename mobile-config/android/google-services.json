@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "859242575175",
+    "firebase_url": "https://api-for-warp-drive-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "api-for-warp-drive",
+    "storage_bucket": "api-for-warp-drive.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859242575175:android:0bc8b1d5acd16430514862",
+        "android_client_info": {
+          "package_name": "com.Coaching2100.Aixtiv_Symphony_Orchestrating_Operating_System"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859242575175-2mtjoij5t4kvsi7ae8r37q24ihnmbalm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAegLlPFBZNa2ixly7vFUVGp6SesGrsQa8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "102330798963948373910",
+              "client_type": 3
+            },
+            {
+              "client_id": "859242575175-oebmfa3cuii8r0ch8d13euajbhmhvqv7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Coaching2100.Aixtiv-Symphony-Orchestrating-Operating-System"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
