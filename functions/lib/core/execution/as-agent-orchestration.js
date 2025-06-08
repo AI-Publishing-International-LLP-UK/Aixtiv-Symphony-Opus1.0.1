@@ -822,6 +822,8 @@ exports.AgentNFTManager = AgentNFTManager;
 class MultiAgentCollaborationSystem {
     constructor() {
         this.orchestrationManager = AgentOrchestrationManager.getInstance();
+        this.agentPriorities = new Map();
+        this.collaborationModels = new Map();
     }
     /**
      * Create a multi-agent conversation
@@ -853,14 +855,12 @@ class MultiAgentCollaborationSystem {
         }
         catch (error) {
             console.error('Error creating multi-agent conversation:', error);
-            throw error;
-        }
-    }
-    /**
+            // Setup collaboration model for this conversation
+            await this.setupCollaborationModel(co    /**
      * Process a message in a multi-agent conversation
      */
     async processMultiAgentMessage(conversationId, message) {
-        var _a;
+        var _a, _b;
         try {
             // Get conversation data
             const conversationDoc = await (0, firestore_1.getDoc)((0, firestore_1.doc)(db, 'conversations', conversationId));
@@ -872,25 +872,61 @@ class MultiAgentCollaborationSystem {
             if (!((_a = conversation.metadata) === null || _a === void 0 ? void 0 : _a.isMultiAgent)) {
                 throw new Error('Not a multi-agent conversation');
             }
+            
+            // Load collaboration model (from Firestore for persistence or from memory)
+            let collaborationModel;
+            if ((_b = conversation.metadata) === null || _b === void 0 ? void 0 : _b.collaborationModel) {
+                collaborationModel = conversation.metadata.collaborationModel;
+            } else if (this.collaborationModels.has(conversationId)) {
+                collaborationModel = this.collaborationModels.get(conversationId);
+            } else {
+                // Default model if none exists
+                collaborationModel = {
+                    type: 'standard',
+                    leadAgent: null,
+                    specializedTasks: {},
+                    routingStrategy: 'keyword',
+                    delegationEnabled: false
+                };
+            }
+            
             // Get agent participants
             const participantsQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'conversations', conversationId, 'participants'), (0, firestore_1.where)('participantType', '==', 'agent'), (0, firestore_1.where)('status', '==', 'active'));
             const querySnapshot = await (0, firestore_1.getDocs)(participantsQuery);
             const agentParticipants = querySnapshot.docs.map(doc => doc.data());
-            // Process message with each agent
+            
+            // Detect if message contains task delegation directives
+            const delegationRequest = this.detectDelegationRequest(message.content);
+            
+            // Check for specialized tasks in the message
+            const specializedTask = this.detectSpecializedTask(message.content, collaborationModel.specializedTasks);
+            
+            // Handle Wing Squadron priority-based routing if applicable
+            if (collaborationModel.type === 'wing_squadron' && collaborationModel.routingStrategy === 'priority') {
+                return await this.processPriorityBasedRouting(conversationId, message, agentParticipants, collaborationModel);
+            }
+            
+            // Handle delegation if requested and enabled
+            if (delegationRequest && collaborationModel.delegationEnabled) {
+                return await this.processDelegationRequest(conversationId, message, delegationRequest, agentParticipants, collaborationModel);
+            }
+            
+            // Handle specialized task routing if detected
+            if (specializedTask) {
+                return await this.processSpecializedTaskRouting(conversationId, message, specializedTask, agentParticipants, collaborationModel);
+            }
+            
+            // Process message with each agent using standard routing
             const responses = [];
             for (const participant of agentParticipants) {
                 const agentId = participant.participantId;
                 // Determine if this agent should respond
-                // This could be based on roles, turn-taking, etc.
                 if (await this.shouldAgentRespond(agentId, conversationId, message)) {
                     const response = await this.orchestrationManager.processMessage(agentId, message, conversationId);
                     responses.push(response);
                 }
             }
             return responses;
-        }
-        catch (error) {
-            console.error('Error processing multi-agent message:', error);
             throw error;
         }
     }
@@ -1039,6 +1075,365 @@ class MultiAgentCollaborationSystem {
     containsKeywords(content, keywords) {
         const lowerContent = content.toLowerCase();
         return keywords.some(keyword => lowerContent.includes(keyword.toLowerCase()));
+    }
+    
+    /**
+     * Process message using priority-based routing (Wing Squadron model)
+     */
+    async processPriorityBasedRouting(conversationId, message, agentParticipants, collaborationModel) {
+        try {
+            // Get priorities for this conversation
+            let priorities;
+            if (this.agentPriorities.has(conversationId)) {
+                priorities = this.agentPriorities.get(conversationId);
+            } else {
+                // Create default priorities based on agent types if not already set
+                priorities = new Map();
+                for (const participant of agentParticipants) {
+                    const agentId = participant.participantId;
+                    const agent = await core_1.AgentService.getAgentById(agentId);
+                    
+                    if (agent) {
+                        if (agent.agentTypeId.includes('R1_CORE')) {
+                            priorities.set(agentId, 10);
+                        } else if (agent.agentTypeId.includes('R2')) {
+                            priorities.set(agentId, 5);
+                        } else if (agent.agentTypeId.includes('R3')) {
+                            priorities.set(agentId, 2);
+                        } else {
+                            priorities.set(agentId, 1);
+                        }
+                    } else {
+                        priorities.set(agentId, 1);
+                    }
+                }
+                this.agentPriorities.set(conversationId, priorities);
+            }
+            
+            // Sort agents by priority
+            const sortedAgents = [...agentParticipants].sort((a, b) => {
+                const priorityA = priorities.get(a.participantId) || 0;
+                const priorityB = priorities.get(b.participantId) || 0;
+                return priorityB - priorityA; // Higher priority first
+            });
+            
+            // Check if lead agent should handle this exclusively
+            if (collaborationModel.leadAgent) {
+                const leadAgentKeywords = [
+                    "orchestrate", "coordinate", "overview", "squadron", "team",
+                    "strategic", "strategy", "leadership", "organize", "plan"
+                ];
+                
+                if (this.containsKeywords(message.content, leadAgentKeywords)) {
+                    // Let only the lead agent respond
+                    const response = await this.orchestrationManager.processMessage(
+                        collaborationModel.leadAgent, 
+                        message, 
+                        conversationId
+                    );
+                    
+                    await core_1.ActivityLoggerService.logActivity(
+                        'system', 
+                        'multi_agent', 
+                        'LEAD_AGENT_RESPONSE', 
+                        'conversation', 
+                        conversationId, 
+                        'success', 
+                        { agentId: collaborationModel.leadAgent }
+                    );
+                    
+                    return [response];
+                }
+            }
+            
+            // Process with top agent(s) based on priority
+            const responses = [];
+            let hasResponse = false;
+            
+            // Try with highest priority agent first
+            if (sortedAgents.length > 0) {
+                const topAgent = sortedAgents[0];
+                if (await this.shouldAgentRespond(topAgent.participantId, conversationId, message)) {
+                    const response = await this.orchestrationManager.processMessage(
+                        topAgent.participantId, 
+                        message, 
+                        conversationId
+                    );
+                    responses.push(response);
+                    hasResponse = true;
+                }
+            }
+            
+            // If highest priority agent didn't respond, try next highest
+            if (!hasResponse && sortedAgents.length > 1) {
+                const nextAgent = sortedAgents[1];
+                if (await this.shouldAgentRespond(nextAgent.participantId, conversationId, message)) {
+                    const response = await this.orchestrationManager.processMessage(
+                        nextAgent.participantId, 
+                        message, 
+                        conversationId
+                    );
+                    responses.push(response);
+                    hasResponse = true;
+                }
+            }
+            
+            // If still no response, fall back to standard routing
+            if (!hasResponse) {
+                for (const participant of agentParticipants) {
+                    const agentId = participant.participantId;
+                    if (await this.shouldAgentRespond(agentId, conversationId, message)) {
+                        const response = await this.orchestrationManager.processMessage(agentId, message, conversationId);
+                        responses.push(response);
+                    }
+                }
+            }
+            
+            return responses;
+        } catch (error) {
+            console.error('Error in priority-based routing:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Detect if message contains a delegation request
+     */
+    detectDelegationRequest(content) {
+        const lowerContent = content.toLowerCase();
+        
+        // Check for delegation keywords
+        const delegationPhrases = [
+            { keyword: "assign this to", agent: null },
+            { keyword: "delegate to", agent: null },
+            { keyword: "have dr. lucia handle", agent: "DR_LUCY" },
+            { keyword: "have dr. lucy handle", agent: "DR_LUCY" },
+            { keyword: "memoria should", agent: "DR_MEMORIA" },
+            { keyword: "memoria can", agent: "DR_MEMORIA" },
+            { keyword: "let match handle", agent: "DR_MATCH" },
+            { keyword: "maria should translate", agent: "DR_MARIA" },
+            { keyword: "r1 squadron", agent: "R1_CORE" },
+            { keyword: "r2 squadron", agent: "R2" },
+            { keyword: "r3 squadron", agent: "R3" }
+        ];
+        
+        for (const phrase of delegationPhrases) {
+            if (lowerContent.includes(phrase.keyword)) {
+                return phrase.agent || this.extractAgentFromContent(content);
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Extract agent name from content
+     */
+    extractAgentFromContent(content) {
+        const lowerContent = content.toLowerCase();
+        
+        // Map of agent names to their types
+        const agentMap = {
+            "lucia": "DR_LUCY",
+            "lucy": "DR_LUCY",
+            "match": "DR_MATCH",
+            "memoria": "DR_MEMORIA",
+            "maria": "DR_MARIA",
+            "r1": "R1_CORE",
+            "r2": "R2",
+            "r3": "R3"
+        };
+        
+        for (const [name, type] of Object.entries(agentMap)) {
+            if (lowerContent.includes(name)) {
+                return type;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Process delegation request
+     */
+    async processDelegationRequest(conversationId, message, delegationRequest, agentParticipants, collaborationModel) {
+        try {
+            // Find the agent that matches the delegation request
+            let delegatedAgent = null;
+            
+            for (const participant of agentParticipants) {
+                const agentId = participant.participantId;
+                const agent = await core_1.AgentService.getAgentById(agentId);
+                
+                if (agent && agent.agentTypeId.includes(delegationRequest)) {
+                    delegatedAgent = agent;
+                    break;
+                }
+            }
+            
+            if (!delegatedAgent) {
+                // If requested agent not found, use lead agent to respond about the issue
+                if (collaborationModel.leadAgent) {
+                    const delegationFailureMessage = {
+                        id: message.id + '_delegation_failure',
+                        content: `I notice you're trying to delegate to a ${delegationRequest} agent, but that agent isn't available in this conversation. I'll handle your request instead.`,
+                        senderId: collaborationModel.leadAgent,
+                        senderType: 'agent',
+                        conversationId: conversationId,
+                        sentAt: new Date().toISOString(),
+                        metadata: {
+                            delegationFailure: true,
+                            requestedAgent: delegationRequest
+                        }
+                    };
+                    
+                    await core_1.ConversationService.addMessage(
+                        conversationId,
+                        'agent',
+                        collaborationModel.leadAgent,
+                        delegationFailureMessage.content,
+                        'text',
+                        message.id
+                    );
+                    
+                    // Process with lead agent
+                    const response = await this.orchestrationManager.processMessage(
+                        collaborationModel.leadAgent,
+                        message,
+                        conversationId
+                    );
+                    
+                    return [response];
+                }
+                
+                // Fall back to standard routing
+                const responses = [];
+                for (const participant of agentParticipants) {
+                    const agentId = participant.participantId;
+                    if (await this.shouldAgentRespond(agentId, conversationId, message)) {
+                        const response = await this.orchestrationManager.processMessage(agentId, message, conversationId);
+                        responses.push(response);
+                    }
+                }
+                return responses;
+            }
+            
+            // Process with delegated agent
+            const response = await this.orchestrationManager.processMessage(
+                delegatedAgent.id,
+                message,
+                conversationId
+            );
+            
+            // Log the delegation
+            await core_1.ActivityLoggerService.logActivity(
+                'system',
+                'multi_agent',
+                'TASK_DELEGATION',
+                'conversation',
+                conversationId,
+                'success',
+                { 
+                    delegatedTo: delegatedAgent.id,
+                    agentType: delegatedAgent.agentTypeId,
+                    messageId: message.id
+                }
+            );
+            
+            return [response];
+        } catch (error) {
+            console.error('Error processing delegation request:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Detect specialized task in message
+     */
+    detectSpecializedTask(content, specializedTasks) {
+        if (!specializedTasks || Object.keys(specializedTasks).length === 0) {
+            return null;
+        }
+        
+        const lowerContent = content.toLowerCase();
+        
+        // Task detection keywords
+        const taskKeywords = {
+            memory_management: [
+                "save this memory", "remember this", "store this information",
+                "add to my memories", "create memory", "recall", "memory search"
+            ],
+            network_analysis: [
+                "analyze my network", "linkedin profile", "connection strategy",
+                "job recommendation", "professional growth", "career advice"
+            ],
+            cultural_adaptation: [
+                "translate this", "cultural context", "adapt for region",
+                "localization", "international", "language differences"
+            ]
+        };
+        
+        // Check each task type
+        for (const [taskType, keywords] of Object.entries(taskKeywords)) {
+            if (specializedTasks[taskType] && this.containsKeywords(lowerContent, keywords)) {
+                return {
+                    taskType,
+                    agentId: specializedTasks[taskType]
+                };
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Process specialized task routing
+     */
+    async processSpecializedTaskRouting(conversationId, message, specializedTask, agentParticipants, collaborationModel) {
+        try {
+            // Verify the agent is in the conversation
+            const agentInConversation = agentParticipants.some(p => p.participantId === specializedTask.agentId);
+            
+            if (!agentInConversation) {
+                // Fall back to standard routing
+                const responses = [];
+                for (const participant of agentParticipants) {
+                    const agentId = participant.participantId;
+                    if (await this.shouldAgentRespond(agentId, conversationId, message)) {
+                        const response = await this.orchestrationManager.processMessage(agentId, message, conversationId);
+                        responses.push(response);
+                    }
+                }
+                return responses;
+            }
+            
+            // Process with specialized agent
+            const response = await this.orchestrationManager.processMessage(
+                specializedTask.agentId,
+                message,
+                conversationId
+            );
+            
+            // Log specialized task routing
+            await core_1.ActivityLoggerService.logActivity(
+                'system',
+                'multi_agent',
+                'SPECIALIZED_TASK_ROUTING',
+                'conversation',
+                conversationId,
+                'success',
+                { 
+                    taskType: specializedTask.taskType,
+                    agentId: specializedTask.agentId,
+                    messageId: message.id
+                }
+            );
+            
+            return [response];
+        } catch (error) {
+            console.error('Error in specialized task routing:', error);
+            throw error;
+        }
     }
 }
 exports.MultiAgentCollaborationSystem = MultiAgentCollaborationSystem;

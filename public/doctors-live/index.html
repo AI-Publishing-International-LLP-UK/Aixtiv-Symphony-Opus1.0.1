@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors Live - Aixtiv Symphony</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .doctor-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .doctor-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 300px;
+            transition: transform 0.3s ease;
+        }
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .dr-claude .card-header {
+            background-color: #9b59b6;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .card-body p {
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .dr-claude .btn {
+            background-color: #9b59b6;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            background-color: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Doctors Live</h1>
+        <p>Part of the Aixtiv Symphony Ecosystem</p>
+    </header>
+    
+    <div class="container">
+        <h2>Select a Doctor to Continue</h2>
+        
+        <div class="doctor-cards">
+            <div class="doctor-card">
+                <div class="card-header">
+                    <h3>Dr. Lucy</h3>
+                </div>
+                <div class="card-body">
+                    <p>Dr. Lucy specializes in Flight Memory Systems and cognitive enhancement technologies. Access her expertise for optimized learning and memory solutions.</p>
+                    <a href="/drlucy/" class="btn">Visit Dr. Lucy</a>
+                </div>
+            </div>
+            
+            <div class="doctor-card dr-claude">
+                <div class="card-header">
+                    <h3>Dr. Claude</h3>
+                </div>
+                <div class="card-body">
+                    <p>Dr. Claude is our orchestration specialist, focusing on agent coordination and workflow optimization. Consult with him for systems integration.</p>
+                    <a href="/drclaude/" class="btn">Visit Dr. Claude</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Aixtiv Symphony - All Rights Reserved</p>
+    </footer>
+</body>
+</html>
+
