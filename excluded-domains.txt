@@ -1,0 +1,26 @@
+# Excluded Domains
+# These domains are excluded from automatic Firebase configuration
+# One domain per line, comments start with #
+
+# Development and testing domains
+dev.2100.cool
+staging.asoos.2100.cool
+test.aixtiv.com
+
+# Domains with custom hosting configuration
+philliproark.com
+byfabriziodesign.com
+kennedypartain.com
+2100.group
+fabriziosassano.com
+
+# Infrastructure domains
+api.2100.cool
+cdn.2100.cool
+
+# Special handling domains
+asoos.2100.cool   # Managed separately
+zena.2100.cool    # Legacy configuration
+vision.2100.cool  # Special integration requirements
+app.2100.cool     # Custom application hosting
+

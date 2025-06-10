@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to all users for messages collection
+    match /messages/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to all users for claude_interactions collection
+    match /claude_interactions/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to all users for users collection
+    match /users/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to all users for copilots collection
+    match /copilots/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+

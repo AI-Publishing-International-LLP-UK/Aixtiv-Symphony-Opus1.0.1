@@ -1,53 +1,53 @@
-# Logs
-logs
-*.log
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+build/
+dist/
+.tmp/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
+.pnpm-debug.log*
 
-# Dependency directories
-node_modules/
-
-# Environment
-.env
-.env.test
-
-# Service account files
-service-account-key.json
-*-service-account-key.json
-*-firebase-adminsdk-*.json
-
-# OS generated
-.DS_Store
-
-# Editors
-.idea/
-.vscode/
+# System files
+*.log
 *.swp
-*.swo
 
-# Testing
-coverage/
+# Backup and temp
+*.bak
+*.tmp
 
-# Output of 'npm pack'
-*.tgz
+# env files (can opt-in for committing if needed)
+.env*
 
-# Optional npm cache directory
-.npm
+# vercel
+.vercel
 
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-node-installer.pkg
-aixtiv-cli-1.0.1.tgz
-.github/workflows/claude-automation-github.yml
-logs/
-
-script_with_*.sh
-{
-this.windowMs
-=
-aixtiv-cli/
+# typescript
+*.tsbuildinfo
+next-env.d.ts

@@ -1,0 +1,420 @@
+"""
+Multi-Platform Coordinator module for Dr. Memoria's Anthology system.
+Coordinates content across multiple platforms.
+"""
+
+import logging
+import time
+import json
+from typing import Dict, Any, Optional, List, Tuple, Union
+from datetime import datetime, timedelta
+
+from models import CreativeWork, ContentType, WorkStatus, Contribution
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+class MultiPlatformCoordinator:
+    """Coordinates content across multiple platforms"""
+    
+    def __init__(
+        self,
+        content_generator: 'ContentGenerator',
+        publishing_coordinator: 'PublishingCoordinator',
+        analytics_engine: 'AnalyticsEngine',
+        compliance_checker: 'ComplianceChecker',
+        scheduler: 'PublishingScheduler'
+    ):
+        self.content_generator = content_generator
+        self.publishing_coordinator = publishing_coordinator
+        self.analytics_engine = analytics_engine
+        self.compliance_checker = compliance_checker
+        self.scheduler = scheduler
+    
+    async def create_multi_platform_campaign(
+        self,
+        base_work: CreativeWork,
+        platforms: List[str],
+        schedule_strategy: str = "sequential",
+        interval_hours: int = 24,
+        check_compliance: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Create and schedule a multi-platform campaign from a base work
+        
+        Args:
+            base_work: The base creative work to adapt for multiple platforms
+            platforms: List of target platforms
+            schedule_strategy: 'simultaneous' or 'sequential'
+            interval_hours: Hours between publications for sequential strategy
+            check_compliance: Whether to check compliance before scheduling
+            
+        Returns:
+            Dict with campaign details
+        """
+        campaign = {
+            "id": f"campaign_{int(time.time())}",
+            "base_work_id": base_work.id,
+            "title": base_work.title,
+            "platforms": platforms,
+            "schedule_strategy": schedule_strategy,
+            "platform_works": {},
+            "schedule": {},
+            "compliance": {},
+            "status": "draft"
+        }
+        
+        # Create platform-specific versions
+        for platform in platforms:
+            try:
+                # Generate platform-specific content
+                platform_content = await self.content_generator.generate_content_for_platform(
+                    base_work, platform, base_work.content_type, base_work.owner_id
+                )
+                
+                # Create platform-specific work
+                platform_work = CreativeWork(
+                    owner_id=base_work.owner_id,
+                    title=platform_content.get("title", base_work.title),
+                    content_type=base_work.content_type,
+                    target_platforms=[platform],
+                    metadata={"source_work_id": base_work.id, "campaign_id": campaign["id"]}
+                )
+                
+                # Add contribution with platform content
+                contribution = Contribution(
+                    contributor_id="system",
+                    content=json.dumps(platform_content) if isinstance(platform_content, dict) else platform_content,
+                    content_type=base_work.content_type,
+                    metadata={"platform": platform}
+                )
+                platform_work.contributions.append(contribution)
+                
+                # Add to campaign
+                campaign["platform_works"][platform] = {
+                    "work_id": platform_work.id,
+                    "title": platform_work.title,
+                    "status": platform_work.status.value
+                }
+                
+                # Check compliance if enabled
+                if check_compliance:
+                    compliance_result = await self.compliance_checker.check_compliance(
+                        platform_work, platform
+                    )
+                    campaign["compliance"][platform] = {
+                        "compliant": compliance_result["overall_compliant"],
+                        "flags": compliance_result["flags"],
+                        "warnings": compliance_result["warnings"]
+                    }
+                    
+                    # Update work status if not compliant
+                    if not compliance_result["overall_compliant"]:
+                        platform_work.status = WorkStatus.IN_REVIEW
+                        campaign["platform_works"][platform]["status"] = platform_work.status.value
+                
+            except Exception as e:
+                logger.error(f"Error creating content for {platform}: {e}")
+                campaign["platform_works"][platform] = {
+                    "error": str(e),
+                    "status": "failed"
+                }
+        
+        # Create publication schedule
+        if schedule_strategy == "simultaneous":
+            # Schedule all platforms at the optimal time for the primary platform
+            primary_platform = platforms[0] if platforms else None
+            if primary_platform:
+                optimal_time = self.analytics_engine.get_optimal_publishing_time(
+                    primary_platform, base_work.content_type, base_work.owner_id
+                )
+                
+                for platform in platforms:
+                    campaign["schedule"][platform] = optimal_time.isoformat()
+        else:
+            # Schedule sequentially based on platform-specific optimal times
+            current_time = datetime.now()
+            
+            for i, platform in enumerate(platforms):
+                # Get optimal time, but ensure it's after current_time + interval
+                optimal_time = self.analytics_engine.get_optimal_publishing_time(
+                    platform, base_work.content_type, base_work.owner_id
+                )
+                
+                scheduled_time = max(
+                    optimal_time,
+                    current_time + timedelta(hours=i * interval_hours)
+                )
+                
+                campaign["schedule"][platform] = scheduled_time.isoformat()
+        
+        campaign["status"] = "ready"
+        return campaign
+    
+    async def execute_campaign(
+        self,
+        campaign: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Execute a multi-platform campaign
+        
+        Args:
+            campaign: Campaign definition from create_multi_platform_campaign
+            
+        Returns:
+            Dict with execution results
+        """
+        results = {
+            "campaign_id": campaign["id"],
+            "platform_results": {},
+            "overall_status": "in_progress"
+        }
+        
+        # Process each platform
+        for platform, work_info in campaign["platform_works"].items():
+            # Skip if there was an error creating content
+            if "error" in work_info:
+                results["platform_results"][platform] = {
+                    "status": "skipped",
+                    "reason": f"Content creation failed: {work_info['error']}"
+                }
+                continue
+            
+            # Skip if not compliant
+            if platform in campaign["compliance"] and not campaign["compliance"][platform]["compliant"]:
+                results["platform_results"][platform] = {
+                    "status": "skipped",
+                    "reason": "Content not compliant with platform guidelines"
+                }
+                continue
+            
+            # Get scheduled time
+            scheduled_time = None
+            if platform in campaign["schedule"]:
+                try:
+                    scheduled_time = datetime.fromisoformat(campaign["schedule"][platform])
+                except (ValueError, TypeError):
+                    scheduled_time = None
+            
+            # TODO: In a real implementation, fetch the work from a database
+            # For now, we'll assume we have a mock function
+            work = self._get_work_by_id(work_info["work_id"])
+            
+            if work:
+                # If time to publish now
+                if scheduled_time is None or scheduled_time <= datetime.now():
+                    try:
+                        # Publish directly
+                        success, content_id, error = await self._publish_to_platform(work, platform)
+                        
+                        if success:
+                            results["platform_results"][platform] = {
+                                "status": "published",
+                                "content_id": content_id,
+                                "url": self._get_content_url(platform, content_id)
+                            }
+                        else:
+                            results["platform_results"][platform] = {
+                                "status": "failed",
+                                "error": error
+                            }
+                    except Exception as e:
+                        results["platform_results"][platform] = {
+                            "status": "error",
+                            "error": str(e)
+                        }
+                else:
+                    # Schedule for later
+                    try:
+                        # Schedule publication
+                        scheduled = self.scheduler.schedule_publication(work, scheduled_time, [platform])
+                        
+                        if scheduled:
+                            results["platform_results"][platform] = {
+                                "status": "scheduled",
+                                "scheduled_time": scheduled_time.isoformat()
+                            }
+                        else:
+                            results["platform_results"][platform] = {
+                                "status": "scheduling_failed",
+                                "error": "Failed to schedule publication"
+                            }
+                    except Exception as e:
+                        results["platform_results"][platform] = {
+                            "status": "scheduling_error",
+                            "error": str(e)
+                        }
+            else:
+                results["platform_results"][platform] = {
+                    "status": "error",
+                    "error": f"Work with ID {work_info['work_id']} not found"
+                }
+        
+        # Determine overall status
+        statuses = [result["status"] for result in results["platform_results"].values()]
+        
+        if all(status == "published" for status in statuses):
+            results["overall_status"] = "completed"
+        elif any(status == "published" for status in statuses):
+            results["overall_status"] = "partially_completed"
+        elif all(status == "scheduled" for status in statuses):
+            results["overall_status"] = "scheduled"
+        elif any(status == "scheduled" for status in statuses):
+            results["overall_status"] = "partially_scheduled"
+        else:
+            results["overall_status"] = "failed"
+        
+        return results
+    
+    async def _publish_to_platform(
+        self,
+        work: CreativeWork,
+        platform: str
+    ) -> Tuple[bool, Optional[str], Optional[str]]:
+        """Publish a work to a platform using the publishing coordinator"""
+        # This would use the publishing coordinator in a real implementation
+        # For now, return a simulated result
+        success = True  # Simulate successful publication
+        content_id = f"{platform}_{int(time.time())}"
+        error = None
+        
+        return success, content_id, error
+    
+    def _get_content_url(self, platform: str, content_id: str) -> str:
+        """Get URL for published content"""
+        # Platform-specific URL templates
+        url_templates = {
+            "youtube": f"https://www.youtube.com/watch?v={content_id}",
+            "twitter": f"https://twitter.com/user/status/{content_id}",
+            "linkedin": f"https://www.linkedin.com/feed/update/{content_id}",
+            "instagram": f"https://www.instagram.com/p/{content_id}/",
+            "facebook": f"https://www.facebook.com/{content_id}",
+            "tiktok": f"https://www.tiktok.com/@user/video/{content_id}",
+            "medium": f"https://medium.com/p/{content_id}"
+        }
+        
+        return url_templates.get(platform.lower(), f"{platform}:{content_id}")
+    
+    def _get_work_by_id(self, work_id: str) -> Optional[CreativeWork]:
+        """Mock function to get a work by ID - in a real implementation, this would fetch from a database"""
+        # Return a simulated work
+        return CreativeWork(
+            owner_id="user123",
+            title="Simulated Work",
+            content_type=ContentType.ARTICLE,
+            status=WorkStatus.DRAFT
+        )
+    
+    async def track_campaign_performance(
+        self,
+        campaign_id: str,
+        days: int = 7
+    ) -> Dict[str, Any]:
+        """
+        Track performance of a multi-platform campaign
+        
+        Args:
+            campaign_id: ID of the campaign to track
+            days: Number of days to analyze
+            
+        Returns:
+            Dict with performance analysis across platforms
+        """
+        # In a real implementation, fetch the campaign from a database
+        # For now, return a simulated analysis
+        performance = {
+            "campaign_id": campaign_id,
+            "period_days": days,
+            "total_reach": 0,
+            "total_engagement": 0,
+            "platform_performance": {},
+            "cross_platform_insights": [],
+            "recommendations": []
+        }
+        
+        # Simulate platform performances
+        platforms = ["youtube", "twitter", "linkedin", "instagram"]
+        total_reach = 0
+        total_engagement = 0
+        
+        for platform in platforms:
+            # Simulate platform metrics
+            reach = int(self._simulate_metric(1000, 10000))
+            engagement = int(reach * self._simulate_metric(0.01, 0.1))
+            engagement_rate = round(engagement / reach * 100, 2) if reach > 0 else 0
+            
+            performance["platform_performance"][platform] = {
+                "reach": reach,
+                "engagement": engagement,
+                "engagement_rate": engagement_rate,
+                "best_performing_metric": self._get_random_best_metric(platform),
+                "worst_performing_metric": self._get_random_worst_metric(platform)
+            }
+            
+            total_reach += reach
+            total_engagement += engagement
+        
+        performance["total_reach"] = total_reach
+        performance["total_engagement"] = total_engagement
+        performance["overall_engagement_rate"] = round(total_engagement / total_reach * 100, 2) if total_reach > 0 else 0
+        
+        # Add cross-platform insights
+        performance["cross_platform_insights"] = [
+            "Content is receiving better engagement on visual platforms compared to text-heavy platforms.",
+            "Earlier publications in the campaign are driving traffic to later publications.",
+            "Audience demographics show significant overlap between YouTube and Instagram."
+        ]
+        
+        # Add recommendations
+        performance["recommendations"] = [
+            "Consider creating more visual content as it's performing better across platforms.",
+            "Future campaigns should lead with Instagram content to build momentum.",
+            "Increase cross-platform references to drive traffic between platforms."
+        ]
+        
+        return performance
+    
+    def _simulate_metric(self, min_val: float, max_val: float) -> float:
+        """Generate a simulated metric value"""
+        import random
+        return random.uniform(min_val, max_val)
+    
+    def _get_random_best_metric(self, platform: str) -> Dict[str, Any]:
+        """Get a random best performing metric for a platform"""
+        metrics = {
+            "youtube": ["watch_time", "click_through_rate", "subscription_rate", "comment_rate"],
+            "twitter": ["retweet_rate", "click_rate", "reply_rate", "follower_growth"],
+            "linkedin": ["comment_rate", "share_rate", "click_rate", "connection_growth"],
+            "instagram": ["save_rate", "comment_rate", "follow_rate", "story_completion_rate"]
+        }
+        
+        import random
+        platform_metrics = metrics.get(platform.lower(), ["engagement_rate", "reach"])
+        metric = random.choice(platform_metrics)
+        
+        return {
+            "name": metric,
+            "value": round(self._simulate_metric(0.1, 0.3), 2),
+            "comparison": f"{round(self._simulate_metric(10, 30), 1)}% above average"
+        }
+    
+    def _get_random_worst_metric(self, platform: str) -> Dict[str, Any]:
+        """Get a random worst performing metric for a platform"""
+        metrics = {
+            "youtube": ["skip_rate", "dislike_rate", "audience_retention", "card_click_rate"],
+            "twitter": ["unfollow_rate", "mute_rate", "block_rate", "negative_sentiment"],
+            "linkedin": ["hide_post_rate", "dwell_time", "negative_reactions", "unfollow_rate"],
+            "instagram": ["unfollow_rate", "negative_sentiment", "swipe_away_rate", "report_rate"]
+        }
+        
+        import random
+        platform_metrics = metrics.get(platform.lower(), ["bounce_rate", "negative_sentiment"])
+        metric = random.choice(platform_metrics)
+        
+        return {
+            "name": metric,
+            "value": round(self._simulate_metric(0.05, 0.15), 2),
+            "comparison": f"{round(self._simulate_metric(5, 15), 1)}% below average"
+        }

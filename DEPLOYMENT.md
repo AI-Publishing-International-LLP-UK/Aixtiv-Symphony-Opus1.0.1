@@ -10,6 +10,7 @@ This document provides instructions for deploying the Aixtiv CLI using GitHub Ac
 4. [Verifying Deployments](#verifying-deployments)
 5. [Dockerfile Explanation](#dockerfile-explanation)
 6. [Local Testing Before Deployment](#local-testing-before-deployment)
+7. [Build Architecture](#build-architecture)
 
 ## Deployment Architecture Overview
 
@@ -258,3 +259,9 @@ ls -la dist/
 ```
 
 By following this deployment guide, you'll be able to successfully set up CI/CD for Aixtiv CLI and deploy it to Google Cloud Run.
+
+## Build Architecture
+
+For a comprehensive understanding of the build architecture, including directory structure, Firebase hosting configuration, and best practices, please refer to the [Build Architecture Guide](BUILD_ARCHITECTURE.md).
+
+> **Important Note**: Our architecture does not use a `website-build` submodule. All website assets are built using our standard build process and deployed to the `public` directory as specified in `firebase.json`. If you find a nested Git repository in a `website-build` directory, it should be removed, not converted to a submodule.

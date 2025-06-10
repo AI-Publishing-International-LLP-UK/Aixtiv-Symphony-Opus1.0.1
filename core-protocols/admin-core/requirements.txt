@@ -1,0 +1,31 @@
+# API Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.4.2
+python-multipart==0.0.5
+gunicorn==20.1.0
+slowapi==0.1.8
+
+# HTTP Clients
+aiohttp>=3.9.0
+httpx==0.23.0
+requests==2.31.0
+
+# Google Cloud
+google-auth>=2.23.3,<3.0
+google-auth-oauthlib>=0.4.6
+google-cloud-storage>=2.14.0
+
+# GitHub Integration
+PyGithub==1.55
+PyJWT==2.8.0
+
+# Security & Encryption
+cryptography==44.0.1
+
+# Cache & Storage
+aioredis==2.0.1
+
+# Development & Testing
+pytest==7.4.0
+python-dotenv==0.19.2

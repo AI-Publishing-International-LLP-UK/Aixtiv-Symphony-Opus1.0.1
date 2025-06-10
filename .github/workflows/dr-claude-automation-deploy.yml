@@ -43,7 +43,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/api-for-warp-drive/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'drClaude@api-for-warp-drive.iam.gserviceaccount.com'
 
       - name: Setup Firebase CLI
         run: npm install -g firebase-tools

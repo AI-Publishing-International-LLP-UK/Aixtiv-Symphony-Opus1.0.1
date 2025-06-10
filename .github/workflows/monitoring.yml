@@ -1,6 +1,10 @@
 name: Service Monitoring
-
 on:
+  push:
+    branches:
+      - '**'
+
+on:  # ← ❌ this second 'on' overrides the first one
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:

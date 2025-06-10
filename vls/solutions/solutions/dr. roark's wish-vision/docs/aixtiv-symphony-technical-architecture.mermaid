@@ -1,0 +1,67 @@
+---
+title: AIXTIV SYMPHONY Technical Architecture
+---
+graph TB
+    User(("User/Owner-Subscriber"))
+    
+    subgraph "AIXTIV SYMPHONY - Wing Operations"
+        CP[Co-Pilot Wish Agent]
+        DC[Dream Commander]
+        
+        subgraph "Solution Agents"
+            WG[Wish Generator]
+            SA1[Specialized Agent 1]
+            SA2[Specialized Agent 2]
+            SA3[Specialized Agent 3]
+        end
+        
+        subgraph "Integration Systems"
+            Q4D[Q4D-Lenz: Professor Lee]
+            S2DO[S2DO Protocol: Dr. Burby]
+            FMS[Flight Memory System: Dr. Lucy]
+            TB[Tower Blockchain: Dr. Cypriot]
+        end
+        
+        subgraph "Agency Structure"
+            R1[R1: Core Agency - Dr. Lucy 01]
+            R2[R2: Deploy Agency - Dr. Grant 02]
+            R3[R3: Engage & Sell Agency - Dr. Sabina 03]
+        end
+    end
+    
+    User -- "Expresses Complex Desires" --> CP
+    CP -- "Evaluates Solution Paths" --> WG
+    CP -- "Evaluates Solution Paths" --> SA1
+    CP -- "Evaluates Solution Paths" --> SA2
+    CP -- "Evaluates Solution Paths" --> SA3
+    
+    WG --> DC
+    SA1 --> DC
+    SA2 --> DC
+    SA3 --> DC
+    
+    DC -- "Orchestrates Comprehensive Vision" --> CP
+    
+    CP -- "Contextual Enhancement" --> Q4D
+    Q4D -- "Provides Contextual Intelligence" --> FMS
+    
+    FMS -- "Mission Coordination" --> S2DO
+    S2DO -- "Validates Execution" --> TB
+    
+    TB -- "Records & Rewards" --> User
+    
+    R1 --> CP
+    R2 --> CP
+    R3 --> CP
+    
+    classDef core fill:#f96,stroke:#333,stroke-width:2px
+    classDef solution fill:#4299e1,stroke:#333,stroke-width:2px
+    classDef integration fill:#c9f,stroke:#333,stroke-width:2px
+    classDef agency fill:#48bb78,stroke:#333,stroke-width:2px
+    classDef user fill:#6c6,stroke:#333,stroke-width:2px
+    
+    class CP,DC core
+    class WG,SA1,SA2,SA3 solution
+    class Q4D,S2DO,FMS,TB integration
+    class R1,R2,R3 agency
+    class User user

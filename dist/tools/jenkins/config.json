@@ -1,0 +1,7 @@
+{
+  "name": "Jenkins",
+  "primary": false,
+  "auth_type": "api_token",
+  "secret_file": "jenkins-api-token",
+  "server_url": "https://jenkins.aixtiv.dev"
+}

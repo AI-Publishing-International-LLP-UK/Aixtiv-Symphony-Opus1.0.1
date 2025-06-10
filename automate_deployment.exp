@@ -1,0 +1,69 @@
+#!/usr/bin/expect -f
+
+# Source the environment variables from the secrets file
+spawn bash -c "source /Users/as/asoos/integration-gateway/.env.secrets && env | grep -E 'OPENAI|PINECONE|ANTHROPIC|FIREBASE'"
+
+# Store the API keys
+expect eof
+set env_output $expect_out(buffer)
+
+# Extract API keys from environment output
+set openai_key [exec bash -c "echo '$env_output' | grep OPENAI_API_KEY | cut -d= -f2"]
+set pinecone_key [exec bash -c "echo '$env_output' | grep PINECONECONNECT | cut -d= -f2"]
+set anthropic_key [exec bash -c "echo '$env_output' | grep ANTHROPIC_ADMIN | cut -d= -f2"]
+set firebase_id "api-for-warp-drive"
+set pinecone_env "us-west1-gcp"
+set web3_provider "https://mainnet.infura.io/v3/YOUR_INFURA_ID"
+
+# Debug output
+puts "Loaded environment variables:"
+puts "OPENAI_API_KEY: $openai_key"
+puts "PINECONE_KEY: $pinecone_key"
+puts "ANTHROPIC_KEY: $anthropic_key"
+puts "FIREBASE_ID: $firebase_id"
+puts "PINECONE_ENV: $pinecone_env"
+puts "WEB3_PROVIDER: $web3_provider"
+
+# Change directory and start the deployment script
+spawn bash -c "cd /Users/as/staging/llm-orchestrator-clean && bash deploy_to_cloudrun.sh"
+
+# Handle Secret Manager prompt
+expect "Do you want to use Secret Manager for sensitive variables? (y/n):"
+send "y\r"
+
+# Handle OpenAI API key prompt
+expect "Enter value for OPENAI_API_KEY:"
+send "$openai_key\r"
+
+# Handle Anthropic API key prompt
+expect "Enter value for ANTHROPIC_API_KEY:"
+send "$anthropic_key\r"
+
+# Handle Pinecone API key prompt
+expect "Enter value for PINECONE_API_KEY:"
+send "$pinecone_key\r"
+
+# Handle Wallet private key prompt (if prompted)
+expect {
+    "Enter value for WALLET_PRIVATE_KEY:" {
+        send "placeholder-private-key\r"
+        exp_continue
+    }
+    "Enter PINECONE_ENVIRONMENT:" {}
+}
+
+# Continue with the correct environment values
+send "$pinecone_env\r"
+
+expect "Enter WEB3_PROVIDER_URI:"
+send "$web3_provider\r"
+
+expect "Enter FIREBASE_PROJECT_ID:"
+send "$firebase_id\r"
+
+# Handle service account email prompt
+expect "Enter service account email for Firebase (leave blank to create new):"
+send "\r"
+
+# Continue with the rest of the deployment
+interact
