@@ -13,11 +13,19 @@
 
 const { https, pubsub, firestore } = require('firebase-functions/v1');
 const logger = require('firebase-functions/logger');
-const admin = require('firebase-admin');
+const { initialize, admin, getFirestore, getAuth, healthCheck } = require('./firebase-admin-init');
 
-// Initialize Firebase Admin SDK if not already initialized
-if (!admin.apps.length) {
-  admin.initializeApp();
+// Initialize Firebase Admin SDK with enhanced configuration
+let initializationPromise = null;
+
+/**
+ * Ensure Firebase is initialized before function execution
+ */  
+async function ensureFirebaseInit() {
+  if (!initializationPromise) {
+    initializationPromise = initialize();
+  }
+  return initializationPromise;
 }
 
 // Import function modules

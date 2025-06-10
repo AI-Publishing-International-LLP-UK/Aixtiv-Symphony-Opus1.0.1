@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-const functions = require('firebase-functions');
+const { https, pubsub, firestore } = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
@@ -32,15 +32,15 @@ const {
   deleteFromPinecone,
   storeMemoryInPinecone,
   storePromptInPinecone
-} = require('../src/functions/pineconeIntegration');
+} = require('./pineconeIntegration');
 
 /**
  * HTTP function to search for similar memories
  */
-exports.searchMemories = functions.https.onCall(async (data, context) => {
+exports.searchMemories = https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'unauthenticated',
       'Authentication required to search memories'
     );
@@ -50,7 +50,7 @@ exports.searchMemories = functions.https.onCall(async (data, context) => {
     const { queryText, filter = {}, topK = 10 } = data;
     
     if (!queryText) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Query text is required'
       );
@@ -69,7 +69,7 @@ exports.searchMemories = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error searching memories:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -80,10 +80,10 @@ exports.searchMemories = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to search for similar prompts
  */
-exports.searchPrompts = functions.https.onCall(async (data, context) => {
+exports.searchPrompts = https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'unauthenticated',
       'Authentication required to search prompts'
     );
@@ -93,7 +93,7 @@ exports.searchPrompts = functions.https.onCall(async (data, context) => {
     const { queryText, filter = {}, topK = 10 } = data;
     
     if (!queryText) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Query text is required'
       );
@@ -112,7 +112,7 @@ exports.searchPrompts = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error searching prompts:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -123,10 +123,10 @@ exports.searchPrompts = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to store a memory in Pinecone
  */
-exports.storeMemory = functions.https.onCall(async (data, context) => {
+exports.storeMemory = https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'unauthenticated',
       'Authentication required to store memories'
     );
@@ -136,7 +136,7 @@ exports.storeMemory = functions.https.onCall(async (data, context) => {
     const { memory } = data;
     
     if (!memory || !memory.content) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Memory object with content is required'
       );
@@ -152,7 +152,7 @@ exports.storeMemory = functions.https.onCall(async (data, context) => {
     const success = await storeMemoryInPinecone(memory);
     
     if (!success) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'internal',
         'Failed to store memory in Pinecone'
       );
@@ -162,7 +162,7 @@ exports.storeMemory = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error storing memory:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -173,10 +173,10 @@ exports.storeMemory = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to store a prompt in Pinecone
  */
-exports.storePrompt = functions.https.onCall(async (data, context) => {
+exports.storePrompt = https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth) {
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'unauthenticated',
       'Authentication required to store prompts'
     );
@@ -186,7 +186,7 @@ exports.storePrompt = functions.https.onCall(async (data, context) => {
     const { prompt } = data;
     
     if (!prompt || !prompt.content) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Prompt object with content is required'
       );
@@ -202,7 +202,7 @@ exports.storePrompt = functions.https.onCall(async (data, context) => {
     const success = await storePromptInPinecone(prompt);
     
     if (!success) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'internal',
         'Failed to store prompt in Pinecone'
       );
@@ -212,7 +212,7 @@ exports.storePrompt = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error storing prompt:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -223,10 +223,10 @@ exports.storePrompt = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to delete items from Pinecone
  */
-exports.deleteFromPinecone = functions.https.onCall(async (data, context) => {
+exports.deleteFromPinecone = https.onCall(async (data, context) => {
   // Verify authentication
   if (!context.auth && !context.auth.token.admin) {
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'permission-denied',
       'Admin authentication required to delete from Pinecone'
     );
@@ -236,7 +236,7 @@ exports.deleteFromPinecone = functions.https.onCall(async (data, context) => {
     const { indexName, ids } = data;
     
     if (!indexName || !ids || !Array.isArray(ids) || ids.length === 0) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Index name and array of IDs are required'
       );
@@ -246,7 +246,7 @@ exports.deleteFromPinecone = functions.https.onCall(async (data, context) => {
     const success = await deleteFromPinecone(indexName, ids);
     
     if (!success) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'internal',
         'Failed to delete items from Pinecone'
       );
@@ -256,7 +256,7 @@ exports.deleteFromPinecone = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error deleting from Pinecone:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -267,7 +267,7 @@ exports.deleteFromPinecone = functions.https.onCall(async (data, context) => {
 /**
  * Firestore trigger to store chat history in Pinecone
  */
-exports.onChatHistoryCreated = functions.firestore
+exports.onChatHistoryCreated = firestore
   .document('chat_history/{memoryId}')
   .onCreate(async (snapshot, context) => {
     try {
@@ -306,7 +306,7 @@ exports.onChatHistoryCreated = functions.firestore
 /**
  * Firestore trigger to store prompt runs in Pinecone
  */
-exports.onPromptRunCreated = functions.firestore
+exports.onPromptRunCreated = firestore
   .document('prompt_runs/{promptId}')
   .onCreate(async (snapshot, context) => {
     try {
@@ -354,7 +354,7 @@ exports.onPromptRunCreated = functions.firestore
 /**
  * Scheduled function to ensure Pinecone indexes exist
  */
-exports.ensurePineconeIndexes = functions.pubsub
+exports.ensurePineconeIndexes = pubsub
   .schedule('every 24 hours')
   .onRun(async (context) => {
     try {
