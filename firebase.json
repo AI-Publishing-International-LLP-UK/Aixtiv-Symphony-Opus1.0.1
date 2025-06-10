@@ -21,7 +21,7 @@
       ]
     },
     {
-      "target": "asoos-2100-cool",
+      "site": "asoos-2100-cool",
       "public": "downloaded_content",
       "ignore": [
         "firebase.json",
