@@ -1,12 +1,21 @@
 {
-  "name": "vision-lake-demo",
-  "version": "0.1.0",
+  "name": "aixtiv-symphony-vision-lake",
+  "version": "1.0.3",
+  "description": "Vision Lake demo component for AIXTIV-SYMPHONY - API integration layer for Warp Drive project",
   "private": true,
+  "main": "bin/aixtiv.js",
+  "bin": {
+    "aixtiv": "bin/aixtiv.js"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "agent:monitor": "bash monitoring/agent-monitor.sh",
+    "agent:report": "node scripts/generate-agent-report.js",
+    "test": "node test/envValidator-test.js",
+    "validate-env": "node lib/utils/envValidator.js"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -23,5 +32,14 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "@eslint/eslintrc": "^3"
-  }
+  },
+  "keywords": [
+    "aixtiv",
+    "vision-lake",
+    "symphony",
+    "next.js",
+    "warp-drive"
+  ],
+  "author": "Phillip Corey Roark, And the Pilots of Vision Lake",
+  "license": "UNLICENSED"
 }

@@ -1,0 +1,86 @@
+{
+  "integration_points": [
+    {
+      "name": "Gateway Health Check",
+      "endpoint": "http://localhost:8080/health",
+      "method": "GET",
+      "expected_status": 200,
+      "validation_criteria": {
+        "type": "json_path",
+        "path": "status",
+        "expected_value": "UP"
+      }
+    },
+    {
+      "name": "Agent Registry Service",
+      "endpoint": "http://localhost:8081/api/agents/list",
+      "method": "GET",
+      "expected_status": 200,
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}",
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "name": "Authentication Service",
+      "endpoint": "http://localhost:8082/auth/validate",
+      "method": "POST",
+      "expected_status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payload": {
+        "token": "${TEST_TOKEN}"
+      },
+      "validation_criteria": {
+        "type": "json_path",
+        "path": "valid",
+        "expected_value": true
+      }
+    },
+    {
+      "name": "Training Pipeline API",
+      "endpoint": "http://localhost:8083/api/training/status",
+      "method": "GET",
+      "expected_status": 200,
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}"
+      }
+    },
+    {
+      "name": "Database Connection",
+      "endpoint": "http://localhost:8084/db/health",
+      "method": "GET",
+      "expected_status": 200
+    },
+    {
+      "name": "Message Queue Connection",
+      "endpoint": "http://localhost:8085/mq/status",
+      "method": "GET",
+      "expected_status": 200
+    },
+    {
+      "name": "Cost Management Service",
+      "endpoint": "http://localhost:8086/cost/limits",
+      "method": "GET",
+      "expected_status": 200,
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}"
+      }
+    },
+    {
+      "name": "External AI Provider Connection",
+      "endpoint": "http://localhost:8087/ai/provider/status",
+      "method": "GET",
+      "expected_status": 200,
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}"
+      },
+      "validation_criteria": {
+        "type": "json_path",
+        "path": "providers.openai.status",
+        "expected_value": "connected"
+      }
+    }
+  ]
+}

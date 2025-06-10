@@ -1,0 +1,12 @@
+{
+  "name": "dr-memoria-anthology-functions",
+  "version": "1.0.0",
+  "description": "Firebase Functions for Dr. Memoria's Anthology System",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ."
+  }
+}

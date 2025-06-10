@@ -1,0 +1,40 @@
+# <JIRA-KEY>: Subject line (max 50 chars)
+# |<----  Using a maximum of 50 characters  ---->|
+
+# Body (optional): Explain the what and why, not the how (wrap at 72 chars)
+# |<----  Using a maximum of 72 characters  ----------------------------------->|
+#
+# Include a more detailed explanation here if needed. Wrap text at 72 
+# characters. Separate paragraphs with blank lines.
+#
+# - Use bullet points if helpful
+# - Each bullet on its own line
+#
+# Jira Smart Commit Commands (must be on separate lines):
+# <JIRA-KEY> #comment This adds a comment to the Jira issue
+# <JIRA-KEY> #time 2h 30m This logs work time (2 hours, 30 minutes)
+# <JIRA-KEY> #<transition-name> This transitions the issue (e.g., #close, #resolve)
+#
+# Examples:
+# PROJ-123: Add user authentication feature
+# 
+# Implement JWT-based authentication for user login and registration.
+# Added proper error handling and validation.
+#
+# PROJ-123 #time 3h 30m
+# PROJ-123 #comment Implemented as discussed in the planning meeting
+# PROJ-123 #resolve
+#
+# Multiple issues:
+# PROJ-123 PROJ-456: Fix related bugs in authentication flow
+#
+# --------------------
+# Remember:
+# 1. Start with the JIRA issue key (e.g., PROJ-123:)
+# 2. Keep subject line under 50 characters
+# 3. Use imperative mood ("Add" not "Added" or "Adds")
+# 4. No period at the end of subject line
+# 5. Capitalize first word of subject line
+# 6. Place smart commit commands on separate lines
+# --------------------
+

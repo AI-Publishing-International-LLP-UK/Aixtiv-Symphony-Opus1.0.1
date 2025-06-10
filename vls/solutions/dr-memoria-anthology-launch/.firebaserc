@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "api-for-warp-drive"
+  },
+  "targets": {
+    "api-for-warp-drive": {
+      "hosting": {
+        "dr-memoria-anthology-launch": [
+          "dr-memoria-anthology-launch"
+        ]
+      }
+    }
+  }
+}

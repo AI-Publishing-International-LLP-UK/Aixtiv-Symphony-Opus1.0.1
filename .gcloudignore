@@ -1,0 +1,105 @@
+# Ignore files for Google Cloud deployment
+
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Build directories
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Test files
+__tests__/
+*.test.js
+*.spec.js
+test/
+tests/
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Scripts (except deployment)
+*.sh
+!ci-deploy.sh
+
+# Large files and archives
+*.tar.gz
+*.zip
+*.tar
+*.rar
+
+# Secrets and sensitive files
+secrets/
+*.key
+*.pem
+*.p12
+service-account-key.json
+
+# Local development
+.env.example
+docker-compose.yml
+Dockerfile.dev
+

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">S2DO Basic Icons for AIXTIV SYMPHONY</text>
+  
+  <!-- Row 1 -->
+  <!-- GROW Icon -->
+  <circle cx="125" cy="150" r="50" fill="#4CAF50" />
+  <text x="125" y="155" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">GROW</text>
+  <path d="M105 160 L125 130 L145 160" fill="none" stroke="white" stroke-width="3" />
+  
+  <!-- ROI Icon -->
+  <circle cx="275" cy="150" r="50" fill="#2196F3" />
+  <text x="275" y="155" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">ROI</text>
+  <path d="M260 170 L275 130 L290 150" fill="none" stroke="white" stroke-width="3" />
+  <circle cx="290" cy="150" r="5" fill="white" />
+  
+  <!-- IMPROVE Icon -->
+  <circle cx="425" cy="150" r="50" fill="#9C27B0" />
+  <text x="425" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">IMPROVE</text>
+  <path d="M410 160 L425 145 L440 160 L425 175 L410 160" fill="none" stroke="white" stroke-width="3" />
+  
+  <!-- DEVELOP Icon -->
+  <circle cx="575" cy="150" r="50" fill="#FF9800" />
+  <text x="575" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">DEVELOP</text>
+  <rect x="555" y="140" width="40" height="10" fill="white" />
+  <rect x="555" y="155" width="30" height="10" fill="white" />
+  
+  <!-- Row 2 -->
+  <!-- ACHIEVE Icon -->
+  <circle cx="125" cy="275" r="50" fill="#E91E63" />
+  <text x="125" y="280" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">ACHIEVE</text>
+  <path d="M105 270 L125 255 L145 270 L135 290 L115 290 Z" fill="none" stroke="white" stroke-width="3" />
+  
+  <!-- CUSTOMERS Icon -->
+  <circle cx="275" cy="275" r="50" fill="#00BCD4" />
+  <text x="275" y="280" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">CUSTOMERS</text>
+  <circle cx="260" cy="260" r="10" fill="none" stroke="white" stroke-width="2" />
+  <circle cx="290" cy="260" r="10" fill="none" stroke="white" stroke-width="2" />
+  <path d="M255 290 C 265 300, 285 300, 295 290" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- EMPLOYEES Icon -->
+  <circle cx="425" cy="275" r="50" fill="#607D8B" />
+  <text x="425" y="280" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">EMPLOYEES</text>
+  <circle cx="425" cy="255" r="12" fill="none" stroke="white" stroke-width="2" />
+  <path d="M405 295 L425 275 L445 295" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- ME Icon -->
+  <circle cx="575" cy="275" r="50" fill="#673AB7" />
+  <text x="575" y="280" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">ME</text>
+  <circle cx="575" cy="260" r="15" fill="none" stroke="white" stroke-width="3" />
+  
+  <!-- Row 3 -->
+  <!-- BRAND Icon -->
+  <circle cx="125" cy="400" r="50" fill="#3F51B5" />
+  <text x="125" y="405" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">BRAND</text>
+  <rect x="105" y="380" width="40" height="20" rx="5" ry="5" fill="none" stroke="white" stroke-width="3" />
+  
+  <!-- MARKETING Icon -->
+  <circle cx="275" cy="400" r="50" fill="#F44336" />
+  <text x="275" y="405" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">MARKETING</text>
+  <path d="M255 385 L275 375 L295 385 L295 415 L255 415 Z" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- OPERATIONS Icon -->
+  <circle cx="425" cy="400" r="50" fill="#009688" />
+  <text x="425" y="405" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">OPERATIONS</text>
+  <path d="M405 390 L445 390 M425 370 L425 410 M405 380 L445 380 M405 400 L445 400" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- FINANCE Icon -->
+  <circle cx="575" cy="400" r="50" fill="#4CAF50" />
+  <text x="575" y="405" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">FINANCE</text>
+  <text x="575" y="390" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">$</text>
+  
+  <!-- Row 4 -->
+  <!-- ACCOUNTING Icon -->
+  <circle cx="125" cy="525" r="50" fill="#795548" />
+  <text x="125" y="530" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">ACCOUNTING</text>
+  <path d="M110 515 L140 515 M110 525 L140 525 M110 535 L140 535" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- HR Icon -->
+  <circle cx="275" cy="525" r="50" fill="#FF5722" />
+  <text x="275" y="530" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">HR</text>
+  <circle cx="260" cy="510" r="8" fill="none" stroke="white" stroke-width="2" />
+  <circle cx="290" cy="510" r="8" fill="none" stroke="white" stroke-width="2" />
+  <path d="M260 540 L290 540" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- RECRUIT Icon -->
+  <circle cx="425" cy="525" r="50" fill="#2196F3" />
+  <text x="425" y="530" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">RECRUIT</text>
+  <path d="M410 510 L440 510 M425 495 L425 525 M415 525 L435 525" fill="none" stroke="white" stroke-width="2" />
+  
+  <!-- TEAM Icon -->
+  <circle cx="575" cy="525" r="50" fill="#9C27B0" />
+  <text x="575" y="530" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">TEAM</text>
+  <circle cx="560" cy="510" r="7" fill="none" stroke="white" stroke-width="2" />
+  <circle cx="575" cy="510" r="7" fill="none" stroke="white" stroke-width="2" />
+  <circle cx="590" cy="510" r="7" fill="none" stroke="white" stroke-width="2" />
+  <path d="M560 525 L590 525" fill="none" stroke="white" stroke-width="2" />
+</svg>

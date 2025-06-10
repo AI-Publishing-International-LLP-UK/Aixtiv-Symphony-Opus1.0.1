@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -19,6 +20,9 @@
 
 # production
 /build
+build/
+dist/
+.tmp/
 
 # misc
 .DS_Store
@@ -29,6 +33,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# System files
+*.log
+*.swp
+
+# Backup and temp
+*.bak
+*.tmp
 
 # env files (can opt-in for committing if needed)
 .env*
