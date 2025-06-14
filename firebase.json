@@ -1,4 +1,5 @@
 {
+  "_comment": "Last updated: May 16, 2025 - Added configuration for asoos.2100.cool",
   "hosting": [
     {
       "target": "drclaude-live",
@@ -16,20 +17,56 @@
         {
           "source": "/model-metrics",
           "function": "modelMetrics"
+        }
+      ]
+    },
+    {
+      "site": "asoos-2100-cool",
+      "public": "downloaded_content",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
         },
         {
-          "source": "/projects/delegate",
-          "function": "drClaude"
+          "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
         },
         {
-          "source": "/dr-claude-health",
-          "function": "drClaude"
+          "source": "index.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, must-revalidate"
+            }
+          ]
         }
       ]
     }
   ],
   "functions": {
     "source": "functions",
-    "runtime": "nodejs22"
+    "runtime": "nodejs20"
   }
 }

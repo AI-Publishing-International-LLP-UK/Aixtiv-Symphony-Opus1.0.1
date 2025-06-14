@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-05-31T15:02:59.197Z",
+  "total": 6,
+  "completed": [],
+  "failed": [],
+  "pending": [
+    "prepárate.org"
+  ],
+  "retrying": [
+    "café.example.com",
+    "aixtiv.com",
+    "coaching2100.com",
+    "2100.cool",
+    "asoos.2100.cool"
+  ],
+  "quotaExceeded": [],
+  "currentBatch": 0
+}

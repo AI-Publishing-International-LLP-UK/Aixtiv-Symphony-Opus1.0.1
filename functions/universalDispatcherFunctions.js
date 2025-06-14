@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-const functions = require('firebase-functions/v1');
+const { https, pubsub, firestore } = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const { v4: uuidv4 } = require('uuid');
 
@@ -20,15 +20,15 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-const { dispatcher } = require('../src/functions/universalDispatcher');
+const { dispatcher } = require('./universalDispatcher');
 
 /**
  * HTTP function to handle a dispatch request
  */
-exports.handleDispatch = functions.https.onCall(async (data, context) => {
+exports.handleDispatch = https.onCall(async (data, context) => {
   // Verify authentication if required
-  if (!context.auth && functions.config().dispatcher?.requireAuth === 'true') {
-    throw new functions.https.HttpsError(
+  if (!context.auth) {
+    throw new https.HttpsError(
       'unauthenticated',
       'Authentication required to use this function'
     );
@@ -38,7 +38,7 @@ exports.handleDispatch = functions.https.onCall(async (data, context) => {
     const { promptData, options = {} } = data;
     
     if (!promptData) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Prompt data is required'
       );
@@ -59,7 +59,7 @@ exports.handleDispatch = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error handling dispatch:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -70,12 +70,12 @@ exports.handleDispatch = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to get the status of a dispatch
  */
-exports.getDispatchStatus = functions.https.onCall(async (data, context) => {
+exports.getDispatchStatus = https.onCall(async (data, context) => {
   try {
     const { dispatchId } = data;
     
     if (!dispatchId) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Dispatch ID is required'
       );
@@ -93,7 +93,7 @@ exports.getDispatchStatus = functions.https.onCall(async (data, context) => {
       status.options.userId !== context.auth.uid && 
       !context.auth.token.admin
     ) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'permission-denied',
         'You do not have permission to access this dispatch'
       );
@@ -103,7 +103,7 @@ exports.getDispatchStatus = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error getting dispatch status:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -114,12 +114,12 @@ exports.getDispatchStatus = functions.https.onCall(async (data, context) => {
 /**
  * HTTP function to cancel a dispatch
  */
-exports.cancelDispatch = functions.https.onCall(async (data, context) => {
+exports.cancelDispatch = https.onCall(async (data, context) => {
   try {
     const { dispatchId } = data;
     
     if (!dispatchId) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Dispatch ID is required'
       );
@@ -137,7 +137,7 @@ exports.cancelDispatch = functions.https.onCall(async (data, context) => {
       status.options.userId !== context.auth.uid && 
       !context.auth.token.admin
     ) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'permission-denied',
         'You do not have permission to cancel this dispatch'
       );
@@ -150,7 +150,7 @@ exports.cancelDispatch = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error cancelling dispatch:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error
@@ -161,7 +161,7 @@ exports.cancelDispatch = functions.https.onCall(async (data, context) => {
 /**
  * Firestore trigger to handle new prompt runs
  */
-exports.onPromptRunCreated = functions.firestore
+exports.onPromptRunCreated = firestore
   .document('prompt_runs/{runId}')
   .onCreate(async (snapshot, context) => {
     try {
@@ -204,7 +204,7 @@ exports.onPromptRunCreated = functions.firestore
 /**
  * Firestore trigger to handle prompt run cancellations
  */
-exports.onPromptRunUpdated = functions.firestore
+exports.onPromptRunUpdated = firestore
   .document('prompt_runs/{runId}')
   .onUpdate(async (change, context) => {
     try {
@@ -239,7 +239,7 @@ exports.onPromptRunUpdated = functions.firestore
 /**
  * Scheduled function to clean up stale dispatches
  */
-exports.cleanupStaleDispatches = functions.pubsub
+exports.cleanupStaleDispatches = pubsub
   .schedule('every 30 minutes')
   .onRun(async (context) => {
     try {
@@ -284,12 +284,12 @@ exports.cleanupStaleDispatches = functions.pubsub
 /**
  * HTTP function to handle agent routing requests
  */
-exports.routeToAgent = functions.https.onCall(async (data, context) => {
+exports.routeToAgent = https.onCall(async (data, context) => {
   try {
     const { prompt, agentId, options = {} } = data;
     
     if (!prompt || !agentId) {
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         'Prompt and agent ID are required'
       );
@@ -312,7 +312,7 @@ exports.routeToAgent = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error routing to agent:', error);
     
-    throw new functions.https.HttpsError(
+    throw new https.HttpsError(
       'internal',
       error.message || 'An unknown error occurred',
       error

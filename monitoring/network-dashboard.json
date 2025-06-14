@@ -1,0 +1,257 @@
+{
+  "displayName": "API Network Monitoring Dashboard",
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Network Traffic (Bytes In/Out)",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/backend_request_bytes_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.labels.url_map_name"
+                      ]
+                    }
+                  },
+                  "unitOverride": "By"
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "Bytes In"
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/backend_response_bytes_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.labels.url_map_name"
+                      ]
+                    }
+                  },
+                  "unitOverride": "By"
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "Bytes Out"
+              }
+            ],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "y1",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "xPos": 0,
+        "yPos": 0
+      },
+      {
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Latency Metrics (Request/Response Time)",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_PERCENTILE_99",
+                      "crossSeriesReducer": "REDUCE_MEAN",
+                      "groupByFields": [
+                        "resource.labels.url_map_name"
+                      ]
+                    }
+                  },
+                  "unitOverride": "ms"
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "p99 Latency"
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_PERCENTILE_50",
+                      "crossSeriesReducer": "REDUCE_MEAN",
+                      "groupByFields": [
+                        "resource.labels.url_map_name"
+                      ]
+                    }
+                  },
+                  "unitOverride": "ms"
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "p50 Latency"
+              }
+            ],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "y1",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "xPos": 6,
+        "yPos": 0
+      },
+      {
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Error Rates and Counts",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\" AND metric.labels.response_code_class!=\"200\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.labels.response_code_class"
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "Error Count (Non-200 status)"
+              },
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM"
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "displayName": "Total Request Count"
+              }
+            ],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "y1",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "xPos": 0,
+        "yPos": 4
+      },
+      {
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Status Code Distribution",
+          "pieChart": {
+            "chartOptions": {
+              "mode": "STATS"
+            },
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "300s",
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "metric.labels.response_code_class"
+                      ]
+                    }
+                  }
+                },
+                "minAlignmentPeriod": "60s",
+                "plotType": "PIE"
+              }
+            ]
+          }
+        },
+        "xPos": 6,
+        "yPos": 4
+      },
+      {
+        "width": 12,
+        "height": 2,
+        "widget": {
+          "title": "Request Count By Region",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"loadbalancing.googleapis.com/https/request_count\" AND resource.type=\"https_lb_rule\" AND resource.labels.project_id=\"api-for-warp-drive\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.labels.region"
+                      ]
+                    }
+                  }
+                },
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s"
+              }
+            ],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "y1",
+              "scale": "LINEAR"
+            }
+          }
+        },
+        "xPos": 0,
+        "yPos": 8
+      }
+    ]
+  },
+  "etag": "1234567890",
+  "labels": {
+    "service": "api-service",
+    "environment": "production"
+  }
+}
+

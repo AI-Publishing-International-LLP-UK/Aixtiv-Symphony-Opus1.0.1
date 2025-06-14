@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "api-for-warp-drive",
+    "production": "api-for-warp-drive"
+  },
+  "targets": {
+    "api-for-warp-drive": {
+      "hosting": {
+        "drclaude-live": [
+          "api-for-warp-drive"
+        ],
+        "asoos-2100-cool": [
+          "api-for-warp-drive",
+          "asoos-2100-cool"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "lastUpdated": "2025-05-16"
+}

@@ -23,7 +23,7 @@ const {
   storePromptInPinecone,
   searchSimilarMemories,
   searchSimilarPrompts
-} = require('../src/functions/pineconeIntegration');
+} = require('./pineconeIntegration');
 
 // Set environment variables for testing
 process.env.PINECONE_API_KEY = process.env.PINECONE_API_KEY || 'your-pinecone-api-key';

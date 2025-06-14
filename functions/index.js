@@ -13,11 +13,19 @@
 
 const { https, pubsub, firestore } = require('firebase-functions/v1');
 const logger = require('firebase-functions/logger');
-const admin = require('firebase-admin');
+const { initialize, admin, getFirestore, getAuth, healthCheck } = require('./firebase-admin-init');
 
-// Initialize Firebase Admin SDK if not already initialized
-if (!admin.apps.length) {
-  admin.initializeApp();
+// Initialize Firebase Admin SDK with enhanced configuration
+let initializationPromise = null;
+
+/**
+ * Ensure Firebase is initialized before function execution
+ */  
+async function ensureFirebaseInit() {
+  if (!initializationPromise) {
+    initializationPromise = initialize();
+  }
+  return initializationPromise;
 }
 
 // Import function modules
@@ -26,6 +34,8 @@ const universalDispatcherFunctions = require('./universalDispatcherFunctions');
 const memoryFunctions = require('./memoryFunctions');
 const agentTriggerFunctions = require('./firebase_agent_trigger');
 const pineconeIntegrationFunctions = require('./pineconeIntegrationFunctions');
+const { syncMessage } = require('./syncMessage');
+const { delegateToClaude } = require('./delegateToClaude');
 
 // Configuration for functions
 const runtimeOpts = {
@@ -140,3 +150,7 @@ exports.deleteFromPinecone = pineconeIntegrationFunctions.deleteFromPinecone;
 exports.onPineconeChatHistoryCreated = pineconeIntegrationFunctions.onChatHistoryCreated;
 exports.onPineconePromptRunCreated = pineconeIntegrationFunctions.onPromptRunCreated;
 exports.ensurePineconeIndexes = pineconeIntegrationFunctions.ensurePineconeIndexes;
+
+// Export Message Sync and Claude Delegation functions
+exports.syncMessage = syncMessage;
+exports.delegateToClaude = delegateToClaude;
