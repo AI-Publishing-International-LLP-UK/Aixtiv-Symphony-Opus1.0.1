@@ -1,13 +1,33 @@
-
-// functions/package.json
-
 {
-  "name": "agent-pulse-fn",
+  "name": "vision-lake-functions",
   "version": "1.0.0",
   "description": "Simulates VisionLake AI agent metrics",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "deploy": "gcloud functions deploy agentPulsePanel --runtime nodejs20 --trigger-http --allow-unauthenticated --region=us-west1 --source=. --entry-point=agentPulseHandler",
+    "deploy:mcp": "gcloud functions deploy agentPulsePanel --runtime nodejs20 --trigger-http --allow-unauthenticated --region=us-west1 --source=. --entry-point=agentPulseHandler --project=visionlake-core-mcp"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@aixtiv/bacasu-property": "^1.0.0",
+    "@aixtiv/metaverse-venue": "^1.0.0",
+    "@2100/timeline-view": "^1.0.0",
+    "@2100/live-statistics": "^1.0.0",
+    "@aixtiv/token-exchange": "^1.0.0",
+    "@aixtiv/reward-marketplace": "^1.0.0",
+    "@2100/social-pub-sdk": "^1.0.0",
+    "@2100/nft-showcase": "^1.0.0",
+    "@aixtiv/unified-wallet": "^1.0.0",
+    "express": "^4.18.0",
+    "@aixtiv/dr-cypriot-core": "^1.0.0",
+    "@aixtiv/tower-blockchain": "^1.0.0",
+    "@aixtiv/queen-mint-mark": "^1.0.0",
+    "@google-cloud/functions-framework": "^3.0.0",
+    "@aixtiv/diamond-sao": "^1.0.0",
+    "@aixtiv/vision-lake-core": "^1.0.0",
+    "@aixtiv/dr-claude-core": "^1.0.0",
+    "@aixtiv/load-balancer": "^1.0.0",
+    "@aixtiv/mocoa-core": "^1.0.0",
+    "@aixtiv/mocorix2-core": "^1.0.0"
+  }
 }
