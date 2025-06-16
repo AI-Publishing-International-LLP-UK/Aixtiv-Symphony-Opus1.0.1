@@ -68,3 +68,14 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 *.pkg
+
+# Security-sensitive files
+*.pem
+*.key
+*.sa-key.json
+*service-account*.json
+*credentials*.json
+.env
+.env.*
+secrets/
+
