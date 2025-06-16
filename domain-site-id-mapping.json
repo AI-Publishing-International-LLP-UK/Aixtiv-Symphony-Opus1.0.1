@@ -1,8 +1,82 @@
 {
-  "aixtiv.com": "aixtiv-com",
-  "coaching2100.com": "coaching2100-com",
-  "2100.cool": "2100-cool",
-  "asoos.2100.cool": "asoos-2100-cool",
-  "café.example.com": "xn--caf-dma-example-com",
-  "prepárate.org": "xn--preprate-cza-org"
+  "categories": {
+    "100": {
+      "name": "Leadership & Coaching",
+      "sites": 8,
+      "prefix": "lead-coach"
+    },
+    "200": {
+      "name": "Government & Civic Engagement",
+      "sites": 9,
+      "prefix": "gov-civic"
+    },
+    "300": {
+      "name": "Community Culture",
+      "sites": 8,
+      "prefix": "comm-culture"
+    },
+    "320": {
+      "name": "Digital Art & Cultural Experiences",
+      "sites": 7,
+      "prefix": "digital-art"
+    },
+    "400": {
+      "name": "Bacasu Springs: City of Agents Tech Stack",
+      "sites": 12,
+      "prefix": "bacasu-tech"
+    },
+    "410": {
+      "name": "2100 Corporate & Brand",
+      "sites": 10,
+      "prefix": "2100-corp"
+    },
+    "420": {
+      "name": "Ethical Retail & Consumer Goods",
+      "sites": 12,
+      "prefix": "eth-retail"
+    },
+    "500": {
+      "name": "Finance, Risk & Data Governance",
+      "sites": 4,
+      "prefix": "fin-risk"
+    },
+    "600": {
+      "name": "Third Sector & NGOs",
+      "sites": 6,
+      "prefix": "third-sector"
+    },
+    "620": {
+      "name": "Foundations & Philanthropy",
+      "sites": 8,
+      "prefix": "philanthropy"
+    },
+    "700": {
+      "name": "Academia & Research Centers",
+      "sites": 5,
+      "prefix": "academia"
+    },
+    "800": {
+      "name": "Vision Lake Pilots",
+      "sites": 13,
+      "prefix": "vl-pilots"
+    },
+    "810": {
+      "name": "Super Agents & RIX",
+      "sites": 6,
+      "prefix": "super-agents"
+    },
+    "900": {
+      "name": "Life at Vision Lake",
+      "sites": 11,
+      "prefix": "life-vl"
+    }
+  },
+  "legacy_mappings": {
+    "aixtiv.com": "aixtiv-com",
+    "coaching2100.com": "coaching2100-com",
+    "2100.cool": "2100-cool",
+    "asoos.2100.cool": "asoos-2100-cool",
+    "café.example.com": "xn--caf-dma-example-com",
+    "prepárate.org": "xn--preprate-cza-org"
+  }
 }

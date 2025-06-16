@@ -1,0 +1,49 @@
+# AIXTIV Symphony Hosting ID Mapping
+# Base: 119 hosting IDs across 14 categories
+
+# 100: Leadership & Coaching (8 sites)
+lead-coach-1 through lead-coach-8
+
+# 200: Government & Civic Engagement (9 sites)
+gov-civic-1 through gov-civic-9
+
+# 300: Community Culture (8 sites)
+comm-culture-1 through comm-culture-8
+
+# 320: Digital Art & Cultural Experiences (7 sites)
+digital-art-1 through digital-art-7
+
+# 400: Bacasu Springs: City of Agents Tech Stack (12 sites)
+bacasu-tech-1 through bacasu-tech-12
+
+# 410: 2100 Corporate & Brand (10 sites)
+2100-corp-1 through 2100-corp-10
+
+# 420: Ethical Retail & Consumer Goods (12 sites)
+eth-retail-1 through eth-retail-12
+
+# 500: Finance, Risk & Data Governance (4 sites)
+fin-risk-1 through fin-risk-4
+
+# 600: Third Sector & NGOs (6 sites)
+third-sector-1 through third-sector-6
+
+# 620: Foundations & Philanthropy (8 sites)
+philanthropy-1 through philanthropy-8
+
+# 700: Academia & Research Centers (5 sites)
+academia-1 through academia-5
+
+# 800: Vision Lake Pilots (13 sites)
+vl-pilots-1 through vl-pilots-13
+
+# 810: Super Agents & RIX (6 sites)
+super-agents-1 through super-agents-6
+
+# 900: Life at Vision Lake (11 sites)
+life-vl-1 through life-vl-11
+
+# Total: 119 hosting IDs
+
+Now we need to map your domains to these hosting IDs. Would you like me to create the domain-to-hosting-ID mapping using this base configuration?
+

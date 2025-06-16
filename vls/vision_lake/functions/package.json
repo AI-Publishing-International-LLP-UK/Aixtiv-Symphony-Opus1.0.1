@@ -1,0 +1,13 @@
+
+// functions/package.json
+
+{
+  "name": "agent-pulse-fn",
+  "version": "1.0.0",
+  "description": "Simulates VisionLake AI agent metrics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {}
+}
