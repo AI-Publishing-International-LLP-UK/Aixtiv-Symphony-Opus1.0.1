@@ -10,8 +10,9 @@ const GoDaddyConfigSchema = zod_1.z.object({
     API_SECRET: zod_1.z.string().min(1, 'GoDaddy API secret is required'),
     API_BASE_URL: zod_1.z.string().url('Invalid GoDaddy API base URL').default('https://api.godaddy.com/v1'),
     REQUEST_TIMEOUT_MS: zod_1.z.number().int().positive().default(30000),
-    RATE_LIMIT_REQUESTS: zod_1.z.number().int().positive().default(50),
+    RATE_LIMIT_REQUESTS: zod_1.z.number().int().positive().default(500),
     RATE_LIMIT_WINDOW_MS: zod_1.z.number().int().positive().default(60000),
+    PAGE_SIZE: zod_1.z.number().int().positive().default(500),
     RETRY_ATTEMPTS: zod_1.z.number().int().min(0).default(3),
     RETRY_DELAY_MS: zod_1.z.number().int().positive().default(1000),
 });

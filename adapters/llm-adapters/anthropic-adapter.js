@@ -48,8 +48,36 @@ class AnthropicAdapter extends ServiceAdapter {
     try {
       console.log(`Connecting to Anthropic service (${this.serviceId})...`);
       
-      if (!credentials.apiKey) {
-        throw new Error('API key is required for Anthropic connection');
+      // Check authentication method
+      if (credentials.useWorkloadFederation) {
+        // Use Google Cloud workload federation
+        const {GoogleAuth} = require('google-auth-library');
+        const auth = new GoogleAuth();
+        const client = await auth.getClient();
+        const token = await client.getAccessToken();
+        
+        // Initialize HTTP client with workload federation
+        this.httpClient = axios.create({
+          baseURL: credentials.endpoint || this.baseUrl,
+          headers: {
+            'Authorization': `Bearer ${token.token}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000
+        });
+      } else if (credentials.apiKey) {
+        // Use direct Anthropic API key
+        this.httpClient = axios.create({
+          baseURL: this.baseUrl,
+          headers: {
+            'x-api-key': credentials.apiKey,
+            'anthropic-version': this.apiVersion,
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000
+        });
+      } else {
+        throw new Error('Either API key or workload federation configuration is required');
       }
       
       // Initialize HTTP client

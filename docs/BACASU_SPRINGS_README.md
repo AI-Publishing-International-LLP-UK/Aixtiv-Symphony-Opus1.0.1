@@ -1,11 +1,17 @@
 # 🌆 Bacasu Springs: City of Agents
 
+![Bacasu Springs Cityscape](images/bacasu/BASP_Futuristic%20City%20at%20Sunset%20(1).png)
+
 ## Overview
 Bacasu Springs is a digital metropolis designed as the operational hub for AI agents and human collaborators within the Aixtiv Symphony ecosystem. This city serves as the virtual infrastructure where agents, pilots, and systems seamlessly interact.
 
 ## Key Locations
 
 ### 🚉 Grand Loop Transportation Network
+
+![Grand Loop Center](images/bacasu/BASP_GrandLoopCenteratLoopTerminus.png)
+
+![Harmony Bazaar Station](images/bacasu/BASP_GrandLOOPHarmonyBazaarStation.png)
 - **Grand Loop Center at Loop Terminus**
 - **Harmony Bazaar Station**
 - **Memory Center Station**
@@ -13,6 +19,14 @@ Bacasu Springs is a digital metropolis designed as the operational hub for AI ag
   - Houses the AI Code Archives
 
 ### 🏛️ Notable Districts
+
+![Memory Park Plaza](images/bacasu/BASP_MEMORYPARKPLAZA.png)
+
+![Garden Districts PowerCraft](images/bacasu/BASP_GARDEN_DISTRICTS_POWERCRAFT.png)
+
+![Edge Labs Entertainment](images/bacasu/BASP_EdgeLabsEntertainment.png)
+
+![Divinity Haven Memorial Park](images/bacasu/BASP_DIvinityHavenMemorialPark.png)
 1. **Memory Park Plaza**
    - Central hub for Flight Memory System (FMS) operations
    - Historical data archival and retrieval
@@ -37,6 +51,10 @@ Bacasu Springs is a digital metropolis designed as the operational hub for AI ag
 ## Access & Navigation
 
 ### 🎫 Access Systems
+
+![Portal Card Access](images/bacasu/BASP_PortalCardAccess_PathfindJrTicket.png)
+
+![HyperLoop South Tower](images/bacasu/BASP_HyoerLoopSouthTowerEntrance.png)
 - **Portal Card Access**
   - PathfindJr Ticket system
   - Role-based access control
@@ -47,6 +65,12 @@ Bacasu Springs is a digital metropolis designed as the operational hub for AI ag
 ## Technical Infrastructure
 
 ### 🔌 Core Systems
+
+![Vision Lake Agent Pulse](images/bacasu/BASP_VISIONLAKE%20AGENT%20PULSE.png)
+
+![Vision Lake Agent Activity](images/bacasu/BASP_VISIONLAKE%20AGETN%20ACTIVITY.png)
+
+![OPUS1 Pulse](images/bacasu/BASP_VISIONLAKE-%20OPUS1%20PULSE.png)
 1. **Vision Lake Agent Pulse**
    - Real-time agent activity monitoring
    - Performance metrics and analytics

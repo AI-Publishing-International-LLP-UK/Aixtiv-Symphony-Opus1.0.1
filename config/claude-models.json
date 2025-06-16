@@ -35,7 +35,7 @@
       "api_endpoint": "https://us-west1-aiplatform.googleapis.com/v1/projects/api-for-warp-drive/locations/us-west1/publishers/anthropic/models/claude-3-7-sonnet@20250219:predict",
       "api_version": "v1",
       "provider": "google",
-      "auth_method": "gcp",
+      "auth_method": "workload_federation",
       "project_id": "api-for-warp-drive",
       "region": "us-west1"
     },

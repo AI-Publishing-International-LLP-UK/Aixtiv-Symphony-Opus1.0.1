@@ -65,7 +65,7 @@ class GodaddyCommander {
             .action(async () => {
                 const spinner = ora('Fetching domain list...').start();
                 try {
-                    const domains = await this.service.listDomains();
+const domains = await this.service.listAllDomains({ pageSize: 500 });
                     spinner.succeed(`Found ${domains.length} domains`);
                     this.logger.info(JSON.stringify(domains, null, 2));
                 } catch (error) {

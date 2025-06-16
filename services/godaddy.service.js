@@ -19,8 +19,8 @@ class GoDaddyService {
         this.config = config;
         this.logger = logger || new logger_1.Logger('GoDaddyService');
         this.integration = new godaddy_integration_1.GoDaddyIntegration(config);
-        this.rateLimiter = new rate_limiter_1.RateLimiter({
-            maxRequests: 50,
+this.rateLimiter = new rate_limiter_1.RateLimiter({
+            maxRequests: 500,
             perSeconds: 60,
         });
     }
@@ -245,4 +245,48 @@ class GoDaddyService {
         });
     }
 }
-exports.GoDaddyService = GoDaddyService;
+    /**
+     * Lists all domains with pagination support
+     */
+    listAllDomains(options = { pageSize: 500 }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allDomains = [];
+            let offset = 0;
+            let hasMore = true;
+
+            while (hasMore) {
+                try {
+                    yield this.rateLimiter.waitForSlot();
+                    const domains = yield (0, retry_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
+                        return this.integration.listDomains({
+                            limit: options.pageSize,
+                            offset: offset,
+                        });
+                    }), {
+                        maxAttempts: 3,
+                        backoff: 'exponential',
+                        baseDelay: 1000,
+                    });
+
+                    if (domains && domains.length > 0) {
+                        allDomains.push(...domains);
+                        offset += domains.length;
+                    } else {
+                        hasMore = false;
+                    }
+
+                    // If we got less than pageSize, we've reached the end
+                    if (domains.length < options.pageSize) {
+                        hasMore = false;
+                    }
+
+                    this.logger.info(`Retrieved ${domains.length} domains, total: ${allDomains.length}`);
+                } catch (error) {
+                    this.logger.error('Failed to retrieve domains:', error);
+                    throw error;
+                }
+            }
+
+            return allDomains;
+        });
+    }

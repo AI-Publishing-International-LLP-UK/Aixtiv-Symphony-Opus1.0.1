@@ -81,12 +81,7 @@ module.exports = async function automateGithubTasks(options) {
         // Simulate API response
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-<<<<<<< HEAD
-        // Create the result object
         const operationResult = {
-=======
-        return {
->>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
           status: 'completed',
           action: action,
           repository: repository,
