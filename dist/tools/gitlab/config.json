@@ -1,7 +1,0 @@
-{
-  "name": "GitLab",
-  "primary": false,
-  "auth_type": "token",
-  "secret_file": "gitlab-access-token",
-  "api_endpoint": "https://gitlab.com/api/v4"
-}
