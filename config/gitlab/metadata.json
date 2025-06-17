@@ -1,0 +1,8 @@
+{
+    "entityID": "https://gitlab.com",
+    "assertionConsumerService": "https://gitlab.com/callback",
+    "singleSignOnService": "https://accounts.google.com/o/saml2/idp?idpid=C04cj3jky",
+    "nameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    "workloadIdentityPool": "gitlab-federation-pool",
+    "workloadIdentityProvider": "gitlab-saml-provider"
+}
