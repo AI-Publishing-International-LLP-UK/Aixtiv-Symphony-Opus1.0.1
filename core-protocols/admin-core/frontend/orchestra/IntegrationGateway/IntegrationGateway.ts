@@ -17,6 +17,7 @@ ANALYTICS = 'analytics',
 CRM = 'crm',
 ERP = 'erp',
 CMS = 'cms',
+CLAUDE_DESKTOP = 'claude_desktop',
 }
 
 /**
@@ -125,6 +126,22 @@ complete(prompt: string, options?: any): Promise<IntegrationResponse<string>>;
 generateEmbeddings(text: string): Promise<IntegrationResponse<number[]>>;
 streamComplete?(prompt: string, callback: (chunk: string, done: boolean) => void, options?: any): Promise<void>;
 listModels?(): Promise<IntegrationResponse<string[]>>;
+}
+
+/**
+* Extended interface for Claude Desktop integration
+*/
+export interface ClaudeDesktopIntegration extends Integration {
+readonly type: IntegrationType.CLAUDE_DESKTOP;
+
+// Sync settings to cloud
+syncSettings(settings: any): Promise<IntegrationResponse<void>>;
+
+// Get settings from cloud
+getSettings(): Promise<IntegrationResponse<any>>;
+
+// Apply settings from cloud to local
+applySettings(settings: any): Promise<IntegrationResponse<void>>;
 }
 
 /**
@@ -324,6 +341,11 @@ public getOAuthIntegration(id: string): OAuthIntegration | undefined {
 public getLLMIntegration(id: string): LLMIntegration | undefined {
     const integration = this.registry.get<LLMIntegration>(id);
     return integration?.type === IntegrationType.LLM ? integration : undefined;
+}
+
+public getClaudeDesktopIntegration(id: string): ClaudeDesktopIntegration | undefined {
+    const integration = this.registry.get<ClaudeDesktopIntegration>(id);
+    return integration?.type === IntegrationType.CLAUDE_DESKTOP ? integration : undefined;
 }
 
 /**

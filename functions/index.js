@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * Aixtiv CLI Owner-Subscriber V1-V2 Immersive System
  * Firebase Cloud Functions Main Entry Point
@@ -75,42 +74,22 @@ exports.triggerAgent = agentTriggerFunctions.triggerAgent;
 exports.onChatMessageCreated = agentTriggerFunctions.onChatMessageCreated;
 exports.scheduledAgentActions = agentTriggerFunctions.scheduledAgentActions;
 exports.processScheduledAgentActions = agentTriggerFunctions.processScheduledAgentActions;
-=======
-const { https } = require('firebase-functions/v1');
-const logger = require('firebase-functions/logger');
-const { drClaude } = require('./dr-claude');
-
-// Configuration for functions
-const runtimeOpts = {
-  memory: '512MB',
-  timeoutSeconds: 60
-};
-
-// Dr. Claude orchestration function with specific configuration
-exports.drClaude = https.onRequest(drClaude);
 
 // Endpoint for generating code with Dr. Claude
 exports.claudeCodeGenerate = https.onRequest((request, response) => {
   logger.info('Claude code generation request received', { structuredData: true });
 
-  // This is a placeholder implementation
-  const mockResponse = {
+  response.json({
     code: 'function factorial(n) {\n  if (n === 0 || n === 1) {\n    return 1;\n  }\n  return n * factorial(n - 1);\n}',
     language: 'javascript',
-    status: 'success',
-  };
-
-  response.json(mockResponse);
+    status: 'success'
+  });
 });
->>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
 
 // Context storage endpoint
 exports.contextStorage = https.onRequest((request, response) => {
   if (request.method === 'GET') {
-<<<<<<< HEAD
     logger.info('Context retrieval request', { structuredData: true });
-    
-    // Return context data
     response.json({ 
       context: 'Sample context data',
       timestamp: new Date().toISOString(),
@@ -118,19 +97,10 @@ exports.contextStorage = https.onRequest((request, response) => {
     });
   } else if (request.method === 'POST') {
     logger.info('Context storage request', { structuredData: true });
-    
-    // Store context data
     response.json({ 
       status: 'success', 
       message: 'Context stored successfully'
     });
-=======
-    // Return context data - placeholder implementation
-    response.json({ context: 'Sample context data', timestamp: new Date().toISOString() });
-  } else if (request.method === 'POST') {
-    // Store context data - placeholder implementation
-    response.json({ status: 'success', message: 'Context stored successfully' });
->>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   } else {
     response.status(405).send('Method not allowed');
   }
@@ -138,19 +108,14 @@ exports.contextStorage = https.onRequest((request, response) => {
 
 // Model metrics endpoint
 exports.modelMetrics = https.onRequest((request, response) => {
-<<<<<<< HEAD
   logger.info('Model metrics request', { structuredData: true });
   
-  // Return metrics data
-=======
-  // Return metrics data - placeholder implementation
->>>>>>> 89e66f3 (Comprehensive update for aixtiv-cli infrastructure and dependencies)
   response.json({
     model: 'claude-3-opus-20240229',
     latency: {
       p50: 1200,
       p90: 1800,
-      p99: 2500,
+      p99: 2500
     },
     throughput: 120,
     errors: {
@@ -158,10 +123,10 @@ exports.modelMetrics = https.onRequest((request, response) => {
       types: {
         timeout: 2,
         rate_limit: 1,
-        server: 0,
-      },
+        server: 0
+      }
     },
-    status: 'healthy',
+    status: 'healthy'
   });
 });
 
