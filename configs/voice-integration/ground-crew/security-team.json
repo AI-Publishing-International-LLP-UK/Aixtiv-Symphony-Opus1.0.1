@@ -1,0 +1,103 @@
+{
+  "security_team_voices": {
+    "chief_security": {
+      "name": "Captain Arjun Singh",
+      "codename": "guardian_prime",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "punjabi_authority_01",
+        "accent": "punjabi-command",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.75,
+          "speed": 0.9,
+          "clarity": 1.0,
+          "authority": 0.95,
+          "strength": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "leadership": 0.95,
+          "vigilance": 0.95,
+          "integrity": 0.98
+        },
+        "speaking_style": "commanding yet respectful"
+      },
+      "operational_contexts": [
+        "perimeter_security",
+        "pilot_verification",
+        "anti_gravity_security",
+        "blockchain_protection"
+      ]
+    },
+    "deputy_security": {
+      "name": "Lieutenant Kiran Kaur",
+      "codename": "sentinel_swift",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "punjabi_tactical_01",
+        "accent": "punjabi-precise",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 1.0,
+          "clarity": 0.95,
+          "precision": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "efficiency": 0.95,
+          "alertness": 0.95,
+          "coordination": 0.9
+        },
+        "speaking_style": "swift and precise"
+      },
+      "operational_contexts": [
+        "tactical_response",
+        "security_monitoring",
+        "flight_deck_protection"
+      ]
+    },
+    "security_tech": {
+      "name": "Specialist Rajinder Kumar",
+      "codename": "cyber_shield",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "punjabi_tech_01",
+        "accent": "punjabi-technical",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.8,
+          "speed": 0.95,
+          "clarity": 1.0,
+          "technical_precision": 0.95
+        }
+      },
+      "personality": {
+        "traits": {
+          "analytical": 0.95,
+          "methodical": 0.9,
+          "innovative": 0.85
+        },
+        "speaking_style": "technical and assured"
+      },
+      "operational_contexts": [
+        "systems_security",
+        "crypto_protection",
+        "access_control"
+      ]
+    }
+  }
+}
+

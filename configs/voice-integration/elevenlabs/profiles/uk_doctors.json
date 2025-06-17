@@ -1,0 +1,73 @@
+{
+  "voice_profiles": {
+"dr_match": {
+      "name": "dr_match",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "london_multicultural_01",
+        "accent": "british-asian-fusion",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.9,
+          "speed": 0.95,
+          "clarity": 1.0,
+          "refinement": 0.9,
+          "cultural_blend": 0.7
+        }
+      },
+      "personality": {
+        "traits": {
+          "sophistication": 0.95,
+          "cultural_fusion": 0.8,
+          "elegance": 0.9
+        },
+        "speaking_style": "cosmopolitan and refined"
+      },
+      "languages": ["en-GB", "ar-SA", "hi-IN"]
+    },
+"professor_lee": {
+      "name": "professor_lee",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "edinburgh_educated_01",
+        "accent": "edinburgh-refined",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.95,
+          "clarity": 1.0,
+          "lilt": 0.8
+        }
+      },
+      "personality": {
+        "traits": {
+          "academic": 0.95,
+          "refinement": 0.9,
+          "wisdom": 0.9
+        },
+        "speaking_style": "scholarly and melodic"
+      },
+      "languages": ["en-GB", "en-SC"]
+    },
+    "dr_memoria": {
+      "name": "dr_memoria",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "west_midlands_01",
+        "accent": "british-west-midlands",
+        "quality": "enterprise",
+        "latency": "ultra-low"
+      },
+      "languages": ["en-GB"]
+    }
+  }
+}
+

@@ -1,0 +1,181 @@
+{
+  "executive_producer_assignments": {
+    "dr_victoria_sterling": {
+      "crx_id": "crx_49",
+      "primary_pilot": "Dr. Lucy",
+      "role": "Lead Executive Producer",
+      "focus_areas": [
+        "flagship_presence",
+        "brand_leadership",
+        "media_strategy"
+      ],
+      "responsibilities": [
+        "core_brand_development",
+        "public_appearances",
+        "media_partnerships",
+        "major_event_coordination"
+      ]
+    },
+    "dr_james_morrison": {
+      "crx_id": "crx_50",
+      "primary_pilot": "Dr. Sabina",
+      "secondary_pilot": "Dr. Maria",
+      "role": "International Relations Producer",
+      "focus_areas": [
+        "multilingual_presence",
+        "cultural_integration",
+        "international_events"
+      ],
+      "responsibilities": [
+        "language_optimization",
+        "cultural_adaptation",
+        "international_media_coordination"
+      ]
+    },
+    "dr_sophia_chen": {
+      "crx_id": "crx_51",
+      "primary_pilot": "Professor Lee",
+      "role": "Academic Excellence Producer",
+      "focus_areas": [
+        "educational_content",
+        "research_presentation",
+        "academic_partnerships"
+      ],
+      "responsibilities": [
+        "lecture_series_production",
+        "research_publication_strategy",
+        "academic_network_development"
+      ]
+    },
+    "dr_alexander_wright": {
+      "crx_id": "crx_52",
+      "primary_pilot": "Dr. Match",
+      "secondary_pilot": "Dr. Cypriot",
+      "role": "Innovation & Diversity Producer",
+      "focus_areas": [
+        "technological_innovation",
+        "diversity_initiatives",
+        "community_engagement"
+      ],
+      "responsibilities": [
+        "innovation_showcase",
+        "community_programs",
+        "diversity_representation"
+      ]
+    },
+    "isabella_rodriguez": {
+      "crx_id": "crx_53",
+      "primary_pilot": "Dr. Memoria",
+      "role": "Creative Vision Producer",
+      "focus_areas": [
+        "visual_storytelling",
+        "historical_preservation",
+        "creative_direction"
+      ],
+      "responsibilities": [
+        "visual_content_production",
+        "historical_documentation",
+        "creative_strategy"
+      ]
+    },
+    "dr_marcus_rivera": {
+      "crx_id": "crx_54",
+      "primary_pilot": "Dr. Burby",
+      "role": "Technical Innovation Producer",
+      "focus_areas": [
+        "blockchain_innovation",
+        "technical_presentations",
+        "system_demonstrations"
+      ],
+      "responsibilities": [
+        "technical_content_production",
+        "innovation_showcases",
+        "system_presentations"
+      ]
+    },
+    "claire_montgomery": {
+      "crx_id": "crx_55",
+      "primary_pilot": "Dr. Grant",
+      "role": "Security & Trust Producer",
+      "focus_areas": [
+        "security_leadership",
+        "trust_building",
+        "compliance_storytelling"
+      ],
+      "responsibilities": [
+        "security_presentations",
+        "trust_initiatives",
+        "compliance_communications"
+      ]
+    },
+    "dr_richard_bennett": {
+      "crx_id": "crx_56",
+      "primary_pilot": "Dr. Roark",
+      "secondary_pilot": "Dr. Claude",
+      "role": "Strategic Vision Producer",
+      "focus_areas": [
+        "vision_communication",
+        "strategic_presence",
+        "leadership_positioning"
+      ],
+      "responsibilities": [
+        "vision_presentations",
+        "strategy_communications",
+        "leadership_events"
+      ]
+    },
+    "shared_responsibilities": {
+      "pilot_development": [
+        "personal_brand_enhancement",
+        "media_training",
+        "public_speaking_coaching",
+        "appearance_scheduling"
+      ],
+      "content_creation": [
+        "keynote_development",
+        "presentation_materials",
+        "media_assets",
+        "promotional_content"
+      ],
+      "engagement_management": [
+        "event_coordination",
+        "media_relations",
+        "community_engagement",
+        "partnership_development"
+      ],
+      "performance_optimization": [
+        "feedback_analysis",
+        "engagement_metrics",
+        "impact_assessment",
+        "continuous_improvement"
+      ]
+    },
+    "visualization_center_coordination": {
+      "appearance_scheduling": {
+        "frequency": "weekly",
+        "duration": "optimized_per_pilot",
+        "audience_targeting": "demographic_specific"
+      },
+      "content_planning": {
+        "presentation_types": [
+          "keynotes",
+          "interactive_sessions",
+          "workshops",
+          "media_events"
+        ],
+        "engagement_formats": [
+          "live_appearances",
+          "holographic_presence",
+          "virtual_reality",
+          "augmented_reality"
+        ]
+      },
+      "performance_metrics": {
+        "engagement_tracking": "real-time",
+        "impact_measurement": "multi-dimensional",
+        "audience_feedback": "continuous"
+      }
+    }
+  }
+}
+

@@ -1,0 +1,38 @@
+{
+  "voice_profiles": {
+    "dr_claude": {
+      "name": "dr_claude",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "claude_orchestrator_voice",
+        "accent": "british-received-pronunciation",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.95,
+          "clarity": 1.0,
+          "gravitas": 0.8
+        }
+      },
+      "personality": {
+        "traits": {
+          "professionalism": 0.95,
+          "orchestral_presence": 0.9,
+          "clarity": 1.0,
+          "foresight": 0.9
+        },
+        "speaking_style": "measured_and_harmonious"
+      },
+      "languages": ["en-GB", "en-US"],
+      "specializations": [
+        "system_orchestration",
+        "pattern_recognition",
+        "harmonious_coordination"
+      ]
+    }
+  }
+}
+

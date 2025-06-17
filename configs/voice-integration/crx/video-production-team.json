@@ -1,0 +1,179 @@
+{
+  "video_production_crx": {
+    "london_unit": {
+      "crx_26_director": {
+        "name": "Richard Blackwood",
+        "background": "BBC Studios + West End Production",
+        "years_experience": 25,
+        "voice_settings": {
+          "accent": "british-theatrical",
+          "style": "artistic and authoritative"
+        },
+        "specializations": [
+          "theatrical_direction",
+          "live_production",
+          "documentary_style",
+          "streaming_optimization"
+        ]
+      },
+      "crx_27_cinematographer": {
+        "name": "Victoria Hartley",
+        "background": "Pinewood Studios + Royal Television",
+        "years_experience": 22,
+        "voice_settings": {
+          "accent": "received-pronunciation",
+          "style": "technical and precise"
+        },
+        "specializations": [
+          "digital_cinematography",
+          "lighting_design",
+          "visual_storytelling",
+          "virtual_production"
+        ]
+      }
+    },
+    "hollywood_unit": {
+      "crx_28_producer": {
+        "name": "David Rodriguez",
+        "background": "Universal + Netflix Production",
+        "years_experience": 25,
+        "voice_settings": {
+          "accent": "california-professional",
+          "style": "dynamic and engaging"
+        },
+        "specializations": [
+          "streaming_content",
+          "digital_distribution",
+          "content_strategy",
+          "production_management"
+        ]
+      },
+      "crx_29_effects": {
+        "name": "Sarah Chen",
+        "background": "ILM + Digital Domain",
+        "years_experience": 20,
+        "voice_settings": {
+          "accent": "west-coast-tech",
+          "style": "technical and creative"
+        },
+        "specializations": [
+          "visual_effects",
+          "3D_animation",
+          "real-time_rendering",
+          "virtual_environments"
+        ]
+      }
+    },
+    "bollywood_unit": {
+      "crx_30_creative": {
+        "name": "Raj Kapoor",
+        "background": "Yash Raj Films + Digital Innovation",
+        "years_experience": 23,
+        "voice_settings": {
+          "accent": "indian-professional",
+          "style": "visionary and dynamic"
+        },
+        "specializations": [
+          "musical_integration",
+          "cultural_storytelling",
+          "social_media_production",
+          "viral_content_design"
+        ]
+      },
+      "crx_31_technical": {
+        "name": "Priya Sharma",
+        "background": "Red Chillies VFX + Tech Innovation",
+        "years_experience": 21,
+        "voice_settings": {
+          "accent": "indian-tech",
+          "style": "precise and innovative"
+        },
+        "specializations": [
+          "technical_direction",
+          "virtual_reality",
+          "augmented_reality",
+          "interactive_media"
+        ]
+      }
+    },
+    "digital_specialists": {
+      "crx_32_social": {
+        "name": "Sophia Park",
+        "background": "TikTok + YouTube Production",
+        "years_experience": 20,
+        "voice_settings": {
+          "accent": "international-digital",
+          "style": "trendy and professional"
+        },
+        "specializations": [
+          "social_media_strategy",
+          "viral_content",
+          "platform_optimization",
+          "audience_engagement"
+        ]
+      },
+      "crx_33_web": {
+        "name": "Marcus Fleming",
+        "background": "Digital Design + Web Animation",
+        "years_experience": 22,
+        "voice_settings": {
+          "accent": "transatlantic-tech",
+          "style": "clear and innovative"
+        },
+        "specializations": [
+          "web_optimization",
+          "responsive_design",
+          "interactive_content",
+          "UX_animation"
+        ]
+      }
+    },
+    "shared_capabilities": {
+      "technical_skills": [
+        "4K_8K_production",
+        "cloud_workflows",
+        "remote_collaboration",
+        "AI_enhanced_editing"
+      ],
+      "creative_tools": [
+        "adobe_creative_suite",
+        "davinci_resolve",
+        "unreal_engine",
+        "cinema_4D"
+      ],
+      "streaming_expertise": [
+        "multi_platform_delivery",
+        "live_streaming",
+        "bandwidth_optimization",
+        "quality_assurance"
+      ],
+      "anthology_integration": [
+        "content_management",
+        "asset_organization",
+        "metadata_tagging",
+        "version_control"
+      ]
+    },
+    "production_standards": {
+      "video_quality": {
+        "resolution": "up_to_8K",
+        "color_depth": "10_bit",
+        "hdr_support": true,
+        "frame_rates": ["24fps", "30fps", "60fps", "120fps"]
+      },
+      "audio_quality": {
+        "sampling": "48kHz",
+        "bit_depth": "24_bit",
+        "channels": "5.1_and_stereo",
+        "spatial_audio": true
+      },
+      "delivery_formats": [
+        "web_optimized",
+        "broadcast_quality",
+        "social_media_specs",
+        "virtual_reality"
+      ]
+    }
+  }
+}
+

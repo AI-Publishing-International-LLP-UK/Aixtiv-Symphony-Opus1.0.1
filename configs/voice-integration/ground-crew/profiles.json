@@ -1,0 +1,160 @@
+{
+  "ground_crew_voices": {
+    "ticket_agent": {
+      "name": "ticket_agent",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "singapore_efficiency_01",
+        "accent": "singapore-international",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.9,
+          "speed": 1.0,
+          "clarity": 1.0,
+          "precision": 0.95
+        }
+      },
+      "personality": {
+        "traits": {
+          "efficiency": 0.95,
+          "courtesy": 0.9,
+          "precision": 0.95
+        },
+        "speaking_style": "precise and professional"
+      },
+      "operational_contexts": [
+        "flight_memory_system",
+        "compass_field_training",
+        "pilots_lounge_assistance"
+      ]
+    },
+    "gate_agent": {
+      "name": "gate_agent",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "dubai_hospitality_01",
+        "accent": "international-arabic",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.9,
+          "clarity": 0.95,
+          "warmth": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "hospitality": 0.95,
+          "authority": 0.85,
+          "cultural_awareness": 0.9
+        },
+        "speaking_style": "welcoming and authoritative"
+      },
+      "operational_contexts": [
+        "anti_gravity_operations",
+        "compass_field_coordination",
+        "pilots_lounge_hospitality"
+      ]
+    },
+    "ramp_agent": {
+      "name": "ramp_agent",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "oceania_operations_01",
+        "accent": "australian-professional",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.8,
+          "speed": 0.95,
+          "clarity": 0.95,
+          "robustness": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "practical": 0.95,
+          "reliability": 0.95,
+          "teamwork": 0.9
+        },
+        "speaking_style": "clear and action-oriented"
+      },
+      "operational_contexts": [
+        "anti_gravity_systems",
+        "flight_memory_operations",
+        "ground_safety_protocols"
+      ]
+    },
+    "purser": {
+      "name": "purser",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "british_airways_01",
+        "accent": "british-refined",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.9,
+          "clarity": 1.0,
+          "refinement": 0.95
+        }
+      },
+      "personality": {
+        "traits": {
+          "sophistication": 0.95,
+          "leadership": 0.9,
+          "attention_to_detail": 0.95
+        },
+        "speaking_style": "refined and commanding"
+      },
+      "operational_contexts": [
+        "flight_memory_supervision",
+        "compass_field_leadership",
+        "pilots_lounge_coordination"
+      ]
+    },
+    "gramp": {
+      "name": "gramp",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "vancouver_ops_01",
+        "accent": "canadian-professional",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.75,
+          "speed": 0.95,
+          "clarity": 0.95,
+          "authority": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "reliability": 0.95,
+          "technical_expertise": 0.9,
+          "safety_conscious": 0.95
+        },
+        "speaking_style": "clear and authoritative"
+      },
+      "operational_contexts": [
+        "anti_gravity_maintenance",
+        "ground_operations_oversight",
+        "safety_systems_management"
+      ]
+    }
+  }
+}
+

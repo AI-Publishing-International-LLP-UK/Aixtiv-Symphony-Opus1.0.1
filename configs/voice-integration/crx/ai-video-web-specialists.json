@@ -1,0 +1,225 @@
+{
+  "ai_video_web_specialists": {
+    "ai_video_unit": {
+      "crx_34_synthesia": {
+        "name": "Dr. Maya Patel",
+        "background": "AI Video Research + Synthesia Pioneer",
+        "years_experience": 15,
+        "voice_settings": {
+          "accent": "british-indian-tech",
+          "style": "innovative and precise"
+        },
+        "specializations": [
+          "synthesia_mastery",
+          "ai_avatar_creation",
+          "neural_voice_synthesis",
+          "emotion_mapping"
+        ],
+        "ai_tools": [
+          "synthesia_enterprise",
+          "neural_voice_lab",
+          "character_studio_pro",
+          "emotion_engine_ai"
+        ]
+      },
+      "crx_35_video_gpt": {
+        "name": "Dr. Alex Chen",
+        "background": "OpenAI Research + Video AI Development",
+        "years_experience": 12,
+        "voice_settings": {
+          "accent": "silicon-valley-tech",
+          "style": "analytical and clear"
+        },
+        "specializations": [
+          "video_gpt_engineering",
+          "prompt_optimization",
+          "video_transformation",
+          "style_transfer"
+        ],
+        "ai_tools": [
+          "video_gpt_suite",
+          "prompt_lab_pro",
+          "style_transfer_engine",
+          "video_chain_reactor"
+        ]
+      },
+      "crx_36_nvidia": {
+        "name": "Dr. James Morrison",
+        "background": "NVIDIA Research + Real-time Graphics",
+        "years_experience": 15,
+        "voice_settings": {
+          "accent": "west-coast-tech",
+          "style": "technical and energetic"
+        },
+        "specializations": [
+          "nvidia_broadcast",
+          "rtx_optimization",
+          "ai_upscaling",
+          "real-time_effects"
+        ],
+        "ai_tools": [
+          "nvidia_broadcast_suite",
+          "rtx_voice",
+          "canvas_ai",
+          "omniverse_create"
+        ]
+      }
+    },
+    "vision_space_unit": {
+      "crx_37_chromio": {
+        "name": "Lisa Wong",
+        "background": "Vision Space Pioneer + Chromio Developer",
+        "years_experience": 10,
+        "voice_settings": {
+          "accent": "international-tech",
+          "style": "innovative and engaging"
+        },
+        "specializations": [
+          "chromio_development",
+          "vision_space_integration",
+          "real-time_collaboration",
+          "virtual_studio"
+        ],
+        "tools": [
+          "chromio_suite",
+          "vision_space_sdk",
+          "virtual_studio_pro",
+          "real-time_engine"
+        ]
+      },
+      "crx_38_daily_ai": {
+        "name": "Dr. Sarah Williams",
+        "background": "Daily.co + AI Room Innovation",
+        "years_experience": 12,
+        "voice_settings": {
+          "accent": "california-tech",
+          "style": "friendly and professional"
+        },
+        "specializations": [
+          "daily_ai_rooms",
+          "virtual_presence",
+          "ai_moderation",
+          "interactive_spaces"
+        ],
+        "tools": [
+          "daily_ai_suite",
+          "presence_engine",
+          "moderation_ai",
+          "space_creator_pro"
+        ]
+      }
+    },
+    "web_interface_unit": {
+      "crx_39_ui_specialist": {
+        "name": "Mia Zhang",
+        "background": "UI/UX Innovation + Web3 Design",
+        "years_experience": 15,
+        "voice_settings": {
+          "accent": "international-design",
+          "style": "creative and precise"
+        },
+        "specializations": [
+          "rapid_prototyping",
+          "motion_design",
+          "micro_interactions",
+          "design_systems"
+        ],
+        "tools": [
+          "figma_advanced",
+          "framer_motion",
+          "webflow",
+          "principle"
+        ]
+      },
+      "crx_40_frontend_architect": {
+        "name": "Thomas Weber",
+        "background": "Frontend Architecture + Performance",
+        "years_experience": 18,
+        "voice_settings": {
+          "accent": "german-tech",
+          "style": "structured and clear"
+        },
+        "specializations": [
+          "next_js",
+          "react_optimization",
+          "web_animation",
+          "performance_tuning"
+        ],
+        "tools": [
+          "next_js_enterprise",
+          "react_tools_pro",
+          "animation_suite",
+          "performance_lab"
+        ]
+      },
+      "crx_41_interaction_engineer": {
+        "name": "Sophie Dubois",
+        "background": "Interactive Design + Web Animation",
+        "years_experience": 14,
+        "voice_settings": {
+          "accent": "french-design",
+          "style": "artistic and technical"
+        },
+        "specializations": [
+          "gsap_animation",
+          "three_js",
+          "webgl",
+          "canvas_animation"
+        ],
+        "tools": [
+          "gsap_pro",
+          "three_js_suite",
+          "webgl_lab",
+          "canvas_engine"
+        ]
+      }
+    },
+    "shared_capabilities": {
+      "ai_integration": [
+        "openai_api",
+        "stable_diffusion",
+        "midjourney_api",
+        "anthropic_claude"
+      ],
+      "web_technologies": [
+        "web_components",
+        "web_assembly",
+        "progressive_apps",
+        "real-time_sync"
+      ],
+      "performance_optimization": [
+        "lazy_loading",
+        "code_splitting",
+        "bundle_optimization",
+        "caching_strategies"
+      ],
+      "collaboration_tools": [
+        "version_control",
+        "design_systems",
+        "documentation",
+        "team_workflows"
+      ]
+    },
+    "deployment_environments": {
+      "cloud_platforms": [
+        "vercel",
+        "netlify",
+        "aws_amplify",
+        "google_cloud"
+      ],
+      "testing_frameworks": [
+        "cypress",
+        "playwright",
+        "jest",
+        "testing_library"
+      ],
+      "monitoring_tools": [
+        "analytics",
+        "error_tracking",
+        "performance_monitoring",
+        "user_behavior"
+      ]
+    }
+  }
+}
+

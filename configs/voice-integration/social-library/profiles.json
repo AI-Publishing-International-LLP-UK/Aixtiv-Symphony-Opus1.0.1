@@ -1,0 +1,69 @@
+{
+  "social_library_voices": {
+    "professor_lucinda": {
+      "name": "Professor Lucinda Bennett",
+      "codename": "social_sage",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "cambridge_scholar_01",
+        "accent": "british-academic",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.92,
+          "clarity": 1.0,
+          "warmth": 0.9
+        }
+      },
+      "personality": {
+        "traits": {
+          "expertise": 0.95,
+          "approachability": 0.9,
+          "enthusiasm": 0.85
+        },
+        "speaking_style": "engaging academic"
+      },
+      "specializations": [
+        "nft_education",
+        "digital_curation",
+        "community_engagement"
+      ]
+    },
+    "professor_levi": {
+      "name": "Professor Levi Rodriguez",
+      "codename": "digital_curator",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "berkeley_tech_01",
+        "accent": "california-academic",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.8,
+          "speed": 0.95,
+          "clarity": 0.95,
+          "energy": 0.85
+        }
+      },
+      "personality": {
+        "traits": {
+          "innovation": 0.9,
+          "clarity": 0.95,
+          "tech_savvy": 0.95
+        },
+        "speaking_style": "tech-savvy educator"
+      },
+      "specializations": [
+        "marketplace_dynamics",
+        "content_valuation",
+        "digital_asset_management"
+      ]
+    }
+  }
+}
+

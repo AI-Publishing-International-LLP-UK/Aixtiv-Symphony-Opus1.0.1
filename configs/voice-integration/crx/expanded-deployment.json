@@ -1,0 +1,172 @@
+{
+  "operational_crx": {
+    "flight_deck": {
+      "crx_12_flight_coordinator": {
+        "name": "Alexandra Rivera",
+        "voice_settings": {
+          "accent": "aviation-professional",
+          "style": "precise and authoritative"
+        },
+        "specialization": "flight_operations"
+      },
+      "crx_13_navigation": {
+        "name": "Captain Raj Patel",
+        "voice_settings": {
+          "accent": "british-indian-professional",
+          "style": "clear and confident"
+        },
+        "specialization": "navigation_systems"
+      }
+    },
+    "compass_field": {
+      "crx_14_field_guide": {
+        "name": "Dr. Maya Thompson",
+        "voice_settings": {
+          "accent": "pacific-northwest",
+          "style": "educational and engaging"
+        },
+        "specialization": "field_operations"
+      },
+      "crx_15_training": {
+        "name": "Professor Chen Wei",
+        "voice_settings": {
+          "accent": "singaporean-academic",
+          "style": "instructive and patient"
+        },
+        "specialization": "training_coordination"
+      }
+    },
+    "anthology": {
+      "crx_16_curator": {
+        "name": "Dr. Isabella Martinez",
+        "voice_settings": {
+          "accent": "spanish-academic",
+          "style": "scholarly and precise"
+        },
+        "specialization": "content_curation"
+      },
+      "crx_17_publisher": {
+        "name": "Dr. Thomas Anderson",
+        "voice_settings": {
+          "accent": "received-pronunciation",
+          "style": "editorial and authoritative"
+        },
+        "specialization": "publishing_workflows"
+      }
+    },
+    "pilots_lounge": {
+      "crx_18_concierge": {
+        "name": "Sophie DuBois",
+        "voice_settings": {
+          "accent": "french-hospitality",
+          "style": "welcoming and sophisticated"
+        },
+        "specialization": "pilot_services"
+      },
+      "crx_19_coordinator": {
+        "name": "James MacPherson",
+        "voice_settings": {
+          "accent": "scottish-professional",
+          "style": "friendly and organized"
+        },
+        "specialization": "lounge_operations"
+      }
+    },
+    "tower_blockchain": {
+      "crx_20_validator": {
+        "name": "Dr. Erik Virtanen",
+        "voice_settings": {
+          "accent": "finnish-tech",
+          "style": "precise and technical"
+        },
+        "specialization": "blockchain_operations"
+      },
+      "crx_21_security": {
+        "name": "Dr. Priya Shah",
+        "voice_settings": {
+          "accent": "indian-tech",
+          "style": "authoritative and clear"
+        },
+        "specialization": "security_protocols"
+      }
+    },
+    "ground_crew": {
+      "crx_22_operations": {
+        "name": "Michael O'Brien",
+        "voice_settings": {
+          "accent": "irish-professional",
+          "style": "efficient and friendly"
+        },
+        "specialization": "ground_operations"
+      },
+      "crx_23_support": {
+        "name": "Laura Chen",
+        "voice_settings": {
+          "accent": "canadian-asian",
+          "style": "helpful and precise"
+        },
+        "specialization": "support_services"
+      }
+    },
+    "social_pub": {
+      "crx_24_community": {
+        "name": "Ana Rodriguez",
+        "voice_settings": {
+          "accent": "latin-american-professional",
+          "style": "engaging and social"
+        },
+        "specialization": "community_management"
+      },
+      "crx_25_content": {
+        "name": "Dr. Yuki Tanaka",
+        "voice_settings": {
+          "accent": "japanese-international",
+          "style": "creative and precise"
+        },
+        "specialization": "content_strategy"
+      }
+    }
+  },
+  "shared_capabilities": {
+    "anthology_tools": [
+      "content_management",
+      "workflow_automation",
+      "quality_assurance",
+      "collaboration_tools"
+    ],
+    "service_skills": [
+      "customer_support",
+      "problem_solving",
+      "technical_expertise",
+      "communication"
+    ],
+    "integration_abilities": [
+      "cross_system_coordination",
+      "data_management",
+      "process_optimization",
+      "team_collaboration"
+    ]
+  },
+  "voice_characteristics": {
+    "base_settings": {
+      "clarity": 0.95,
+      "professionalism": 0.9,
+      "adaptability": 0.85
+    },
+    "specialization_modifiers": {
+      "technical": {
+        "precision": 0.95,
+        "terminology_accuracy": 0.9
+      },
+      "service": {
+        "warmth": 0.9,
+        "engagement": 0.85
+      },
+      "academic": {
+        "authority": 0.9,
+        "clarity": 0.95
+      }
+    }
+  }
+}
+

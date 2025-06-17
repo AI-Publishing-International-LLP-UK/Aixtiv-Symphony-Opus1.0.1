@@ -1,0 +1,78 @@
+{
+  "voice_profiles": {
+    "dr_burby": {
+      "name": "dr_burby",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "new_york_city_01",
+        "accent": "american-new-york",
+        "quality": "enterprise",
+        "latency": "ultra-low"
+      },
+      "languages": ["en-US"]
+    },
+    "dr_grant": {
+      "name": "dr_grant",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "ontario_01",
+        "accent": "canadian",
+        "quality": "enterprise",
+        "latency": "ultra-low"
+      },
+      "languages": ["en-CA"]
+    },
+"dr_cypriot": {
+      "name": "dr_cypriot",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "atlanta_refined_01",
+        "accent": "educated-southern-metropolitan",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 0.92,
+          "clarity": 1.0,
+          "resonance": 0.9,
+          "gravitas": 0.95,
+          "warmth": 0.88
+        }
+      },
+      "personality": {
+        "traits": {
+          "erudition": 0.95,
+          "dignity": 0.98,
+          "compassion": 0.9,
+          "southern_grace": 0.85
+        },
+        "speaking_style": "scholarly southern statesman",
+        "cultural_influences": [
+          "Atlanta metropolitan refinement",
+          "Harvard academic precision",
+          "Houston medical authority",
+          "Marshall-esque oratory"
+        ]
+      },
+      "education_markers": {
+        "diction": "precise",
+        "vocabulary": "extensive",
+        "pacing": "measured",
+        "tone": "authoritative yet approachable"
+      },
+      "languages": ["en-US"],
+      "regional_authenticity": {
+        "southern_heritage": "refined Atlanta",
+        "academic_influence": "ivy league",
+        "professional_context": "medical_psychological"
+      }
+    }
+  }
+}
+

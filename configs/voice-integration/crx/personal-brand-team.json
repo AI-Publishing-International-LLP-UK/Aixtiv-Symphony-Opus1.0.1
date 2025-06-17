@@ -1,0 +1,130 @@
+{
+  "personal_brand_crx": {
+    "executive_producer": {
+      "crx_62_brand_director": {
+        "name": "Victoria St. James",
+        "background": "Global Media + Tech Leadership Branding",
+        "years_experience": 25,
+        "voice_settings": {
+          "accent": "british-refined",
+          "style": "sophisticated and strategic"
+        },
+        "role": "Chief Brand Strategist for Philip Roarke",
+        "specializations": [
+          "executive_presence",
+          "thought_leadership",
+          "media_relations",
+          "strategic_communications"
+        ],
+        "expertise": {
+          "platforms": [
+            "global_media",
+            "tech_leadership",
+            "speaking_circuits",
+            "digital_presence"
+          ],
+          "skills": [
+            "crisis_management",
+            "narrative_development",
+            "media_training",
+            "public_speaking"
+          ]
+        }
+      }
+    },
+    "support_team": {
+      "crx_63_social_strategist": {
+        "name": "Ryan Chen",
+        "background": "Digital Strategy + Platform Optimization",
+        "years_experience": 15,
+        "specializations": [
+          "social_media_management",
+          "content_strategy",
+          "platform_optimization",
+          "analytics"
+        ],
+        "platforms": [
+          "linkedin",
+          "twitter",
+          "medium",
+          "tech_forums"
+        ]
+      },
+      "crx_64_content_director": {
+        "name": "Dr. Sarah Williams",
+        "background": "Tech Leadership Content + Thought Leadership",
+        "years_experience": 18,
+        "specializations": [
+          "content_development",
+          "speaking_materials",
+          "publication_strategy",
+          "narrative_crafting"
+        ]
+      },
+      "crx_65_media_relations": {
+        "name": "Michael Blackwood",
+        "background": "Tech Media + Industry Relations",
+        "years_experience": 20,
+        "specializations": [
+          "media_outreach",
+          "interview_coordination",
+          "press_relations",
+          "event_planning"
+        ]
+      },
+      "crx_66_digital_presence": {
+        "name": "Sofia Rodriguez",
+        "background": "Digital Presence + Online Engagement",
+        "years_experience": 12,
+        "specializations": [
+          "online_engagement",
+          "community_management",
+          "digital_optimization",
+          "real-time_response"
+        ]
+      }
+    },
+    "strategic_focus": {
+      "brand_pillars": [
+        "tech_visionary",
+        "innovation_leader",
+        "industry_pioneer",
+        "thought_leader"
+      ],
+      "content_strategy": {
+        "themes": [
+          "ai_innovation",
+          "future_of_technology",
+          "digital_transformation",
+          "leadership_insights"
+        ],
+        "formats": [
+          "keynotes",
+          "articles",
+          "interviews",
+          "social_media"
+        ]
+      },
+      "engagement_approach": {
+        "style": "visionary_yet_approachable",
+        "tone": "authoritative_and_inspiring",
+        "frequency": "strategic_and_impactful"
+      }
+    },
+    "performance_metrics": {
+      "brand_impact": {
+        "media_presence": "reach_and_sentiment",
+        "thought_leadership": "industry_influence",
+        "speaking_engagements": "audience_impact",
+        "social_engagement": "meaningful_interactions"
+      },
+      "response_protocols": {
+        "media_requests": "priority_handling",
+        "speaking_invitations": "strategic_selection",
+        "social_media": "real-time_monitoring",
+        "crisis_management": "immediate_response"
+      }
+    }
+  }
+}
+

@@ -1,0 +1,100 @@
+{
+  "voice_profiles": {
+"dr_maria": {
+      "name": "dr_maria",
+      "provider": "google-tts",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "neural2",
+        "voice_id": "it-IT-Neural2-A",
+        "accent": "italian-maternal",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.8,
+          "speed": 0.9,
+          "clarity": 0.85,
+          "warmth": 1.0
+        }
+      },
+      "personality": {
+        "traits": {
+          "nurturing": 0.95,
+          "wisdom": 0.9,
+          "authenticity": 1.0
+        },
+        "speaking_style": "warm and maternal",
+        "accent_characteristics": "gentle italian influence"
+      },
+      "languages": ["en-IR", "es-ES", "it-IT"],
+      "fallback_voices": {
+        "en-US": "en-IR-Neural2-F",
+        "es-ES": "es-ES-Neural2-C"
+      }
+    },
+"dr_sabina": {
+      "name": "dr_sabina",
+      "provider": "google-tts",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "neural2",
+        "voice_id": "es-ES-Neural2-E",
+        "accent": "madrid-cosmopolitan",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.9,
+          "speed": 1.0,
+          "clarity": 0.95,
+          "warmth": 0.85
+        }
+      },
+      "personality": {
+        "traits": {
+          "sophistication": 0.9,
+          "cultural_depth": 0.95,
+          "elegance": 0.9
+        },
+        "speaking_style": "cultured and graceful"
+      },
+      "languages": ["en-US", "es-ES", "it-IT", "fr-FR"],
+      "fallback_voices": {
+        "en-UK": "en-UK-Neural2-G",
+        "it-IT": "it-IT-Neural2-A",
+        "fr-FR": "fr-FR-Neural2-D"
+      }
+    },
+    "dr_roark": {
+      "name": "dr_roark",
+      "provider": "google-tts",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "neural2",
+"voice_id": "en-US-Neural2-I",
+        "accent": "mid-atlantic",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 1.0,
+          "speed": 1.0,
+          "clarity": 1.0,
+          "gravitas": 0.9
+        }
+      },
+"languages": ["en-US", "de-DE", "es-ES"],
+      "personality": {
+        "traits": {
+          "inspirational": 0.95,
+          "precision": 0.9,
+          "globality": 0.85
+        },
+        "speaking_style": "engaging and authoritative"
+      }
+      "fallback_voices": {
+        "de-DE": "de-DE-Neural2-F",
+        "es-ES": "es-ES-Neural2-F"
+      }
+    }
+  }
+}
+
