@@ -1,0 +1,18 @@
+{
+  "categories": [
+    {"code": "100", "name": "Leadership & Coaching", "weight": 8},
+    {"code": "200", "name": "Government & Civic Engagement", "weight": 9},
+    {"code": "300", "name": "Community Culture", "weight": 8},
+    {"code": "320", "name": "Digital Art & Cultural Experiences", "weight": 7},
+    {"code": "400", "name": "Bacasu Springs: City of Agents", "weight": 12},
+    {"code": "410", "name": "2100 Corporate & Brand", "weight": 10},
+    {"code": "420", "name": "Ethical Retail & Consumer Goods", "weight": 12},
+    {"code": "500", "name": "Finance, Risk & Data Governance", "weight": 4},
+    {"code": "600", "name": "Third Sector & NGOs", "weight": 6},
+    {"code": "620", "name": "Foundations & Philanthropy", "weight": 8},
+    {"code": "700", "name": "Academia & Research Centers", "weight": 5},
+    {"code": "800", "name": "Vision Lake Pilots", "weight": 13},
+    {"code": "810", "name": "Super Agents & RIX", "weight": 6},
+    {"code": "900", "name": "Life at Vision Lake", "weight": 11}
+  ]
+}
