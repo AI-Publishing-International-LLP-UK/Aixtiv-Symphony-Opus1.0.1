@@ -1,5 +1,5 @@
 export declare const PORT: string | number;
-export declare const NODE_ENV: "development" | "production" | "test";
+export declare const NODE_ENV: string;
 export declare const JWT_SECRET: string;
 export declare const API_VERSION = "1.0.0";
 export declare const DEMO_USERS: {
