@@ -15,3 +15,4 @@ exports.DEMO_USERS = [
     }
 ];
 exports.BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+//# sourceMappingURL=config.js.map

@@ -1,0 +1,54 @@
+# Claude OAuth2 Provider Configuration
+# This file configures the OAuth2 settings for Claude API integration
+
+# Provider identity
+provider:
+  name: "claude"
+  display_name: "Claude AI"
+  description: "Anthropic's Claude AI models and API services"
+  version: "1.0"
+
+# OAuth2 endpoints
+oauth2:
+  auth_url: "https://api.anthropic.com/oauth/authorize"
+  token_url: "https://api.anthropic.com/oauth/token"
+  token_endpoint_auth_method: "client_secret_post"
+  token_refresh_threshold_seconds: 3600  # Refresh tokens 1 hour before expiry
+
+# Authorization scopes
+scopes:
+  - "mcp:read"    # Permission to read data from Claude MCP
+  - "mcp:write"   # Permission to write data to Claude MCP
+  - "mcp:execute" # Permission to execute models and actions
+
+# Application registration
+client:
+  # These values are loaded from secrets at runtime
+  # DO NOT hardcode actual values here
+  client_id: "${CLAUDE_CLIENT_ID}"
+  client_secret: "${CLAUDE_CLIENT_SECRET}"
+
+# Redirect URIs for OAuth flow completion
+redirect_uris:
+  - "https://drclaude.live/oauth/callback"
+  - "https://drclaude.live/mcp/auth/callback"
+  - "http://localhost:3000/oauth/callback"  # For local development
+
+# Token management configuration
+token_management:
+  # Secret Manager secret names
+  refresh_tokens_secret: "claude-oauth-refresh-tokens"
+  access_tokens_cache_secret: "claude-oauth-access-tokens"
+  
+  # Token storage options
+  store_refresh_tokens_only: true  # Only persist refresh tokens to Secret Manager
+  use_cmek_encryption: true       # Use Customer Managed Encryption Keys if available
+  
+  # Monitoring and auditing
+  audit_log_name: "auth.claude"
+  log_auth_events: true
+
+# Security settings
+security:
+  pkce_required: true             # Use PKCE to secure the authorization code flow
+  token_rotation_months: 12       # Client secret rotation schedule

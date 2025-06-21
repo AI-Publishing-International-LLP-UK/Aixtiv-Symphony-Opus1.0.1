@@ -1,24 +1,28 @@
+# Integration Gateway Reset Configuration
+# This file uses environment variables instead of hardcoded credentials
+# Use .env file or environment variables to configure
+
 cleanup:
   target_deployments:
     - name: generative-ai-kb
-      bucket: "859242575175-us-central1-blueprint-config/generative-ai-kb"
-      location: us-west1
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/generative-ai-kb"
+      location: ${DEPLOYMENT_REGION:-us-west1}
       resources:
         - type: aiplatform.googleapis.com/Endpoint
         - type: storage.googleapis.com/Bucket
         - type: bigquery.googleapis.com/Dataset
 
     - name: rag-cloudsql
-      bucket: "859242575175-us-central1-blueprint-config/rag-cloudsql"
-      location: us-west1
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/rag-cloudsql"
+      location: ${DEPLOYMENT_REGION:-us-west1}
       resources:
         - type: sqladmin.googleapis.com/Instance
         - type: aiplatform.googleapis.com/Endpoint
         - type: storage.googleapis.com/Bucket
 
     - name: dynamic-web-apps
-      bucket: "859242575175-us-central1-blueprint-config/web-apps"
-      location: us-west1
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/web-apps"
+      location: ${DEPLOYMENT_REGION:-us-west1}
       resources:
         - type: run.googleapis.com/Service
         - type: cloudbuild.googleapis.com/Trigger
@@ -27,7 +31,7 @@ cleanup:
 reset_sequence:
   - step: "backup_configs"
     action: "export existing configurations"
-    backup_location: "gs://859242575175-us-central1-blueprint-config/backups"
+    backup_location: "gs://${BACKUP_BUCKET:-default-backup-bucket}/backups"
 
   - step: "cleanup_resources"
     action: "remove problematic resources"
@@ -39,5 +43,6 @@ reset_sequence:
   - step: "reinitialize"
     action: "prepare for new deployment"
 
-service_account: "goog-sc-generative-ai-docu-147@api-for-warp-drive.iam.gserviceaccount.com"
-project_id: "api-for-warp-drive"
+# These values must be set via environment variables
+service_account: "${SERVICE_ACCOUNT}"
+project_id: "${PROJECT_ID}"

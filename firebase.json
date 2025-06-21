@@ -142,7 +142,7 @@
       ]
     },
     {
-      "target": "asoos-2100-cool",
+      "target": "2100-cool-c624d",
       "public": "public/asoos-2100-cool",
       "ignore": [
         "firebase.json",
