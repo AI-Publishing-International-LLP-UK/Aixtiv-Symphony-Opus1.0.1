@@ -19,6 +19,11 @@ export interface UserInfo {
  */
 export interface AuthRequest extends Request {
     user?: UserInfo;
+    body: any;
+    headers: {
+        authorization?: string;
+        [key: string]: string | string[] | undefined;
+    };
 }
 /**
  * Generate a JWT token for a user
