@@ -7,7 +7,7 @@
     "oauth2": "./oauth2-cli.js"
   },
   "dependencies": {
-    "googleapis": "^126.0.1",
-    "google-auth-library": "^9.0.0"
+    "google-auth-library": "^9.0.0",
+    "googleapis": "^126.0.1"
   }
 }

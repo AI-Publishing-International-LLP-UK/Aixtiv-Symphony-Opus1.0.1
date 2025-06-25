@@ -1,7 +1,9 @@
-google-cloud-monitoring>=2.0.0
-google-cloud-compute>=1.0.0
-pandas>=1.0.0
-requests>=2.25.0
-google-cloud-bigquery>=2.0.0
-slack-sdk>=3.0.0
-pyyaml>=5.4.1
+flask==3.0.2
+psycopg2-binary==2.9.9
+requests==2.31.0
+python-dotenv==1.0.2
+gunicorn==21.2.0
+SQLAlchemy==2.0.28
+BeautifulSoup4==4.12.3
+selenium==4.18.1
+webdriver-manager==4.0.1

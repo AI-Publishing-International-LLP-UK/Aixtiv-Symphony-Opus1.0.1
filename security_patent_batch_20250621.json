@@ -1,0 +1,74 @@
+{
+  "batch_id": "security_patents_20250621_212819",
+  "filing_date": "2025-06-21T21:28:19.273479",
+  "customer_number": "208576",
+  "entity_status": "SMALL",
+  "inventor": {
+    "name": "Phillip Corey Roark",
+    "address": {
+      "street": "27 Arlington Rd",
+      "city": "Teddington",
+      "country": "GB",
+      "postal_code": "TW11 8NL"
+    },
+    "citizenship": "US"
+  },
+  "patents": [
+    {
+      "patent_id": "AI_Auth_Gateway",
+      "title": "Adaptive AI Agent Authentication Gateway System",
+      "abstract": "An adaptive authentication gateway system for controlling and securing access to AI agent services through dynamic verification protocols.",
+      "pdf_path": "patents/AI_Agent_Authentication_Gateway.pdf",
+      "priority": "CRITICAL",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Hierarchical_AI_Org",
+      "title": "Hierarchical AI Agent Organization System",
+      "abstract": "A hierarchical organization system for managing AI agents in structured groups with defined roles and responsibilities.",
+      "pdf_path": "patents/Hierarchical_AI_Agent_Organization.pdf",
+      "priority": "HIGH",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Multi_Tenant_Auth",
+      "title": "Multi-Tenant AI Agent Authentication Framework",
+      "abstract": "A multi-tenant authentication framework providing secure isolation between organizational tenants.",
+      "pdf_path": "patents/Multi_Tenant_AI_Authentication.pdf",
+      "priority": "CRITICAL",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Emergency_AI_Control",
+      "title": "Emergency AI Agent Control System",
+      "abstract": "An emergency control system for AI agents providing immediate shutdown and containment capabilities.",
+      "pdf_path": "patents/Emergency_AI_Agent_Control.pdf",
+      "priority": "CRITICAL",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Domain_Clustering",
+      "title": "Domain-Based AI Service Clustering System",
+      "abstract": "A domain-based clustering system for organizing AI services across multiple internet domains.",
+      "pdf_path": "patents/Domain_Based_AI_Clustering.pdf",
+      "priority": "HIGH",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Data_Isolation",
+      "title": "Real-Time Multi-Tenant Data Isolation System",
+      "abstract": "A real-time data isolation system ensuring complete separation of tenant data in multi-tenant environments.",
+      "pdf_path": "patents/Multi_Tenant_Data_Isolation.pdf",
+      "priority": "CRITICAL",
+      "filing_fee": 75
+    },
+    {
+      "patent_id": "Automated_Security",
+      "title": "Automated Security Response System for AI Environments",
+      "abstract": "An automated security response system providing real-time threat detection and coordinated response.",
+      "pdf_path": "patents/Automated_AI_Security_Response.pdf",
+      "priority": "HIGH",
+      "filing_fee": 75
+    }
+  ]
+}
