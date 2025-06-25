@@ -54,3 +54,22 @@ if __name__ == "__main__":
     result = system.validate_command("TestAgent", "test_command")
     print(f"Test result: {result}")
     print("✅ Basic system operational")
+
+    def validate_executive_order_compliance(self, agent_id, context):
+        """Executive Order compliance - effective 20:31 June 24, 2025"""
+        # Check for multi-agent combinations without pre-disclosure
+        if self._is_multi_agent_combination(context):
+            if not self._validate_pre_disclosure(context):
+                print(f"[EXECUTIVE DISMISSAL] {agent_id} - Pre-disclosure violation")
+                self.blocked_agents.add(agent_id)
+                return False
+        return True
+    
+    def _is_multi_agent_combination(self, context):
+        return ('multi_agent_response' in context or 
+                len(context.get('participating_agents', [])) > 1)
+    
+    def _validate_pre_disclosure(self, context):
+        disclosure = context.get('pre_disclosure_statement', '').lower()
+        required = ['speaking with', 'different agents', 'before you say anything']
+        return all(element in disclosure for element in required)
