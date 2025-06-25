@@ -1,0 +1,9 @@
+{
+  "name": "dr-claude-squadron-04",
+  "version": "1.0.0",
+  "description": "Anthropic Claude Squadron 04 for MongoDB HRAICRMS",
+  "main": "index.js",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3"
+  }
+}
