@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASOOS.2100.Cool - Aixtiv Symphony Orchestrating Operating System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Loading Animation */
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(11, 177, 187, 0.3);
+      border-top-color: #0bb1bb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      position: relative;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 50px;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      gap: 8px;
+    }
+
+    .sidebar-icon {
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-icon:hover {
+      transform: scale(1.15);
+    }
+
+    .sidebar-icon.active {
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(11, 177, 187, 0.8), 0 0 20px rgba(11, 177, 187, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(11, 177, 187, 1), 0 0 40px rgba(11, 177, 187, 0.6); }
+    }
+
+    .icon-tooltip {
+      position: absolute;
+      left: 55px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 8px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(11, 177, 187, 0.5);
+      font-size: 12px;
+      z-index: 1000;
+    }
+
+    .sidebar-icon:hover .icon-tooltip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(5px);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      margin-left: 50px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      height: 70px;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FFD700, #c7b299, #50C878, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(11, 177, 187, 0.3);
+    }
+
+    .header-btn.upgrade {
+      padding: 10px;
+      min-width: 40px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(255, 215, 0, 0.1));
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .user-tagline {
+      font-size: 11px;
+      color: #0bb1bb;
+      margin-top: 2px;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+      height: calc(100vh - 130px);
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-cli-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      overflow: hidden;
+    }
+
+    .toggle-option {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .toggle-option.active {
+      background: #0bb1bb;
+      color: black;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 50px;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 15px 20px;
+      border-radius: 20px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #0bb1bb, #0891a0);
+      color: white;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .message.system {
+      align-self: center;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      text-align: center;
+      font-size: 12px;
+      max-width: 80%;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 25px;
+      border: 2px solid transparent;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        linear-gradient(135deg, #FFD700, #c7b299, #50C878, #0bb1bb);
+      background-origin: border-box;
+      background-clip: content-box, border-box;
+    }
+
+    .input-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 16px;
+      padding: 5px 10px;
+    }
+
+    .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .input-btn:hover {
+      background: rgba(11, 177, 187, 0.2);
+      border-color: #0bb1bb;
+      transform: scale(1.05);
+    }
+
+    .input-btn.active {
+      background: #0bb1bb;
+      border-color: #0bb1bb;
+    }
+
+    /* Right Panel */
+    .right-panel {
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      height: 100%;
+      padding-right: 10px;
+    }
+
+    .panel-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+
+    .panel-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(11, 177, 187, 0.2);
+      border-color: rgba(11, 177, 187, 0.3);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-content {
+      display: none;
+    }
+
+    .panel-content.active {
+      display: block;
+    }
+
+    /* S2DO Bar */
+    .s2do-bar {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, rgba(11, 177, 187, 0.1), rgba(80, 200, 120, 0.1));
+      border: 1px solid rgba(11, 177, 187, 0.3);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .s2do-bar:hover {
+      background: linear-gradient(135deg, rgba(11, 177, 187, 0.2), rgba(80, 200, 120, 0.2));
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(11, 177, 187, 0.3);
+    }
+
+    .s2do-bar.pending {
+      border-color: #FFD700;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Dynamic Content */
+    .dynamic-content {
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dream-command-item {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(255, 215, 0, 0.1));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dream-command-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .priority-badge.high {
+      background: #ff4757;
+      color: white;
+    }
+
+    .priority-badge.medium {
+      background: #ffa502;
+      color: white;
+    }
+
+    .priority-badge.low {
+      background: #0bb1bb;
+      color: white;
+    }
+
+    /* Blockchain Status */
+    .blockchain-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(80, 200, 120, 0.5);
+      border-radius: 15px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      z-index: 100;
+    }
+
+    .blockchain-status.minting {
+      border-color: #FFD700;
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Bottom Bar */
+    .bottom-bar {
+      height: 60px;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      position: relative;
+      z-index: 90;
+    }
+
+    .integration-icons {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .integration-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 18px;
+      position: relative;
+    }
+
+    .integration-icon:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #0bb1bb;
+    }
+
+    .integration-icon.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: #00ff88;
+      border-radius: 50%;
+    }
+
+    .gateway-btn {
+      padding: 12px 30px;
+      background: #0bb1bb;
+      border: none;
+      border-radius: 25px;
+      color: black;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .gateway-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(11, 177, 187, 0.5);
+    }
+
+    /* Demo Scheduler */
+    .demo-scheduler {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(11, 177, 187, 0.05));
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .time-slot {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 12px;
+    }
+
+    .time-slot:hover:not(.booked) {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.5);
+    }
+
+    .time-slot.selected {
+      background: linear-gradient(135deg, #FFD700, #ff6b35);
+      border-color: #FFD700;
+      color: black;
+      font-weight: 600;
+    }
+
+    .time-slot.booked {
+      background: rgba(255, 255, 255, 0.02);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 15px 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .action-btn:hover {
+      background: rgba(11, 177, 187, 0.1);
+      border-color: rgba(11, 177, 187, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .action-icon {
+      font-size: 24px;
+    }
+
+    .action-label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Topic Item */
+    .topic-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .topic-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(11, 177, 187, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 45px;
+      }
+
+      .main-content {
+        margin-left: 45px;
+      }
+
+      .content-area {
+        flex-direction: column;
+      }
+
+      .chat-area {
+        height: 50vh;
+      }
+
+      .right-panel {
+        width: 100%;
+      }
+
+      .header-center {
+        display: none;
+      }
+
+      .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-icon active" onclick="selectSquadron(this, '01', 'Communication')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9 11l2 2 4-4" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 01</strong><br>
+          <small>Communication</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="selectSquadron(this, '02', 'Automation')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#96CEB4" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 02</strong><br>
+          <small>Automation</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="selectSquadron(this, '03', 'Services')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#45B7D1" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 12h8M12 8v8" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 03</strong><br>
+          <small>Client Services</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="selectSquadron(this, '04', 'Innovation')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#DDA0DD" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M7 12h10M7 8h10M7 16h10" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 04</strong><br>
+          <small>Innovation Lab</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="selectSquadron(this, '05', 'Growth')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4ECDC4" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 05</strong><br>
+          <small>Growth Revenue</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="selectSquadron(this, '06', 'AI Orchestration')" style="border: 2px solid #8b5cf6;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="3" stroke="white" fill="none" stroke-width="1.5"/>
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Squadron 06</strong><br>
+          <small>Dr Cypriot's AI</small>
+        </div>
+      </div>
+      
+      <div class="sidebar-icon" onclick="toggleAcademy(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF9FF3" stroke-width="2">
+          <path d="M12 2L22 20H2L12 2z" />
+        </svg>
+        <div class="icon-tooltip">
+          <strong>Academy</strong><br>
+          <small>Learning & Training</small>
+        </div>
+      </div>
+      
+      <!-- Diamond SAO Star -->
+      <div style="position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center;">
+        <div class="sidebar-icon" onclick="switchToDiamondSAO()" style="border: 2px solid #FFD700; background: rgba(255, 215, 0, 0.1);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#diamondGradient)" stroke-width="2">
+            <defs>
+              <linearGradient id="diamondGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFD700" />
+                <stop offset="33%" stop-color="#FF6B6B" />
+                <stop offset="66%" stop-color="#50C878" />
+                <stop offset="100%" stop-color="#0bb1bb" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="url(#diamondGradient)" opacity="0.3"/>
+            <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" />
+          </svg>
+          <div class="icon-tooltip">
+            <strong>Diamond SAO</strong><br>
+            <small>Supreme Access</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">ASOOS.2100.Cool</div>
+        <div class="header-center">
+          <button class="header-btn upgrade" onclick="openUpgrade('gift')" title="Upgrade Gift Shop">
+            <i class="fas fa-arrow-up"></i>
+          </button>
+          <button class="header-btn" onclick="openGiftShop()">
+            <i class="fas fa-gift"></i>
+            <span>Gift Shop</span>
+          </button>
+          <button class="header-btn upgrade" onclick="openUpgrade('lounge')" title="Upgrade Pilots Lounge">
+            <i class="fas fa-rocket"></i>
+          </button>
+          <button class="header-btn" onclick="openPilotsLounge()">
+            <i class="fas fa-plane"></i>
+            <span>Pilots Lounge</span>
+          </button>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-tagline" id="userRole">Fetching role data...</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Chat Area -->
+        <div class="chat-area">
+          <div class="chat-cli-toggle">
+            <button class="toggle-option active" onclick="toggleChatCLI('chat', this)">My Copilots Chat</button>
+            <button class="toggle-option" onclick="toggleChatCLI('cli', this)">My CLI</button>
+          </div>
+          
+          <div class="messages" id="messages">
+            <div class="message system">
+              <div>🔄 Initializing ASOOS Dynamic System...</div>
+            </div>
+          </div>
+          
+          <div class="input-area">
+            <button class="input-btn" onclick="toggleVoice(this)" title="Google Voice Input">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <input type="text" class="input-field" placeholder="Ask me anything..." id="chatInput" onkeypress="handleKeyPress(event)">
+            <button class="input-btn" onclick="toggleAudio(this)" title="Google TTS Output">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <button class="input-btn" onclick="toggleVideo(this)" title="Daily.co Video Call">
+              <i class="fas fa-video"></i>
+            </button>
+            <button class="input-btn" onclick="sendMessage()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <!-- AI Copilots Card -->
+          <div class="panel-card" style="background: linear-gradient(135deg, rgba(11, 177, 187, 0.05), rgba(255, 215, 0, 0.05));">
+            <div style="text-align: center; font-size: 14px; font-weight: 600; color: #0bb1bb; margin-bottom: 15px;">
+              YOUR AI COPILOTS - SQUADRON 06
+            </div>
+            <div style="display: flex; justify-content: space-around; align-items: center; padding: 20px;">
+              <div style="text-align: center; cursor: pointer;" onclick="activateRIX('QB', 'Dr. Lucy AI')">
+                <svg viewBox="0 0 60 60" style="width: 80px; height: 80px;">
+                  <defs>
+                    <linearGradient id="qbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#FFD700" />
+                      <stop offset="33%" style="stop-color:#c7b299" />
+                      <stop offset="66%" style="stop-color:#50C878" />
+                      <stop offset="100%" style="stop-color:#0bb1bb" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qbGradient)" stroke="#FFD700" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="28" text-anchor="middle" fill="white" font-size="16" font-weight="800">QB</text>
+                  <text x="30" y="42" text-anchor="middle" fill="white" font-size="12" font-weight="600">RIX</text>
+                </svg>
+              </div>
+              
+              <div style="text-align: center; cursor: pointer;" onclick="activateRIX('SH', 'Claude 4 Assistant')">
+                <svg viewBox="0 0 60 60" style="width: 80px; height: 80px;">
+                  <defs>
+                    <linearGradient id="shGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#4ECDC4" />
+                      <stop offset="33%" style="stop-color:#0bb1bb" />
+                      <stop offset="66%" style="stop-color:#50C878" />
+                      <stop offset="100%" style="stop-color:#FFD700" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#shGradient)" stroke="#4ECDC4" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="28" text-anchor="middle" fill="white" font-size="16" font-weight="800">SH</text>
+                  <text x="30" y="42" text-anchor="middle" fill="white" font-size="12" font-weight="600">RIX</text>
+                </svg>
+              </div>
+              
+              <div style="text-align: center; cursor: pointer;" onclick="activateRIX('Q', 'QRIX Intelligence')">
+                <svg viewBox="0 0 60 60" style="width: 80px; height: 80px;">
+                  <defs>
+                    <linearGradient id="qGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#50C878" />
+                      <stop offset="33%" style="stop-color:#FFD700" />
+                      <stop offset="66%" style="stop-color:#0bb1bb" />
+                      <stop offset="100%" style="stop-color:#c7b299" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qGradient)" stroke="#50C878" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="28" text-anchor="middle" fill="white" font-size="16" font-weight="800">Q</text>
+                  <text x="30" y="42" text-anchor="middle" fill="white" font-size="12" font-weight="600">RIX</text>
+                </svg>
+              </div>
+            </div>
+            <div style="text-align: center; font-size: 12px; color: #888; padding: 10px;">
+              <div style="padding: 5px; background: rgba(11, 177, 187, 0.1); border-radius: 15px; border: 1px solid rgba(11, 177, 187, 0.2);">
+                <span id="activeRixDisplay" style="color: #0bb1bb; font-weight: 600;">QB RIX Active</span> • Dr Cypriot Orchestration
+              </div>
+            </div>
+            
+            <!-- S2DO Bar -->
+            <div class="s2do-bar" id="s2doBar" onclick="initiateScanToApprove()">
+              <i class="fas fa-qrcode" style="font-size: 16px;"></i>
+              <span style="font-size: 14px; font-weight: 600; color: #0bb1bb;">Scan to Approve</span>
+              <i class="fas fa-check-circle" style="font-size: 16px; color: #50C878;"></i>
+              <span id="pendingCount" style="background: #FFD700; color: black; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 10px;">0</span>
+            </div>
+          </div>
+
+          <!-- Dream Commander Panel -->
+          <div class="panel-card">
+            <div class="panel-header" onclick="togglePanel(this)">
+              <div class="panel-title">
+                <i class="fas fa-magic" style="color: #8b5cf6;"></i>
+                Dream Commander Queue
+                <span id="dreamCommanderLoading" class="loading-spinner" style="display: none; margin-left: 10px;"></span>
+              </div>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content active" id="dreamCommanderContent">
+              <div class="dynamic-content">
+                <span style="color: #888; font-size: 12px;">Loading Dream Commands...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8-Hour Demo Scheduler -->
+          <div class="panel-card demo-scheduler">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i class="fas fa-calendar-check" style="color: #FFD700;"></i>
+                8-Hour Demo Scheduling
+              </div>
+            </div>
+            <div class="time-slots" id="timeSlots">
+              <!-- Will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="panel-card">
+            <div class="panel-header" onclick="togglePanel(this)">
+              <div class="panel-title">
+                <i class="fas fa-rocket" style="color: #fbbf24;"></i>
+                Quick Actions
+              </div>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content active">
+              <div class="quick-actions">
+                <div class="action-btn" onclick="startDailyCall()">
+                  <span class="action-icon">📹</span>
+                  <span class="action-label">Daily.co</span>
+                </div>
+                <div class="action-btn" onclick="activateIntegration('slack')">
+                  <span class="action-icon">💬</span>
+                  <span class="action-label">Slack</span>
+                </div>
+                <div class="action-btn" onclick="activateIntegration('zapier')">
+                  <span class="action-icon">⚡</span>
+                  <span class="action-label">Zapier</span>
+                </div>
+                <div class="action-btn" onclick="activateIntegration('gpt4')">
+                  <span class="action-icon">🤖</span>
+                  <span class="action-label">GPT-4</span>
+                </div>
+                <div class="action-btn" onclick="activateIntegration('claude')">
+                  <span class="action-icon">🧠</span>
+                  <span class="action-label">Claude</span>
+                </div>
+                <div class="action-btn" onclick="activateBlockchain()">
+                  <span class="action-icon">🔗</span>
+                  <span class="action-label">Blockchain</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Hot Topics -->
+          <div class="panel-card">
+            <div class="panel-header" onclick="togglePanel(this)">
+              <div class="panel-title">
+                <i class="fas fa-fire" style="color: #ff6b35;"></i>
+                Hot Topics for Your Role
+                <span id="topicsLoading" class="loading-spinner" style="display: none; margin-left: 10px;"></span>
+              </div>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content active" id="hotTopicsContent">
+              <div class="dynamic-content">
+                <span style="color: #888; font-size: 12px;">Loading role-specific topics...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DI:DC Active Collaborations -->
+          <div class="panel-card">
+            <div class="panel-header" onclick="togglePanel(this)">
+              <div class="panel-title">
+                <i class="fas fa-bolt" style="color: #0bb1bb;"></i>
+                DI:DC - Active Collaborations
+                <span id="didcLoading" class="loading-spinner" style="display: none; margin-left: 10px;"></span>
+              </div>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content active" id="didcContent">
+              <div class="dynamic-content">
+                <span style="color: #888; font-size: 12px;">Loading collaborations...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        <div class="integration-icons">
+          <div class="integration-icon" id="zapier-icon" onclick="activateIntegration('zapier')" title="Zapier">
+            <i class="fas fa-bolt" style="color: #ff6b35;"></i>
+          </div>
+          <div class="integration-icon" id="slack-icon" onclick="activateIntegration('slack')" title="Slack">
+            <i class="fab fa-slack" style="color: #4a154b;"></i>
+          </div>
+          <div class="integration-icon" id="gpt4-icon" onclick="activateIntegration('gpt4')" title="GPT-4">
+            <i class="fas fa-brain" style="color: #10a37f;"></i>
+          </div>
+          <div class="integration-icon" id="claude-icon" onclick="activateIntegration('claude')" title="Claude">
+            <i class="fas fa-robot" style="color: #d97757;"></i>
+          </div>
+          <div class="integration-icon" id="blockchain-icon" onclick="activateBlockchain()" title="Blockchain">
+            <i class="fas fa-cube" style="color: #0bb1bb;"></i>
+          </div>
+        </div>
+        
+        <button class="gateway-btn" onclick="connectToBackend()">
+          <i class="fas fa-plug"></i>
+          Integration Gateway
+        </button>
+      </div>
+    </div>
+
+    <!-- Blockchain Status -->
+    <div class="blockchain-status" id="blockchainStatus" style="display: none;">
+      <i class="fas fa-cube"></i>
+      <span id="blockchainText">Blockchain Connected</span>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration (Replace with your config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Global State
+    let currentActiveRIX = 'QB';
+    let activeIntegrations = new Set();
+    let currentSquadron = '01';
+    let userRole = null;
+    let userSector = null;
+    let pendingApprovals = 0;
+    let dreamCommands = [];
+    let activeCollaborations = [];
+
+    // Firestore Listeners
+    let dreamCommandListener = null;
+    let collaborationListener = null;
+    let roleListener = null;
+
+    // Initialize System
+    async function initializeSystem() {
+      try {
+        // Get user data (in production, this would come from auth)
+        const userId = 'demo-user'; // Replace with actual user ID
+        
+        // Setup real-time listeners
+        setupUserRoleListener(userId);
+        setupDreamCommandListener();
+        setupCollaborationListener();
+        setupTopicsListener();
+        
+        // Start chron timers
+        startChronTimers();
+        
+        // Initialize demo scheduler
+        initializeDemoScheduler();
+        
+        addMessage('system', '✅ ASOOS Dynamic System initialized. Connected to Firestore.');
+        
+      } catch (error) {
+        console.error('Initialization error:', error);
+        addMessage('system', '⚠️ System initialization error. Some features may be limited.');
+      }
+    }
+
+    // Setup Firestore Listeners
+    function setupUserRoleListener(userId) {
+      roleListener = db.collection('users').doc(userId)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            const userData = doc.data();
+            userRole = userData.role;
+            userSector = userData.sector;
+            
+            document.getElementById('userName').textContent = userData.name || 'User';
+            document.getElementById('userRole').textContent = `${userData.role} - Sector ${userData.sector}`;
+            
+            // Update copilot recommendations based on role
+            updateCopilotRecommendations();
+          }
+        });
+    }
+
+    function setupDreamCommandListener() {
+      dreamCommandListener = db.collection('dreamCommands')
+        .where('status', '==', 'pending')
+        .orderBy('priority', 'desc')
+        .orderBy('timestamp', 'desc')
+        .limit(10)
+        .onSnapshot((snapshot) => {
+          dreamCommands = [];
+          const container = document.getElementById('dreamCommanderContent');
+          container.innerHTML = '';
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="dynamic-content"><span style="color: #888; font-size: 12px;">No pending Dream Commands</span></div>';
+            return;
+          }
+          
+          snapshot.forEach((doc) => {
+            const command = { id: doc.id, ...doc.data() };
+            dreamCommands.push(command);
+            
+            const commandElement = createDreamCommandElement(command);
+            container.appendChild(commandElement);
+          });
+          
+          updatePendingCount();
+        });
+    }
+
+    function setupCollaborationListener() {
+      collaborationListener = db.collection('collaborations')
+        .where('status', 'in', ['active', 'pending'])
+        .orderBy('lastUpdated', 'desc')
+        .limit(5)
+        .onSnapshot((snapshot) => {
+          activeCollaborations = [];
+          const container = document.getElementById('didcContent');
+          container.innerHTML = '';
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="dynamic-content"><span style="color: #888; font-size: 12px;">No active collaborations</span></div>';
+            return;
+          }
+          
+          snapshot.forEach((doc) => {
+            const collab = { id: doc.id, ...doc.data() };
+            activeCollaborations.push(collab);
+            
+            const collabElement = createCollaborationElement(collab);
+            container.appendChild(collabElement);
+          });
+        });
+    }
+
+    function setupTopicsListener() {
+      // Update topics based on user role and sector
+      updateHotTopics();
+    }
+
+    // Create UI Elements
+    function createDreamCommandElement(command) {
+      const div = document.createElement('div');
+      div.className = 'dream-command-item';
+      div.onclick = () => selectDreamCommand(command);
+      
+      const priorityClass = command.priority >= 8 ? 'high' : command.priority >= 5 ? 'medium' : 'low';
+      
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-weight: 600;">${command.title}</span>
+          <span class="priority-badge ${priorityClass}">P${command.priority}</span>
+        </div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">${command.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; color: #8b5cf6;">Recommended: ${command.recommendedCopilot || 'Auto'}</span>
+          <button onclick="event.stopPropagation(); approveDreamCommand('${command.id}')" style="background: #0bb1bb; border: none; padding: 4px 12px; border-radius: 12px; color: white; font-size: 11px; cursor: pointer;">
+            S2DO Approve
+          </button>
+        </div>
+      `;
+      
+      return div;
+    }
+
+    function createCollaborationElement(collab) {
+      const div = document.createElement('div');
+      div.className = 'topic-item';
+      div.onclick = () => selectCollaboration(collab);
+      
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; color: #0bb1bb; font-weight: 600;">DIDC-${collab.id.slice(-6)}</span>
+          <span style="font-size: 10px; padding: 3px 8px; border-radius: 12px; background: ${collab.status === 'active' ? 'linear-gradient(135deg, #0bb1bb, #50C878)' : '#ffa502'}; color: white;">
+            ${collab.status}
+          </span>
+        </div>
+        <div style="font-size: 15px; font-weight: 600; margin-bottom: 5px;">${collab.title}</div>
+        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">
+          Teams: ${collab.teams.join(', ')}
+        </div>
+        <div style="font-size: 12px; color: #0bb1bb; font-weight: 500;">
+          <i class="fas fa-coins"></i> AIRewards: ${collab.rewards} pts
+        </div>
+      `;
+      
+      return div;
+    }
+
+    // Update Functions
+    function updatePendingCount() {
+      pendingApprovals = dreamCommands.filter(cmd => cmd.status === 'pending').length;
+      document.getElementById('pendingCount').textContent = pendingApprovals;
+      
+      if (pendingApprovals > 0) {
+        document.getElementById('s2doBar').classList.add('pending');
+      } else {
+        document.getElementById('s2doBar').classList.remove('pending');
+      }
+    }
+
+    function updateCopilotRecommendations() {
+      // Update copilot recommendations based on user role
+      if (userRole && userRole.includes('Executive')) {
+        addMessage('system', `🎯 Based on your ${userRole} role, QB RIX is recommended for strategic decisions.`);
+      }
+    }
+
+    async function updateHotTopics() {
+      const container = document.getElementById('hotTopicsContent');
+      container.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+        // Query topics based on user sector
+        const topicsSnapshot = await db.collection('topics')
+          .where('sectors', 'array-contains', userSector || 'general')
+          .orderBy('relevanceScore', 'desc')
+          .limit(5)
+          .get();
+        
+        container.innerHTML = '';
+        
+        if (topicsSnapshot.empty) {
+          container.innerHTML = '<div class="dynamic-content"><span style="color: #888; font-size: 12px;">No topics available</span></div>';
+          return;
+        }
+        
+        topicsSnapshot.forEach((doc) => {
+          const topic = doc.data();
+          const topicElement = createTopicElement(topic);
+          container.appendChild(topicElement);
+        });
+        
+      } catch (error) {
+        console.error('Error loading topics:', error);
+        container.innerHTML = '<div class="dynamic-content"><span style="color: #ff4757; font-size: 12px;">Error loading topics</span></div>';
+      }
+    }
+
+    function createTopicElement(topic) {
+      const div = document.createElement('div');
+      div.className = 'topic-item';
+      
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: linear-gradient(135deg, #ff6b35, #f7931e); color: white;">
+            ${topic.category}
+          </span>
+          <span style="font-size: 11px; color: #888;">${formatTimeAgo(topic.timestamp)}</span>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #fff;">${topic.title}</div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px; line-height: 1.4;">${topic.preview}</div>
+      `;
+      
+      return div;
+    }
+
+    // Chron Timers
+    function startChronTimers() {
+      // Update Dream Commands every 30 seconds
+      setInterval(() => {
+        document.getElementById('dreamCommanderLoading').style.display = 'inline-block';
+        setTimeout(() => {
+          document.getElementById('dreamCommanderLoading').style.display = 'none';
+        }, 1000);
+      }, 30000);
+      
+      // Update Hot Topics every 5 minutes
+      setInterval(() => {
+        updateHotTopics();
+      }, 300000);
+      
+      // Check for new S2DO approvals every minute
+      setInterval(() => {
+        checkPendingApprovals();
+      }, 60000);
+    }
+
+    // Demo Scheduler
+    function initializeDemoScheduler() {
+      const slotsContainer = document.getElementById('timeSlots');
+      const slots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'];
+      
+      // Simulate some booked slots
+      const bookedSlots = ['12:00 PM', '2:00 PM'];
+      
+      slotsContainer.innerHTML = '';
+      slots.forEach(time => {
+        const slot = document.createElement('div');
+        slot.className = 'time-slot';
+        if (bookedSlots.includes(time)) {
+          slot.classList.add('booked');
+        } else {
+          slot.onclick = () => selectTimeSlot(slot, time);
+        }
+        slot.textContent = time;
+        slotsContainer.appendChild(slot);
+      });
+    }
+
+    // Action Functions
+    function selectSquadron(element, squadronId, squadronName) {
+      document.querySelectorAll('.sidebar-icon').forEach(icon => {
+        icon.classList.remove('active');
+      });
+      element.classList.add('active');
+      currentSquadron = squadronId;
+      
+      addMessage('system', `🚀 Squadron ${squadronId} - ${squadronName} activated. Loading relevant data...`);
+      
+      // Update content based on squadron
+      if (squadronId === '06') {
+        addMessage('ai', "Dr Cypriot's AI Orchestration Squadron activated. I'm ready to coordinate with Dream Commander and optimize your workflow.");
+      }
+    }
+
+    function activateRIX(type, name) {
+      currentActiveRIX = type;
+      document.getElementById('activeRixDisplay').textContent = `${type} RIX Active`;
+      
+      let message = '';
+      if (type === 'QB') {
+        message = `QB RIX (${name}) activated! I'll help orchestrate your Dream Commands with strategic precision.`;
+      } else if (type === 'SH') {
+        message = `SH RIX (${name}) activated! Claude's advanced reasoning is now coordinating with Dr Cypriot's systems.`;
+      } else if (type === 'Q') {
+        message = `Q RIX (${name}) activated! Quantum intelligence engaged for complex orchestrations.`;
+      }
+      
+      addMessage('ai', message);
+    }
+
+    function selectDreamCommand(command) {
+      addMessage('system', `📋 Opening Dream Command: ${command.title}`);
+      
+      // Auto-assign to appropriate copilot
+      const copilot = command.recommendedCopilot || currentActiveRIX;
+      addMessage('ai', `I'll handle this Dream Command. Creating S2DO workflow for approval...`);
+      
+      // Update S2DO bar
+      document.getElementById('s2doBar').classList.add('pending');
+    }
+
+    async function approveDreamCommand(commandId) {
+      try {
+        // Update command status in Firestore
+        await db.collection('dreamCommands').doc(commandId).update({
+          status: 'approved',
+          approvedBy: currentActiveRIX,
+          approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Trigger blockchain minting
+        initiateBlockchainMint(commandId);
+        
+        addMessage('system', '✅ Dream Command approved via S2DO. Initiating blockchain record...');
+      } catch (error) {
+        console.error('Approval error:', error);
+        addMessage('system', '❌ Error approving command. Please try again.');
+      }
+    }
+
+    function initiateBlockchainMint(commandId) {
+      const blockchainStatus = document.getElementById('blockchainStatus');
+      const blockchainText = document.getElementById('blockchainText');
+      
+      blockchainStatus.style.display = 'flex';
+      blockchainStatus.classList.add('minting');
+      blockchainText.textContent = 'Minting Smart Contract...';
+      
+      setTimeout(() => {
+        blockchainText.textContent = `✅ Minted: Contract #${commandId.slice(-8)}`;
+        blockchainStatus.classList.remove('minting');
+        
+        setTimeout(() => {
+          blockchainStatus.style.display = 'none';
+        }, 5000);
+      }, 3000);
+    }
+
+    function initiateScanToApprove() {
+      if (pendingApprovals > 0) {
+        addMessage('system', `🔍 S2DO Scanner activated. ${pendingApprovals} items pending approval.`);
+        
+        // Show first pending command
+        const firstPending = dreamCommands.find(cmd => cmd.status === 'pending');
+        if (firstPending) {
+          selectDreamCommand(firstPending);
+        }
+      } else {
+        addMessage('system', '✅ No pending approvals. All workflows are up to date.');
+      }
+    }
+
+    function selectTimeSlot(element, time) {
+      if (element.classList.contains('booked')) return;
+      
+      document.querySelectorAll('.time-slot').forEach(slot => {
+        if (!slot.classList.contains('booked')) {
+          slot.classList.remove('selected');
+        }
+      });
+      
+      element.classList.add('selected');
+      addMessage('system', `📅 Demo scheduled for ${time}. Daily.co meeting link will be sent.`);
+    }
+
+    function activateIntegration(integration) {
+      const icon = document.getElementById(`${integration}-icon`);
+      
+      if (activeIntegrations.has(integration)) {
+        activeIntegrations.delete(integration);
+        icon.classList.remove('active');
+        addMessage('system', `${integration.toUpperCase()} integration deactivated.`);
+      } else {
+        activeIntegrations.add(integration);
+        icon.classList.add('active');
+        addMessage('system', `${integration.toUpperCase()} integration activated!`);
+      }
+    }
+
+    function activateBlockchain() {
+      activateIntegration('blockchain');
+      
+      if (activeIntegrations.has('blockchain')) {
+        document.getElementById('blockchainStatus').style.display = 'flex';
+        document.getElementById('blockchainText').textContent = 'Blockchain Connected';
+      } else {
+        document.getElementById('blockchainStatus').style.display = 'none';
+      }
+    }
+
+    function toggle

@@ -99,12 +99,55 @@
     },
     {
       "patent_id": "SAO-20",
-      "title": "SAO-20 \u2013 Quantum Evolutionary Knowledge Function (EKF)",
+      "title": "SAO-20 – Quantum Evolutionary Knowledge Function (EKF)",
       "claim_areas": "System-wide learning algorithm and wisdom-recalibration feedback",
       "lead_agent": "Dr. Memoria",
       "roi_type": "Evolution ROI",
       "filing_fee": 75,
       "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-21",
+      "title": "SAO-21 – ASOOS.2100.Cool Deployment Orchestration System",
+      "claim_areas": "Automated CI/CD deployment for multi-domain hosting; Firebase integration; content synchronization and validation protocols",
+      "lead_agent": "Dr. Claude",
+      "roi_type": "Deployment ROI",
+      "filing_fee": 75,
+      "priority": "HIGH",
+      "deployment_config": {
+        "domain": "asoos.2100.cool",
+        "firebase_site": "asoos-2100-cool",
+        "target_name": "2100-cool-c624d",
+        "project_id": "api-for-warp-drive",
+        "region": "us-west1",
+        "ci_script": "ci-deploy-asoos.sh",
+        "source_path": "/Users/as/asoos/integration-gateway/public/index.html",
+        "target_path": "/Users/as/asoos/integration-gateway/public/asoos-2100-cool/"
+      }
     }
-  ]
+  ],
+  "diamond_sao_deployment_commands": {
+    "asoos_2100_cool": {
+      "full_deploy": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh",
+      "sync_only": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh sync",
+      "test_only": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh test",
+      "rollback": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh rollback",
+      "backup": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh backup"
+    },
+    "multi_site_2100_cool": {
+      "list_sites": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh list",
+      "deploy_all": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy-all",
+      "status_check": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh status",
+      "deploy_coaching": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy coaching",
+      "deploy_academy": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy academy",
+      "deploy_vision_lake": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy vision-lake",
+      "deploy_bacasu": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy bacasu",
+      "deploy_finance": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy finance",
+      "deploy_research": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy research",
+      "deploy_rewards": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy rewards",
+      "deploy_healthcare": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy healthcare",
+      "deploy_civic": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy civic",
+      "generate_config": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh generate-config"
+    }
+  }
 }
