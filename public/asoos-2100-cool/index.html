@@ -1609,9 +1609,9 @@
       
       // Redirect to MOCOA-hosted v99 interface after brief delay
       setTimeout(() => {
-        // In production, this would redirect to the MOCOA-hosted endpoint
-        // For now, redirect to the current domain's authenticated interface
-        window.location.href = '/index.html';
+        // Redirect to MOCOA-hosted endpoint (us-west1-a/b)
+        // This should be the actual MOCOA URL where the v99 interface is hosted
+        window.location.href = 'https://asoos.2100.cool/oi-mcp-mocoa';
       }, 2000);
     }
     
