@@ -1,11 +1,11 @@
-from code_runner import CodeRunner
+from secure_code_runner import SecureCodeRunner
 import yaml
 import logging
 from agent_tracking import log_agent_action, agent_action, get_agent_id
 
 class WorkflowRunner:
     def __init__(self, agent_id=None):
-        self.runner = CodeRunner()
+        self.runner = SecureCodeRunner()
         self.logger = logging.getLogger('workflow')
         self.agent_id = agent_id
         

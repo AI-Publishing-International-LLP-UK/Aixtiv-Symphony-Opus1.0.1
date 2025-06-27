@@ -16,10 +16,10 @@
       "subject": "aixtiv.com",
       "validTo": "Mar  3 08:02:06 2026 GMT",
       "validFrom": "Mar  3 08:02:06 2025 GMT",
-      "expiresIn": 259,
-      "message": "Certificate valid for 259 days"
+      "expiresIn": 249,
+      "message": "Certificate valid for 249 days"
     },
-    "timestamp": "2025-06-17T02:42:14.257Z"
+    "timestamp": "2025-06-27T05:07:43.719Z"
   },
   {
     "domain": "coaching2100.com",
@@ -35,12 +35,12 @@
       "valid": true,
       "issuer": "Google Trust Services",
       "subject": "coaching2100.com",
-      "validTo": "Aug 17 17:11:27 2025 GMT",
-      "validFrom": "May 19 16:12:09 2025 GMT",
-      "expiresIn": 61,
-      "message": "Certificate valid for 61 days"
+      "validTo": "Sep 19 01:29:08 2025 GMT",
+      "validFrom": "Jun 21 00:29:48 2025 GMT",
+      "expiresIn": 83,
+      "message": "Certificate valid for 83 days"
     },
-    "timestamp": "2025-06-17T02:42:13.990Z"
+    "timestamp": "2025-06-27T05:07:43.442Z"
   },
   {
     "domain": "2100.cool",
@@ -54,45 +54,47 @@
       "error": "Command failed: firebase hosting:sites:get 2100-cool --project api-for-warp-drive --json\n"
     },
     "ssl": {
-      "valid": false,
-      "message": "Connection timeout",
-      "expiresIn": 0,
-      "error": "timeout"
+      "valid": true,
+      "issuer": "Google Trust Services",
+      "subject": "coaching2100.com",
+      "validTo": "Sep 19 01:29:08 2025 GMT",
+      "validFrom": "Jun 21 00:29:48 2025 GMT",
+      "expiresIn": 83,
+      "message": "Certificate valid for 83 days"
     },
-    "timestamp": "2025-06-17T02:42:24.008Z"
+    "timestamp": "2025-06-27T05:07:43.809Z"
   },
   {
     "domain": "asoos.2100.cool",
-    "siteId": "asoos-2100-cool",
+    "siteId": "2100-cool-c624d",
     "firebase": {
       "domain": "asoos.2100.cool",
-      "siteId": "asoos-2100-cool",
-      "status": "error",
-      "message": "Error checking Firebase domain status: Command failed: firebase hosting:sites:get asoos-2100-cool --project api-for-warp-drive --json\n",
-      "verified": false,
-      "error": "Command failed: firebase hosting:sites:get asoos-2100-cool --project api-for-warp-drive --json\n"
+      "siteId": "2100-cool-c624d",
+      "status": "not_connected",
+      "message": "Domain not connected to Firebase site",
+      "verified": false
     },
     "ssl": {
       "valid": true,
       "issuer": "Google Trust Services",
       "subject": "coaching2100.com",
-      "validTo": "Aug 17 17:11:27 2025 GMT",
-      "validFrom": "May 19 16:12:09 2025 GMT",
-      "expiresIn": 61,
-      "message": "Certificate valid for 61 days"
+      "validTo": "Sep 19 01:29:08 2025 GMT",
+      "validFrom": "Jun 21 00:29:48 2025 GMT",
+      "expiresIn": 83,
+      "message": "Certificate valid for 83 days"
     },
-    "timestamp": "2025-06-17T02:42:14.216Z"
+    "timestamp": "2025-06-27T05:07:43.522Z"
   },
   {
     "domain": "café.example.com",
-    "siteId": "café-example-com",
+    "siteId": "xn--caf-dma-example-com",
     "firebase": {
       "domain": "café.example.com",
-      "siteId": "café-example-com",
+      "siteId": "xn--caf-dma-example-com",
       "status": "error",
-      "message": "Error checking Firebase domain status: Command failed: firebase hosting:sites:get café-example-com --project api-for-warp-drive --json\n",
+      "message": "Error checking Firebase domain status: Command failed: firebase hosting:sites:get xn--caf-dma-example-com --project api-for-warp-drive --json\n",
       "verified": false,
-      "error": "Command failed: firebase hosting:sites:get café-example-com --project api-for-warp-drive --json\n"
+      "error": "Command failed: firebase hosting:sites:get xn--caf-dma-example-com --project api-for-warp-drive --json\n"
     },
     "ssl": {
       "valid": false,
@@ -100,25 +102,25 @@
       "expiresIn": 0,
       "error": "getaddrinfo ENOTFOUND café.example.com"
     },
-    "timestamp": "2025-06-17T02:42:13.825Z"
+    "timestamp": "2025-06-27T05:07:43.321Z"
   },
   {
     "domain": "prepárate.org",
-    "siteId": "prepárate-org",
+    "siteId": "xn--preprate-cza-org",
     "firebase": {
       "domain": "prepárate.org",
-      "siteId": "prepárate-org",
+      "siteId": "xn--preprate-cza-org",
       "status": "error",
-      "message": "Error checking Firebase domain status: Command failed: firebase hosting:sites:get prepárate-org --project api-for-warp-drive --json\n",
+      "message": "Error checking Firebase domain status: Command failed: firebase hosting:sites:get xn--preprate-cza-org --project api-for-warp-drive --json\n",
       "verified": false,
-      "error": "Command failed: firebase hosting:sites:get prepárate-org --project api-for-warp-drive --json\n"
+      "error": "Command failed: firebase hosting:sites:get xn--preprate-cza-org --project api-for-warp-drive --json\n"
     },
     "ssl": {
       "valid": false,
-      "message": "SSL error: write EPROTO 00DFC30202000000:error:0A000458:SSL routines:ssl3_read_bytes:tlsv1 unrecognized name:ssl/record/rec_layer_s3.c:911:SSL alert number 112\n",
+      "message": "SSL error: write EPROTO 009FF30302000000:error:0A000458:SSL routines:ssl3_read_bytes:tlsv1 unrecognized name:ssl/record/rec_layer_s3.c:911:SSL alert number 112\n",
       "expiresIn": 0,
-      "error": "write EPROTO 00DFC30202000000:error:0A000458:SSL routines:ssl3_read_bytes:tlsv1 unrecognized name:ssl/record/rec_layer_s3.c:911:SSL alert number 112\n"
+      "error": "write EPROTO 009FF30302000000:error:0A000458:SSL routines:ssl3_read_bytes:tlsv1 unrecognized name:ssl/record/rec_layer_s3.c:911:SSL alert number 112\n"
     },
-    "timestamp": "2025-06-17T02:42:27.652Z"
+    "timestamp": "2025-06-27T05:07:47.090Z"
   }
 ]
