@@ -13,3 +13,10 @@ spec:
   pathMatchers:
   - name: "main"
     defaultService: "projects/api-for-warp-drive/global/backendServices/lb-ip-2100-cool-backend"
+    pathRules:
+    - paths:
+      - "/owner-interface/*"
+      service: "projects/api-for-warp-drive/global/backendServices/mocoa-v99-backend"
+    - paths:
+      - "/*"
+      service: "projects/api-for-warp-drive/global/backendServices/lb-ip-2100-cool-backend"
