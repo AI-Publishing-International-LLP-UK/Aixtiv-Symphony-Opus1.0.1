@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "api-for-warp-drive"
-  }
+  },
+  "targets": {
+    "api-for-warp-drive": {
+      "hosting": {
+        "main-site": [
+          "2100-cool-c624d"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
