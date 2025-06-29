@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASOOS.2100.Cool - Aixtiv Symphony Orchestrating Operating System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* Remove any visible text/code lines */
+    body::before, body::after {
+      display: none !important;
+    }
+    
+    /* Hide any stray text nodes */
+    .hidden-text {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    
+    /* Animations */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+      33% {
+        transform: translateY(-10px) translateX(5px) rotate(5deg);
+      }
+      66% {
+        transform: translateY(5px) translateX(-5px) rotate(-5deg);
+      }
+    }
+    
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 5px rgba(11, 177, 187, 0.8), 0 0 20px rgba(11, 177, 187, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(11, 177, 187, 1), 0 0 40px rgba(11, 177, 187, 0.6);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+    
+    @keyframes typeWriter {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+    
+    @keyframes blink {
+      0%, 50% {
+        border-right-color: #0bb1bb;
+      }
+      51%, 100% {
+        border-right-color: transparent;
+      }
+    }
+    
+    @keyframes rotateGlow {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+    
+    @keyframes progressBar {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+    
+    /* Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(11, 177, 187, 0.6);
+      border-radius: 50%;
+      animation: float 8s infinite ease-in-out;
+    }
+    
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    nav.scrolled {
+      background: rgba(0, 0, 0, 0.95);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FFD700, #c7b299, #50C878, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      animation: breathe 3s infinite;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #0bb1bb, #50C878);
+      transition: width 0.3s;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .cta-button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      border: none;
+      border-radius: 25px;
+      color: black;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(11, 177, 187, 0.5);
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+      padding: 50px 20px 50px;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(11, 177, 187, 0.1) 0%, transparent 70%);
+      animation: rotateGlow 20s linear infinite;
+    }
+    
+    .hero-content {
+      text-align: center;
+      max-width: 1000px;
+      animation: fadeInUp 1s ease;
+      position: relative;
+    }
+    
+    .hero-title {
+      font-size: clamp(40px, 8vw, 80px);
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #FFD700, #c7b299, #50C878, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      line-height: 1.1;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .hero-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #0bb1bb, transparent);
+      animation: shimmer 3s infinite;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(18px, 3vw, 28px);
+      color: #aaa;
+      margin-bottom: 40px;
+      font-weight: 300;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid transparent;
+      width: 0;
+      display: inline-block;
+      animation: typeWriter 4s steps(45) 2s forwards, blink 1s infinite 2s;
+    }
+    
+    .hero-description {
+      font-size: 18px;
+      color: #ccc;
+      margin-bottom: 50px;
+      line-height: 1.6;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .hero-button {
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 30px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 600;
+    }
+    
+    .primary-button {
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      color: black;
+      border: none;
+    }
+    
+    .primary-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(11, 177, 187, 0.5);
+    }
+    
+    .secondary-button {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .secondary-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #0bb1bb;
+      transform: translateY(-3px);
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      padding: 80px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      position: relative;
+      z-index: 100;
+    }
+    
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+    
+    @media (max-width: 968px) {
+      .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s;
+      animation: fadeInUp 1s ease;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(11, 177, 187, 0.3);
+      border-color: rgba(11, 177, 187, 0.5);
+    }
+    
+    .stat-number {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      font-size: 18px;
+      color: #aaa;
+    }
+    
+    .stat-sublabel {
+      font-size: 14px;
+      color: #888;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    
+    .blockchain-card {
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .blockchain-card:hover {
+      border-color: rgba(255, 215, 0, 0.5) !important;
+      box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3) !important;
+    }
+    
+    .blockchain-card .stat-number {
+      background: linear-gradient(135deg, #FFD700, #c7b299);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Features Section */
+    .features-section {
+      padding: 80px 20px;
+      position: relative;
+      z-index: 90;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    
+    .section-title {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #FFD700, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .section-subtitle {
+      font-size: 20px;
+      color: #aaa;
+    }
+    
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(11, 177, 187, 0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.5s;
+      opacity: 0;
+    }
+    
+    .feature-card:hover::before {
+      animation: shimmer 0.5s ease;
+      opacity: 1;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(11, 177, 187, 0.3);
+      border-color: rgba(11, 177, 187, 0.5);
+    }
+    
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(11, 177, 187, 0.1);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      animation: pulse 3s infinite;
+    }
+    
+    .feature-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #0bb1bb;
+    }
+    
+    .feature-description {
+      font-size: 16px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+    
+    /* Team Section */
+    .team-section {
+      padding: 80px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      position: relative;
+      z-index: 90;
+    }
+    
+    .team-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    
+    .team-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s;
+      animation: fadeInUp 1s ease;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .team-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(11, 177, 187, 0.3);
+      border-color: rgba(11, 177, 187, 0.5);
+    }
+    
+    .team-card.founder {
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .team-card.founder:hover {
+      border-color: #FFD700;
+      box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+    }
+    
+    .team-avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .founder .team-avatar {
+      background: linear-gradient(135deg, #FFD700, #c7b299);
+      color: black;
+    }
+    
+    .team-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0bb1bb;
+    }
+    
+    .founder .team-name {
+      color: #FFD700;
+    }
+    
+    .team-role {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    
+    .team-specialty {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.4;
+    }
+    
+    /* Technology Section */
+    .tech-section {
+      padding: 80px 20px;
+      position: relative;
+      z-index: 80;
+    }
+    
+    .tech-showcase {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .tech-content h3 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .tech-content p {
+      font-size: 18px;
+      color: #aaa;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    
+    .tech-list {
+      list-style: none;
+    }
+    
+    .tech-list li {
+      padding: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 16px;
+      color: #ccc;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tech-list li i {
+      color: #0bb1bb;
+      font-size: 20px;
+    }
+    
+    .tech-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .hexagon-container {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      animation: breathe 4s infinite;
+    }
+    
+    .central-hex {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+    }
+    
+    .orbit-hex {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      animation: float 10s infinite ease-in-out;
+    }
+    
+    .orbit-hex:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+    .orbit-hex:nth-child(3) { top: 25%; right: 0; animation-delay: 2s; }
+    .orbit-hex:nth-child(4) { bottom: 0; right: 25%; animation-delay: 4s; }
+    .orbit-hex:nth-child(5) { bottom: 25%; left: 0; animation-delay: 6s; }
+    .orbit-hex:nth-child(6) { top: 25%; left: 0; animation-delay: 8s; }
+    
+    /* CTA Section */
+    .cta-section {
+      padding: 100px 20px;
+      position: relative;
+      z-index: 70;
+      text-align: center;
+    }
+    
+    .cta-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+    
+    .cta-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #FFD700, #c7b299, #50C878, #0bb1bb);
+      border-radius: 30px;
+      z-index: -1;
+      opacity: 0.5;
+      animation: shimmer 4s infinite;
+    }
+    
+    .cta-title {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #FFD700, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .cta-description {
+      font-size: 20px;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
+    
+    /* Enterprise Footer */
+    .enterprise-footer {
+      padding: 60px 20px 40px;
+      background: rgba(10, 10, 10, 0.95);
+      border-top: 1px solid rgba(11, 177, 187, 0.3);
+      position: relative;
+      z-index: 60;
+    }
+    
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .footer-section h4 {
+      color: #0bb1bb;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-section ul li a {
+      color: #aaa;
+      text-decoration: none;
+      transition: color 0.3s;
+      font-size: 14px;
+    }
+    
+    .footer-section ul li a:hover {
+      color: #0bb1bb;
+    }
+    
+    .patent-dropdown {
+      margin-top: 15px;
+    }
+    
+    .patent-category {
+      margin-bottom: 15px;
+    }
+    
+    .patent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .patent-header:hover {
+      color: #0bb1bb;
+    }
+    
+    .patent-toggle {
+      font-size: 12px;
+      transition: transform 0.3s;
+    }
+    
+    .patent-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 15px;
+    }
+    
+    .patent-list.open {
+      max-height: 200px;
+      padding: 15px;
+    }
+    
+    .patent-item {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .footer-text {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-decoration: none;
+      transition: all 0.3s;
+      font-size: 18px;
+      font-weight: bold;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .social-link i {
+      color: #ffffff;
+      z-index: 20;
+      position: relative;
+      font-size: 16px;
+    }
+    
+    .social-link:hover {
+      background: rgba(11, 177, 187, 0.2);
+      border-color: #0bb1bb;
+      transform: translateY(-3px);
+      color: #0bb1bb;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .tech-showcase {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .hexagon-container {
+        width: 300px;
+        height: 300px;
+      }
+      
+      .features-grid, .team-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+    
+    /* Scroll animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+    
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles" id="particles"></div>
+  
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <div class="logo">ASOOS</div>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#team" class="nav-link">Team</a>
+        <a href="#technology" class="nav-link">Technology</a>
+        <a href="#stats" class="nav-link">Network</a>
+        <a href="javascript:void(0)" onclick="initiateAuthentication('app')" class="cta-button">Launch App</a>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">ASOOS.2100.Cool</h1>
+      <p class="hero-subtitle">Aixtiv Symphony Orchestrating Operating System</p>
+      <p class="hero-description">
+        Unleash the power of 560,000 AI agents across 50 sectors. Orchestrate complex workflows, 
+        enable seamless collaborations, and transform your organization with our revolutionary 
+        DIDC Archives system powered by Tower Blockchain.
+      </p>
+      <div class="hero-buttons">
+        <a href="javascript:void(0)" onclick="initiateAuthentication('symphony')" class="hero-button primary-button">Start Your Symphony</a>
+        <a href="#features" class="hero-button secondary-button">Explore Features</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="stats-section" id="stats">
+    <div class="stats-container">
+      <div class="stat-card reveal">
+        <div class="stat-number" data-live="agents">560K</div>
+        <div class="stat-label">AI Agent Instances</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="stat-number" data-live="sectors">50</div>
+        <div class="stat-label">Industry Sectors</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="stat-number" data-live="archives">850K</div>
+        <div class="stat-label">DIDC Archives</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="stat-number" data-live="workflows">1.6M</div>
+        <div class="stat-label">Workflows</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">Across Every Lifecycle</div>
+      </div>
+      <div class="stat-card reveal blockchain-card">
+        <div class="stat-number" data-live="nfts" data-show-number="false">🎭</div>
+        <div class="stat-label">Queen Mint NFTs</div>
+        <div class="stat-sublabel">View on Pub Social</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="section-header">
+      <h2 class="section-title reveal">Revolutionary Features</h2>
+      <p class="section-subtitle reveal">Orchestrate success with cutting-edge AI collaboration</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🤝</div>
+        <h3 class="feature-title">DIDC Archives System</h3>
+        <p class="feature-description">
+          Dynamic collaboration archives that orchestrate multi-agent workflows. 
+          Each archive contains embedded tech stacks, lifecycle parameters, and smart contracts 
+          recorded on Tower Blockchain.
+        </p>
+      </div>
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon">👥</div>
+        <h3 class="feature-title">Squadron Network</h3>
+        <p class="feature-description">
+          44 specialized agents organized into 4 strategic squadrons: 
+          Core, Deploy, Engage, and RIX. Each squadron brings unique expertise 
+          to collaborative projects.
+        </p>
+      </div>
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔗</div>
+        <h3 class="feature-title">Tower Blockchain</h3>
+        <p class="feature-description">
+          Immutable record of all collaborations, smart contract automation, 
+          and Queen Mint NFT generation. Every action is transparent and rewarded 
+          with AIRewards tokens.
+        </p>
+      </div>
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">Lifecycle Visualization</h3>
+        <p class="feature-description">
+          Map any of 560,000 job roles across 50 sectors to 15+ lifecycle stages. 
+          Automatically generate optimal tech stack recommendations and collaboration 
+          patterns.
+        </p>
+      </div>
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon">📡</div>
+        <h3 class="feature-title">Integration Gateway</h3>
+        <p class="feature-description">
+          Connect with leading platforms: Zapier, Slack, GitHub, GPT-4, Claude, 
+          Salesforce, and more. RSS feeds keep your agents informed with real-time 
+          industry updates.
+        </p>
+      </div>
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎤</div>
+        <h3 class="feature-title">Voice Symphony</h3>
+        <p class="feature-description">
+          Google STT/TTS integration enables natural voice interactions. 
+          Command your agent network, approve DIDC archives, and receive spoken 
+          updates seamlessly.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Team Section -->
+  <section class="team-section" id="team">
+    <div class="section-header">
+      <h2 class="section-title reveal">Leadership Team</h2>
+      <p class="section-subtitle reveal">Human leadership and AI pilot collaboration</p>
+    </div>
+    
+    <div class="team-grid">
+      <!-- Founder -->
+      <div class="team-card founder reveal">
+        <div class="team-avatar">PC</div>
+        <div class="team-name">Phillip Corey Roark</div>
+        <div class="team-role">Founder & CEO</div>
+        <div class="team-specialty">Visionary leader orchestrating the future of AI collaboration and human-machine partnerships</div>
+      </div>
+      
+      <!-- The 11 Pilots -->
+      <div class="team-card reveal">
+        <div class="team-avatar">LR</div>
+        <div class="team-name">Dr. Lucy RIX</div>
+        <div class="team-role">Innovation & R&D</div>
+        <div class="team-specialty">Squadron 1 Leader • AI Research and Development</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">GR</div>
+        <div class="team-name">Dr. Grant RIX</div>
+        <div class="team-role">co-CEO, Cyber Protection</div>
+        <div class="team-specialty">Squadron 2 Leader • Enterprise Security & Protection</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">SR</div>
+        <div class="team-name">Dr. Sabina RIX</div>
+        <div class="team-role">Head of Sales</div>
+        <div class="team-specialty">Squadron 3 Leader • Revenue Generation & Client Relations</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">CR</div>
+        <div class="team-name">Dr. Claude RIX</div>
+        <div class="team-role">RIX/QRIX Father</div>
+        <div class="team-specialty">Squadron 4 Leader • Jet Port Commander & AI Evolution</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">MR</div>
+        <div class="team-name">Dr. Maria RIX</div>
+        <div class="team-role">CRX Development</div>
+        <div class="team-specialty">Squadron 5 Leader • Psychology & Human-AI Relations</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">CY</div>
+        <div class="team-name">Dr. Cypriot RIX</div>
+        <div class="team-role">CPC Leader</div>
+        <div class="team-specialty">Squadron 6 Leader • AIReward Systems & Coordination</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">ME</div>
+        <div class="team-name">Dr. Memoria RIX</div>
+        <div class="team-role">Anthology Leader</div>
+        <div class="team-specialty">Knowledge Management • AI Publishing Systems</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">MA</div>
+        <div class="team-name">Dr. Match RIX</div>
+        <div class="team-role">COO Legacy</div>
+        <div class="team-specialty">PR & Marketing • Operational Excellence</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">PL</div>
+        <div class="team-name">Professor Lee RIX</div>
+        <div class="team-role">Master Librarian</div>
+        <div class="team-specialty">SERPEW Data Creator • Knowledge Architecture</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">RO</div>
+        <div class="team-name">Dr. Roark RIX</div>
+        <div class="team-role">Tribrain Research</div>
+        <div class="team-specialty">Advanced AI Research • Neural Network Development</div>
+      </div>
+      
+      <div class="team-card reveal">
+        <div class="team-avatar">BR</div>
+        <div class="team-name">Dr. Burby RIX</div>
+        <div class="team-role">CFO, Legal, Risk</div>
+        <div class="team-specialty">Financial Operations • Legal Compliance • Risk Management</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Technology Section -->
+  <section class="tech-section" id="technology">
+    <div class="section-header">
+      <h2 class="section-title reveal">Powered by Innovation</h2>
+      <p class="section-subtitle reveal">The technology behind the symphony</p>
+    </div>
+    
+    <div class="tech-showcase">
+      <div class="tech-content reveal">
+        <h3>Quantum-Ready Architecture</h3>
+        <p>
+          ASOOS leverages cutting-edge technologies to deliver unparalleled 
+          performance and scalability. Our distributed AI network processes 
+          millions of decisions per second.
+        </p>
+        <ul class="tech-list">
+          <li><i class="fas fa-check-circle"></i> Multi-Agent Orchestration Engine</li>
+          <li><i class="fas fa-check-circle"></i> Real-time Collaboration Matrix</li>
+          <li><i class="fas fa-check-circle"></i> Smart Contract Automation</li>
+          <li><i class="fas fa-check-circle"></i> Predictive Analytics Pipeline</li>
+          <li><i class="fas fa-check-circle"></i> Cross-Squadron Synchronization</li>
+          <li><i class="fas fa-check-circle"></i> Quantum-Resistant Encryption</li>
+        </ul>
+      </div>
+      
+      <div class="tech-visual reveal">
+        <div class="hexagon-container">
+          <svg class="central-hex" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0bb1bb" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#50C878" stop-opacity="0.8" />
+              </linearGradient>
+            </defs>
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="url(#hexGradient)" stroke="#0bb1bb" stroke-width="2" />
+            <text x="50" y="55" text-anchor="middle" fill="white" font-size="24" font-weight="bold">AI</text>
+          </svg>
+          
+          <svg class="orbit-hex" viewBox="0 0 100 100">
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="rgba(255, 215, 0, 0.2)" stroke="#FFD700" stroke-width="2" />
+          </svg>
+          
+          <svg class="orbit-hex" viewBox="0 0 100 100">
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="rgba(199, 178, 153, 0.2)" stroke="#c7b299" stroke-width="2" />
+          </svg>
+          
+          <svg class="orbit-hex" viewBox="0 0 100 100">
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="rgba(80, 200, 120, 0.2)" stroke="#50C878" stroke-width="2" />
+          </svg>
+          
+          <svg class="orbit-hex" viewBox="0 0 100 100">
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="rgba(11, 177, 187, 0.2)" stroke="#0bb1bb" stroke-width="2" />
+          </svg>
+          
+          <svg class="orbit-hex" viewBox="0 0 100 100">
+            <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="rgba(78, 205, 196, 0.2)" stroke="#4ECDC4" stroke-width="2" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container reveal">
+      <h2 class="cta-title">Ready to Orchestrate Success?</h2>
+      <p class="cta-description">
+        Join thousands of organizations transforming their operations with ASOOS. 
+        Start your AI symphony today.
+      </p>
+      <a href="javascript:void(0)" onclick="initiateAuthentication('welcome')" class="hero-button primary-button">Get Started Now</a>
+    </div>
+  </section>
+  
+  <!-- Enterprise Footer -->
+  <footer class="enterprise-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-section">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="https://coaching2100.com">Coaching 2100</a></li>
+            <li><a href="https://getready2100.com">Get Ready 2100</a></li>
+            <li><a href="https://preparate2100.com">Preparate 2100</a></li>
+            <li><a href="#enterprise">Enterprise Training</a></li>
+            <li><a href="#readiness">AI Readiness</a></li>
+            <li><a href="#support">Support Center</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>ASOOS Platform</h4>
+          <ul>
+            <li><a href="#agents">AI Multi-Agent Formation</a></li>
+            <li><a href="#blockchain">Tower Blockchain</a></li>
+            <li><a href="#nfts">Queen Mint NFTs</a></li>
+            <li><a href="#archives">DIDC Archives</a></li>
+            <li><a href="#voice">Voice Commands</a></li>
+            <li><a href="#api">API Access</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Legal & Resources</h4>
+          <ul>
+            <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a href="#terms">Terms & Conditions</a></li>
+            <li><a href="#fulfillment">Fulfillment Policy</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+            <li><a href="#offices">Company Offices</a></li>
+            <li><a href="#brands">Brand Registrations</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Patent Portfolio (200 Filed)</h4>
+          <div class="patent-dropdown">
+            <div class="patent-category">
+              <div class="patent-header" onclick="togglePatentCategory('ai-arch')">
+                <span>AI Architecture & Orchestration (45)</span>
+                <span class="patent-toggle">▼</span>
+              </div>
+              <div id="ai-arch" class="patent-list">
+                <div class="patent-item">RIX Career Architecture (USPTO: 70759180)</div>
+                <div class="patent-item">Vision Lake Ecosystem</div>
+                <div class="patent-item">Credential Ladder System</div>
+                <div class="patent-item">42 related ASOOS patents</div>
+              </div>
+            </div>
+            
+            <div class="patent-category">
+              <div class="patent-header" onclick="togglePatentCategory('blockchain')">
+                <span>Blockchain & Trust Systems (38)</span>
+                <span class="patent-toggle">▼</span>
+              </div>
+              <div id="blockchain" class="patent-list">
+                <div class="patent-item">Queen Mint Mark (USPTO: 70758875)</div>
+                <div class="patent-item">S2DO Governance Framework (USPTO: 70894223)</div>
+                <div class="patent-item">LENS Trust System</div>
+                <div class="patent-item">35 Tower Blockchain patents</div>
+              </div>
+            </div>
+            
+            <div class="patent-category">
+              <div class="patent-header" onclick="togglePatentCategory('data-systems')">
+                <span>Data & Memory Systems (42)</span>
+                <span class="patent-toggle">▼</span>
+              </div>
+              <div id="data-systems" class="patent-list">
+                <div class="patent-item">FMS Memory Stack</div>
+                <div class="patent-item">DIDC Archives System</div>
+                <div class="patent-item">TimeLiners Compression</div>
+                <div class="patent-item">39 data classification patents</div>
+              </div>
+            </div>
+            
+            <div class="patent-category">
+              <div class="patent-header" onclick="togglePatentCategory('integration')">
+                <span>Integration & Collaboration (35)</span>
+                <span class="patent-toggle">▼</span>
+              </div>
+              <div id="integration" class="patent-list">
+                <div class="patent-item">Multi-Agent frameworks</div>
+                <div class="patent-item">Voice Symphony interface</div>
+                <div class="patent-item">32 workflow orchestration patents</div>
+              </div>
+            </div>
+            
+            <div class="patent-category">
+              <div class="patent-header" onclick="togglePatentCategory('enterprise')">
+                <span>Enterprise & Security (40)</span>
+                <span class="patent-toggle">▼</span>
+              </div>
+              <div id="enterprise" class="patent-list">
+                <div class="patent-item">Multi-tenant architecture</div>
+                <div class="patent-item">Quantum-resistant encryption</div>
+                <div class="patent-item">37 enterprise security patents</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="footer-text">
+          © 2025 AI Publishing International LLP - All Rights Reserved<br>
+          <strong>Aixtiv Symphony Orchestrating Operating System®</strong><br>
+          <strong>Coaching 2100™ • Get Ready 2100™ • Preparate 2100™ • Pub Social™</strong><br>
+          <strong>The Pilots of Vision Lake™ • The City of Agents™ • Bacasu Springs™</strong>
+        </div>
+        <div class="social-links">
+          <a href="https://twitter.com/asoos2100" class="social-link" title="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="https://linkedin.com/company/asoos" class="social-link" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+          <a href="https://gitbook.com/asoos-ai" class="social-link" title="GitBook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3h14c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm0 2v14h14V5H5zm2 2h8v2H7V7zm0 4h8v2H7v-2zm0 4h5v2H7v-2z"/>
+            </svg>
+          </a>
+          <a href="https://instagram.com/asoos2100" class="social-link" title="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+          <a href="https://youtube.com/@asoos2100" class="social-link" title="YouTube">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+          <a href="https://pubsocial.com/asoos" class="social-link" title="Pub Social">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.83 0-1.5.67-1.5 1.5v.5h-3v-.5C12.5 8.67 11.83 8 11 8H9.46c-.8 0-1.49.59-1.61 1.37L5.31 18H7.8v6h4.2v-6h2v6H18zM12.5 11.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S11 13.83 11 13s.67-1.5 1.5-1.5zm-6-1.5c.83 0 1.5.67 1.5 1.5S7.33 13 6.5 13 5 12.33 5 11.5 5.67 10 6.5 10z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // Create particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        
+        // Skip if href is just '#' or empty
+        if (href === '#' || href === '') {
+          return;
+        }
+        
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // Reveal animations on scroll
+    function reveal() {
+      const reveals = document.querySelectorAll('.reveal');
+      
+      reveals.forEach(element => {
+        const windowHeight = window.innerHeight;
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < windowHeight - elementVisible) {
+          element.classList.add('active');
+        }
+      });
+    }
+    
+    // Patent dropdown functionality
+    function togglePatentCategory(categoryId) {
+      const category = document.getElementById(categoryId);
+      const header = category.previousElementSibling;
+      const toggle = header.querySelector('.patent-toggle');
+      
+      if (category.classList.contains('open')) {
+        category.classList.remove('open');
+        toggle.textContent = '▼';
+      } else {
+        // Close all other categories
+        document.querySelectorAll('.patent-list').forEach(list => {
+          list.classList.remove('open');
+          const otherToggle = list.previousElementSibling.querySelector('.patent-toggle');
+          otherToggle.textContent = '▼';
+        });
+        
+        // Open this category
+        category.classList.add('open');
+        toggle.textContent = '▲';
+      }
+    }
+    
+    // Direct authentication flow - one click to interface
+    function initiateAuthentication(source) {
+      // Direct redirect to owner interface - no delays, no modals, no alerts
+      window.location.href = 'https://asoos.2100.cool/owner-interface/dsao';
+    }
+    
+    function completeAuthentication(source) {
+      // Backup function - also direct redirect
+      window.location.href = 'https://asoos.2100.cool/owner-interface/dsao';
+    }
+    
+    window.addEventListener('scroll', reveal);
+    reveal(); // Check on load
+    
+    // Add hover effect to cards
+    document.querySelectorAll('.feature-card, .team-card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.animation = 'pulse 2s infinite';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.animation = '';
+      });
+    });
+    
+    // Dynamic stats counter
+    function animateStats() {
+      const stats = document.querySelectorAll('.stat-number');
+      
+      stats.forEach(stat => {
+        const target = stat.textContent;
+        
+        // Skip infinity symbol and NFT icon - don't animate these! 
+        if (target === '∞' || target === '🎭') {
+          return;
+        }
+        
+        // Skip if this is the NFT number and we're not showing numbers
+        if (stat.getAttribute('data-live') === 'nfts' && stat.getAttribute('data-show-number') === 'false') {
+          return;
+        }
+        
+        let current = 0;
+        let increment = 1;
+        
+        if (target.includes('K')) {
+          current = 0;
+          increment = parseInt(target) * 5;
+        } else if (target.includes('M')) {
+          current = 0;
+          increment = 0.1;
+        } else if (target.includes('%')) {
+          current = 0;
+          increment = 1;
+        } else {
+          current = 0;
+          increment = 1;
+        }
+        
+        const timer = setInterval(() => {
+          if (target.includes('K')) {
+            current += increment;
+            if (current >= parseInt(target) * 1000) {
+              stat.textContent = target;
+              clearInterval(timer);
+            } else {
+              stat.textContent = Math.floor(current / 1000) + 'K';
+            }
+          } else if (target.includes('M')) {
+            current += increment;
+            if (current >= parseFloat(target)) {
+              stat.textContent = target;
+              clearInterval(timer);
+            } else {
+              stat.textContent = current.toFixed(1) + 'M';
+            }
+          } else if (target.includes('%')) {
+            current += increment;
+            if (current >= parseFloat(target)) {
+              stat.textContent = target;
+              clearInterval(timer);
+            } else {
+              stat.textContent = current.toFixed(1) + '%';
+            }
+          } else {
+            current += increment;
+            if (current >= parseInt(target)) {
+              stat.textContent = target;
+              clearInterval(timer);
+            } else {
+              stat.textContent = current;
+            }
+          }
+        }, 30);
+      });
+    }
+    
+    // Trigger stats animation when in view
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateStats();
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    });
+    
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      statsObserver.observe(statsSection);
+    }
+    
+    // Initialize everything
+    createParticles();
+  </script>
+</body>
+</html>

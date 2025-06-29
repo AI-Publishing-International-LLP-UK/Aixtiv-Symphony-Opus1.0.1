@@ -1,0 +1,23 @@
+{
+  "status_updates_interval": "4_HOURS",
+  "metrics_collection": "REAL_TIME",
+  "escalation_chain": [
+    "Dr_Memoria_Squadron_Lead",
+    "Wing_3_Commander_Production",
+    "MOCORIX2_Orchestrator_Dr_Claude",
+    "ASOOS_Executive_Command"
+  ],
+  "communication_channels": {
+    "status_updates": "integration-gateway-command-live",
+    "milestone_reports": "wing-3-command-production",
+    "exception_alerts": "mocorix2-orchestrator-live",
+    "executive_summary": "asoos-core-command-production"
+  },
+  "monitoring_requirements": [
+    "4_HOUR_STATUS_UPDATES_TO_INTEGRATION_GATEWAY",
+    "REAL_TIME_METRICS_TO_MOCOA_COMMAND_CENTER",
+    "EXCEPTION_ESCALATION_TO_WING_3_COMMAND",
+    "MILESTONE_NOTIFICATIONS_ALL_ORCHESTRATORS"
+  ],
+  "setup_at": "2025-06-29T17:54:52.386Z"
+}

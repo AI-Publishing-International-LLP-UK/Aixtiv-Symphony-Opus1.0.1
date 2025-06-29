@@ -1,0 +1,242 @@
+# Deployment Instructions for Warp.app
+
+## Overview
+
+This document provides detailed instructions for deploying the authentication system and Vision Lake integration to the Warp.app environment. The code should be deployed to the `aixtiv-symphony-opus1` repository and properly integrated with the existing codebase.
+
+## Repository Structure
+
+All code will be deployed to the following structure within the `aixtiv-symphony-opus1` repository:
+
+```
+aixtiv-symphony-opus1/
+├── src/
+│   ├── auth/
+│   │   ├── user-auth-types.ts           # Authentication types and levels
+│   │   ├── auth-service.ts              # Authentication service
+│   │   └── use-auth-hook.ts             # React hook for authentication
+│   ├── agents/
+│   │   ├── agent-auth-integration.ts    # Agent integration with auth system
+│   │   └── agent-dashboard-integration.tsx  # Agent dashboard UI
+│   ├── aixtiv-orchestra/
+│   │   └── IntegrationGateway/
+│   │       ├── IntegrationGateway.ts    # Integration Gateway implementation
+│   │       ├── S2DOProtocol.ts          # S2DO Protocol implementation
+│   │       └── index.ts                 # Entry point exporting all gateway components
+│   └── vision-lake/
+│       ├── components/
+│       │   ├── flight-memory-system.tsx  # Flight Memory System UI
+│       │   ├── s2do-protocol.tsx         # S2DO Protocol UI
+│       │   ├── q4d-lenz.tsx              # Q4D-Lenz UI
+│       │   ├── dream-commander.tsx       # Dream Commander UI
+│       │   └── anthology.tsx             # Anthology UI
+│       └── integration/
+│           └── vertex-pipeline-connector.ts  # Vertex AI pipeline connector
+├── styles/
+│   └── vision-lake-theme.css            # Vision Lake CSS theme
+└── pages/
+    ├── dashboard.tsx                    # Main dashboard page
+    ├── agents.tsx                       # Agents management page
+    └── settings.tsx                     # User settings and upgrades page
+```
+
+## Step-by-Step Deployment Process
+
+### 1. Clone and Set Up the Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/aixtiv-symphony-opus1.git
+cd aixtiv-symphony-opus1
+
+# Create a new branch
+git checkout -b feature/vision-lake-integration
+
+# Install dependencies if needed
+npm install
+```
+
+### 2. Create Directory Structure
+
+```bash
+# Create the required directories
+mkdir -p src/auth
+mkdir -p src/agents
+mkdir -p src/aixtiv-orchestra/IntegrationGateway
+mkdir -p src/vision-lake/components
+mkdir -p src/vision-lake/integration
+mkdir -p styles
+```
+
+### 3. Copy Files to Appropriate Locations
+
+```bash
+# Copy authentication files
+cp path/to/user-auth-types.ts src/auth/
+cp path/to/auth-service.ts src/auth/
+cp path/to/use-auth-hook.ts src/auth/
+
+# Copy agent integration files
+cp path/to/agent-auth-integration.ts src/agents/
+cp path/to/agent-dashboard-integration.tsx src/agents/
+
+# Copy Integration Gateway files
+cp path/to/IntegrationGateway.ts src/aixtiv-orchestra/IntegrationGateway/
+cp path/to/S2DOProtocol.ts src/aixtiv-orchestra/IntegrationGateway/
+
+# Create index.ts to export all gateway components
+echo "export * from './IntegrationGateway';
+export * from './S2DOProtocol';" > src/aixtiv-orchestra/IntegrationGateway/index.ts
+
+# Copy Vision Lake component files
+cp path/to/vision-lake-components/* src/vision-lake/components/
+cp path/to/vertex-pipeline-connector.ts src/vision-lake/integration/
+
+# Copy CSS theme
+cp path/to/vision-lake-theme.css styles/
+```
+
+### 4. Update Pages to Include New Components
+
+```bash
+# Modify dashboard.tsx to include new components
+vi pages/dashboard.tsx
+
+# Add imports:
+# import { AgentDashboard } from '../src/agents/agent-dashboard-integration';
+# import '../styles/vision-lake-theme.css';
+
+# Replace main content with <AgentDashboard />
+
+# Save and close
+```
+
+### 5. Update Package Dependencies
+
+Add any required dependencies to package.json:
+
+```bash
+npm install --save react-hook-form @tailwindcss/forms
+```
+
+### 6. Test the Integration Locally
+
+```bash
+# Run the development server
+npm run dev
+
+# Verify the integration is working in your browser
+```
+
+### 7. Commit the Changes
+
+```bash
+# Add all files to git
+git add .
+
+# Commit with detailed message
+git commit -m "Integrate Vision Lake with authentication system and agent framework"
+```
+
+### 8. Deploy to Staging
+
+```bash
+# Push to staging branch
+git push origin feature/vision-lake-integration
+
+# Create a pull request for review
+# After review, merge to staging
+
+# Pull the latest changes on the staging branch
+git checkout staging
+git pull origin staging
+
+# Deploy to staging environment
+warp deploy --env=staging
+```
+
+### 9. Verify Deployment
+
+1. Log in to the staging environment
+2. Verify all components are displaying correctly
+3. Test authentication flow with different user levels
+4. Verify agent access controls work correctly
+5. Test Integration Gateway connections
+
+### 10. Deploy to Production
+
+Once the staging deployment has been verified:
+
+```bash
+# Create a pull request from staging to main
+# After approval, merge to main
+
+# Pull the latest changes on the main branch
+git checkout main
+git pull origin main
+
+# Deploy to production environment
+warp deploy --env=production
+```
+
+## Post-Deployment Configuration
+
+After deployment, you'll need to configure the following:
+
+1. **Firebase Authentication:**
+   - Update Firebase API keys in the environment configuration
+   - Verify social login providers (Google, Outlook, LinkedIn) are properly configured
+
+2. **Vertex AI Pipeline:**
+   - Ensure the correct project ID and location are set
+   - Verify the model name and evaluation pipeline connection
+
+3. **GKE Configuration:**
+   - Set up Kubernetes secrets for authentication
+   - Configure scaling policies for agent deployments
+
+4. **Integration Gateway:**
+   - Set the correct endpoints for each integration
+   - Configure API keys and authentication tokens
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Failures:**
+   - Check Firebase configuration in auth-service.ts
+   - Verify environment variables are set correctly
+
+2. **Missing Agent UI Components:**
+   - Ensure agent-auth-integration.ts is properly imported
+   - Check if authState and user objects are passed correctly
+
+3. **Integration Gateway Connection Failures:**
+   - Verify the endpoints in IntegrationGateway.ts
+   - Check network access to required services
+
+4. **Build Errors:**
+   - Update TypeScript types if needed
+   - Ensure all dependencies are installed
+
+### Debug Logs
+
+To enable debug logs for troubleshooting:
+
+```javascript
+// Add to src/aixtiv-orchestra/IntegrationGateway/IntegrationGateway.ts
+private enableDebugLogs = true;
+
+// Then use this in methods:
+if (this.enableDebugLogs) {
+  console.log('Debug:', message);
+}
+```
+
+## Support Contacts
+
+If you encounter issues during deployment, contact:
+
+- For authentication issues: auth-team@warp.app
+- For agent integration: agent-support@warp.app
+- For Symphony Opus1 integration: symphony-support@aixtiv.com

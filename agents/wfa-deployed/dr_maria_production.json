@@ -1,0 +1,16 @@
+{
+  "name": "Dr_Maria_Production",
+  "type": "LEAD_AGENT",
+  "status": "ACTIVE",
+  "capabilities": [
+    "Multilingual Support",
+    "Cultural Adaptation",
+    "Translation Services",
+    "Regional Compliance",
+    "International Distribution"
+  ],
+  "deployment_region": "MOCOA_us-west1-a",
+  "scaling_mode": "AUTO_PRODUCTION",
+  "created_at": "2025-06-29T17:52:47.104Z",
+  "orchestrator_id": "ORCH-WFA-ENG-001"
+}

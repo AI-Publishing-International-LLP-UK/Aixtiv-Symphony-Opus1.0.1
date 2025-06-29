@@ -1,0 +1,12 @@
+specVersion: "v1beta"
+serviceId: "aixtiv-admin-desktop"
+location: "us-west1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "aixtiv-admin-desktop-db"
+      cloudSql:
+        instanceId: "aixtiv-admin-core-fdc"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]

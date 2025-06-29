@@ -1,0 +1,15 @@
+title: "DR Match Planning Role"
+description: "Role for planning, marketing communications, and recruitment activities"
+stage: "GA"
+includedPermissions:
+# Project Access
+- resourcemanager.projects.get
+- resourcemanager.projects.list
+
+# Storage and Document Management
+- storage.buckets.get
+- storage.buckets.list
+- storage.objects.get
+- storage.objects.list
+- storage.objects.create
+- storage.objects.update

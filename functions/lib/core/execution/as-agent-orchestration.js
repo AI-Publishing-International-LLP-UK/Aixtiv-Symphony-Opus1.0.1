@@ -855,8 +855,11 @@ class MultiAgentCollaborationSystem {
         }
         catch (error) {
             console.error('Error creating multi-agent conversation:', error);
-            // Setup collaboration model for this conversation
-            await this.setupCollaborationModel(co    /**
+            throw error;
+        }
+    }
+
+    /**
      * Process a message in a multi-agent conversation
      */
     async processMultiAgentMessage(conversationId, message) {
@@ -927,6 +930,9 @@ class MultiAgentCollaborationSystem {
                 }
             }
             return responses;
+        }
+        catch (error) {
+            console.error('Error processing multi-agent message:', error);
             throw error;
         }
     }

@@ -5,8 +5,11 @@
   "targets": {
     "api-for-warp-drive": {
       "hosting": {
-        "main-site": [
+        "asoos-2100-cool": [
           "2100-cool-c624d"
+        ],
+        "mocoa-interface": [
+          "api-for-warp-drive"
         ]
       }
     }

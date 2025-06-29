@@ -117,9 +117,21 @@ class TestamentSwarmDeployer:
         required_tools = ['gcloud', 'firebase', 'kubectl']
         missing_tools = []
         
+        # Add common kubectl paths to environment
+        import os
+        current_path = os.environ.get('PATH', '')
+        kubectl_paths = ['/opt/homebrew/bin', '/usr/local/bin']
+        for path in kubectl_paths:
+            if path not in current_path:
+                os.environ['PATH'] = f"{path}:{current_path}"
+        
         for tool in required_tools:
             try:
-                subprocess.run([tool, '--version'], capture_output=True, check=True)
+                if tool == 'kubectl':
+                    # Special handling for kubectl
+                    subprocess.run([tool, 'version', '--client'], capture_output=True, check=True)
+                else:
+                    subprocess.run([tool, '--version'], capture_output=True, check=True)
                 logger.info(f"✅ {tool} is available")
             except (subprocess.CalledProcessError, FileNotFoundError):
                 missing_tools.append(tool)

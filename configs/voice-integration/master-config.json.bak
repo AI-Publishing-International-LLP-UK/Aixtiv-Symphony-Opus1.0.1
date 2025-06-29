@@ -1,0 +1,32 @@
+{
+  "voice_system": {
+    "providers": {
+      "openai": {
+        "primary_agent": "dr_lucy",
+        "profile_path": "configs/voice-integration/dana-profile.json"
+      },
+      "elevenlabs": {
+        "profile_paths": [
+          "configs/voice-integration/elevenlabs/profiles/uk_doctors.json",
+          "configs/voice-integration/elevenlabs/profiles/na_doctors.json"
+        ],
+        "agents": ["dr_match", "professor_lee", "dr_memoria", "dr_burby", "dr_grant", "dr_cypriot"]
+      },
+      "google-tts": {
+        "profile_paths": ["configs/voice-integration/google-tts/profiles/multilingual_doctors.json"],
+        "agents": ["dr_maria", "dr_sabina", "dr_roark"]
+      }
+    },
+    "default_settings": {
+      "region": "us-west1",
+      "quality": "enterprise",
+      "latency": "ultra-low"
+    },
+    "fallback_chain": [
+      "primary_provider",
+      "google-tts",
+      "elevenlabs"
+    ]
+  }
+}
+

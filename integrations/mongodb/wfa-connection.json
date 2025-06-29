@@ -1,0 +1,35 @@
+{
+  "database": "pilot-database-narratives-live",
+  "connection_string": "mongodb+srv://pilot-database-narratives-live",
+  "collections": [
+    "agent_metrics",
+    "workflow_status",
+    "content_pipeline",
+    "publication_queue",
+    "distribution_logs"
+  ],
+  "indexes": [
+    {
+      "collection": "agent_metrics",
+      "fields": [
+        "agent_id",
+        "timestamp"
+      ]
+    },
+    {
+      "collection": "workflow_status",
+      "fields": [
+        "status",
+        "created_at"
+      ]
+    },
+    {
+      "collection": "content_pipeline",
+      "fields": [
+        "content_type",
+        "processing_stage"
+      ]
+    }
+  ],
+  "established_at": "2025-06-29T17:54:49.377Z"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "api-for-warp-drive",
+  "private_key_id": "cc21cc3fe7fb310ae6ce844b482fd6edb94460c6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC1vJKuV0R1z3nN\n4+BsP9FTVf99NqW4ebIzRCc0n3P6p15ALAr/kfOxOnsPrCLNa98f10JSJOHgOCvY\ncO2jkcMezMnoFS0gxaxZ6vU4fphurk+SBr5+cfSYw7n4+c0jJhd4f23ncgS39ruS\ndhXbCqtFGPudmYdQIPCRXMxiGxQN7qp7EvDnMROrNvq+wbVMSx89Gn6LEArp1wYX\nZ7JhH4erQhFL82FfKYq8XJGkcP5mh6BjiZpsmIsQ7YXbnegBnPLFy0O2uYXPUG7u\nHRh/swfSyTwSSa7xvTNYYum9GUIcPgN3+dYeyP6y0tXgKOQezqa4Q6AEwhsHr3nR\n7Ww183UNAgMBAAECggEAGPJrDzAPB34EyiDFEo77GM22DdXlz0ozTkrFd/mIdeiq\nLTRuiREbquEseeUG/PxZC1mk8ro54GnNiP9Ne7XbWzvA3pEjmftQkqJIaaolGhJm\n/VRcK2bQrPS3L2h5AqFsuN+DMnFqGOevbWY0z1XqV0ib55Em7DatV0LuEmyFpvi4\nKeD0tbhLrxpHuJ+6+3qFHihb64grMfzDjfEIq3j4UVTIWDFB1NBEiNo+ieb9+9NP\nKh479DMxlMiO/RFkmlFOKv64Vw67NsUp7wz+mM7DMjwLOKxL5yTg/S2POl9epf2E\nfIZ2Qkbq/FS3nlZVa4/MY6xvu7Rv4XdVzh7nWsI4EQKBgQDYdQNNJjH/7IBWxkM9\nORUzduQ5kI020iRdHnOfK8Oey5gmWPkfcGx5A4S6WYTxZrI9B+cbA8fOC7XIAoti\nDbQtHZ7IggzKvXuQXjtT6OVlFYl9Lm30zzEfQIjNYjftyjlv7QBfQTokhQM0m9gg\ngQrrkdp40BQbCITLwqPKUKcvcQKBgQDW78w5YufNd8mBQ4qx8v9+3fAmog1XFjKv\nCsO5f/Bi6giAY1sQsaz1zZDLumYU7futJa861rduxfg5/CXrIVl3cX+HUClXHBfv\nYXbwUy5NOJYE8X0FuUPcFu0AVafaqqPrBf/ooH//af9aRE9KksC8x6ujB4PC47xe\nU5AFD7BJXQKBgQDCJzLu4HO4usnjC7MEF0+M+fd8Ksx/f75eSBItk3PD25p9yxCp\nwo2Jfj5vaBx260a0t4H0GU/+4UIMRTwAl4olbYwfDYer0ooi1GMiwKQCJ29LeXnn\nPHEzNw9+KbtA70LVwh+zUS5101kstx0FCrpg0lLESt+938Y9fjisH+vWAQKBgQDD\nS4fo7LFqxFjXlyNCpWT5RXeb4sr0QjszSTimKFWnyraG0cBA3vAlN+9E7c0rX0G7\nBe6+K7LoeAEfzrg1eUvtd7dEn9WwTNqCq7CClVIQ4EWPoEzVEo1SQZJ/J1UpHrtq\nJT1thchHr2xR/Jd/TvDJlzOhIobaYksZ+ht2PdcUEQKBgQDDKIBDX7jltEbrisU3\nZNA8ppBbXoCQs8Ib/ZxvDQOcFqJHM8ri3IFohFls/6YmM/QvkHij/W79RHo6pB+r\ndr++4kOGVPWoZgjRuoqH1BM7yznlAz9861NBfhGamHSgruD5WyP4y3eL2f1tx2L1\nMcvICefG03+dlWPpLE8VE1GdxQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "drlucyautomation@api-for-warp-drive.iam.gserviceaccount.com",
+  "client_id": "102330798963948373910",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/drlucyautomation%40api-for-warp-drive.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

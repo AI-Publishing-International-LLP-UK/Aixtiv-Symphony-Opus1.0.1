@@ -1,0 +1,12 @@
+{
+  "pipeline": "content-validation-stream-production",
+  "content_validation_stream": "production",
+  "processing_rules": [
+    "Automated content ingestion",
+    "Quality validation checks",
+    "Metadata extraction",
+    "Archive categorization",
+    "Publication preparation"
+  ],
+  "activated_at": "2025-06-29T17:54:50.381Z"
+}

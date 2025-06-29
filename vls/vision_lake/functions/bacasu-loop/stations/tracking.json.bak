@@ -1,0 +1,61 @@
+{
+  "metrics": {
+    "engagement": {
+      "stationVisits": {
+        "type": "counter",
+        "resolution": "realtime",
+        "aggregation": ["hourly", "daily", "weekly"]
+      },
+      "messageInteractions": {
+        "type": "gauge",
+        "dimensions": ["station", "message", "agent"]
+      },
+      "opportunitySignups": {
+        "type": "counter",
+        "labels": ["project", "role", "agent"]
+      }
+    },
+    "feedback": {
+      "messageEffectiveness": {
+        "type": "histogram",
+        "dimensions": ["station", "message"],
+        "aggregation": "hourly"
+      },
+      "agentSentiment": {
+        "type": "gauge",
+        "dimensions": ["station", "message"],
+        "resolution": "realtime"
+      }
+    }
+  },
+  "alerts": {
+    "lowEngagement": {
+      "threshold": "<30% normal activity",
+      "window": "1h",
+      "notification": ["Diamond SAO", "Mayor's Dashboard"]
+    },
+    "highImpact": {
+      "threshold": ">150% normal activity",
+      "window": "15m",
+      "notification": ["Diamond SAO", "Mayor's Dashboard"]
+    },
+    "technicalIssues": {
+      "conditions": ["display failure", "interaction lag", "sync issues"],
+      "priority": "high",
+      "notification": ["Diamond SAO", "Technical Team"]
+    }
+  },
+  "reporting": {
+    "mayorDashboard": {
+      "updateFrequency": "realtime",
+      "metrics": ["all"],
+      "visualization": ["trends", "heatmaps", "alerts"]
+    },
+    "diamondSAO": {
+      "dataSync": "realtime",
+      "metrics": ["all"],
+      "retention": "365 days"
+    }
+  }
+}
+

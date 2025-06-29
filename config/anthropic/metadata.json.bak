@@ -1,0 +1,8 @@
+{
+    "entityID": "https://console.anthropic.com",
+    "assertionConsumerService": "https://console.anthropic.com/callback",
+    "singleSignOnService": "https://accounts.google.com/o/saml2/idp?idpid=C04cj3jky",
+    "nameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    "workloadIdentityPool": "anthropic-federation-pool",
+    "workloadIdentityProvider": "anthropic-saml-provider"
+}

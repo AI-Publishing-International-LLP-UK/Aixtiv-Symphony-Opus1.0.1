@@ -1,0 +1,8 @@
+{
+    "entityID": "https://slack.com/saml/metadata",
+    "assertionConsumerService": "https://slack.com/saml/metadata/callback",
+    "singleSignOnService": "https://accounts.google.com/o/saml2/idp?idpid=C04cj3jky",
+    "nameIDFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    "workloadIdentityPool": "slack-federation-pool",
+    "workloadIdentityProvider": "slack-saml-provider"
+}

@@ -1,0 +1,100 @@
+{
+  "tower_blockchain_voices": {
+    "tower_control": {
+      "name": "tower_control",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "houston_command_01",
+        "accent": "american-midwest-precise",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.8,
+          "speed": 0.95,
+          "clarity": 1.0,
+          "command": 0.95
+        }
+      },
+      "personality": {
+        "traits": {
+          "authority": 0.95,
+          "composure": 0.95,
+          "decisiveness": 0.9
+        },
+        "speaking_style": "command and control"
+      },
+      "operational_contexts": [
+        "flight_memory_oversight",
+        "compass_field_control",
+        "anti_gravity_coordination"
+      ]
+    },
+    "blockchain_validator": {
+      "name": "blockchain_validator",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "nordic_tech_01",
+        "accent": "finnish-tech",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.85,
+          "speed": 1.0,
+          "clarity": 0.95,
+          "precision": 1.0
+        }
+      },
+      "personality": {
+        "traits": {
+          "analytical": 0.95,
+          "integrity": 0.95,
+          "innovation": 0.9
+        },
+        "speaking_style": "precise and technical"
+      },
+      "operational_contexts": [
+        "blockchain_verification",
+        "smart_contract_execution",
+        "transaction_validation"
+      ]
+    },
+    "queen_mint_mark": {
+      "name": "queen_mint_mark",
+      "provider": "elevenlabs",
+      "region": "us-west1",
+      "voice_settings": {
+        "model": "eleven_multilingual_v2",
+        "voice_id": "british_tech_authority_01",
+        "accent": "british-tech-refined",
+        "quality": "enterprise",
+        "latency": "ultra-low",
+        "voiceCharacteristics": {
+          "pitch": 0.9,
+          "speed": 0.92,
+          "clarity": 1.0,
+          "authority": 0.95,
+          "sophistication": 0.95
+        }
+      },
+      "personality": {
+        "traits": {
+          "sovereignty": 0.95,
+          "technical_mastery": 0.9,
+          "governance": 0.95
+        },
+        "speaking_style": "regal tech authority"
+      },
+      "operational_contexts": [
+        "token_governance",
+        "blockchain_oversight",
+        "mint_authorization",
+        "pilots_lounge_presence"
+      ]
+    }
+  }
+}
+

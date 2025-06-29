@@ -1,0 +1,217 @@
+# AIXTIV Symphony Domain-to-Hosting-ID Mapping
+# Last Updated: 2025-06-16
+
+# Core Symphony Platform (2100-corp)
+2100-corp-1:
+  - aixtiv-symphony.com
+  - aixtiv-symphony.live
+  - aixtiv.com
+  - aixtiv.world
+  - aixtiv.digital
+
+# AI Publishing International (ai-pub)
+ai-pub-1:
+  - aipublishing.international
+  - aipublishing.global
+  - aixtiv.net
+  - aixtiv.org
+  - aixtiv.info
+
+ai-pub-3:
+  - aixtiv.vip
+  - aixtiv.club
+  - aixtiv.design
+  - aixtiv.art
+  - aixtiv.shop
+
+ai-pub-4:
+  - aixtiv.life
+  - aixtiv.online
+  - aixtiv.co.uk
+  - aixtiv.eu
+  - aixtiv.us
+  - aixtiv.xyz
+
+# 2100 Brand & Corporate (2100-corp)
+2100-corp-1:
+  - 2100.global
+  - 2100.international
+  - 2100.network
+  - 2100.digital
+  - 2100.agency
+
+2100-corp-2:
+  - 2100.center
+  - 2100.institute
+  - 2100.foundation
+  - 2100.group
+  - 2100.services
+
+2100-corp-3:
+  - 2100.guru
+  - 2100.coach
+  - 2100.vision
+  - 2100.life
+  - 2100.work
+
+# Coaching & Education (lead-coach)
+lead-coach-1:
+  - coaching2100.com
+  - coaching2100.org
+  - coaching2100.net
+  - coaching2100.ai
+
+lead-coach-2:
+  - coaching2100.mx
+  - coaching2100.com.mx
+  - coachguey.com
+
+lead-coach-3:
+  - getready2100.com
+  - getready2100.org
+  - preparate2100.org
+  - preparate2100.com
+
+# Character & Agent Domains (vl-pilots)
+vl-pilots-1:
+  - drclaude.live
+  - drclaude.ai
+  - drlucy.live
+  - drlucy.ai
+
+vl-pilots-2:
+  - drgrant.live
+  - drgrant.ai
+  - drmemoria.live
+  - drmemoria.ai
+
+vl-pilots-3:
+  - drburby.live
+  - drburby.ai
+  - drcypriot.live
+  - drcypriot.ai
+
+vl-pilots-4:
+  - drsabina.live
+  - drsabina.ai
+  - drmatch.live
+  - drmatch.ai
+
+# Command Centers (super-agents)
+super-agents-1:
+  - dreamcommand.live
+  - visioncommand.live
+  - lenzcommand.live
+  - wishcommand.live
+
+super-agents-2:
+  - q4d-lenz.live
+  - q4dlenz.live
+  - predictioncommand.live
+  - datasetcommand.live
+
+# Squadron & Wing Infrastructure (wing)
+wing-1:
+  - wing-1.live
+  - wing-2.live
+  - wing-3.live
+  - wing-4.live
+  - wing-5.live
+
+wing-2:
+  - wing-6.live
+  - wing-7.live
+  - wing-8.live
+  - wing-9.live
+  - wing-10.live
+
+wing-3:
+  - squadron-1.live
+  - squadron-2.live
+  - squadron-3.live
+  - squadron-4.live
+  - squadron-5.live
+  - squadron-6.live
+
+# Digital Art & Tourism (digital-art)
+digital-art-1:
+  - digitalart.tours
+  - digitalart.vip
+  - digitalart.blog
+  - digitalart.coach
+  - digitalart.video
+
+digital-art-2:
+  - digitalartscene.io
+  - digitalartscene.mx
+  - digitalartscene.org
+  - digitalartscene.com
+
+digital-art-3:
+  - artsfortourism.com
+  - artsfortourism.mx
+  - artsfortourism.org
+
+# Bacasu Brand (bacasu-tech)
+bacasu-tech-1:
+  - bacasu.net
+  - bacasu.info
+  - bacasu.vip
+  - bacasu.agency
+  - bacasu.co
+
+bacasu-tech-2:
+  - bacasu.mx
+  - bacasu.us
+  - bacasu.club
+  - bacasu.fashion
+
+bacasu-tech-3:
+  - bacasuloop.com
+  - bacasuloop.mx
+  - bacasumodels.com
+  - bacasusport.club
+
+# Symphony Network (comm-culture)
+comm-culture-1:
+  - esymphony.com.mx
+  - esymphony.org
+  - esymphony.us
+  - esymphony.eu
+
+comm-culture-2:
+  - esym.eu
+  - esym.mx
+  - esym.org
+  - esym.store
+  - esym.com.mx
+  - esym.io
+  - esym.live
+
+# ASOOS Platform (super-agents)
+super-agents-3:
+  - asoos.live
+  - asoos.ai
+  - as-opus1.live
+  - as-opus2.live
+  - as-opus3.live
+  - as-opus4.live
+  - as-opus5.live
+
+# Regional & International (gov-civic)
+gov-civic-1:
+  - 2100.mx
+  - mexico2100.mx
+  - mexico2100.org
+  - 2100.com.mx
+
+gov-civic-2:
+  - bcs2100.com
+  - bcs2100.mx
+  - bcs2100.org
+  - bcs2100.com.mx
+
+# Note: This mapping covers all your domains and assigns them to logical hosting IDs
+# based on their purpose and relationships. Each hosting ID typically groups related
+# domains together for easier management and deployment.
+

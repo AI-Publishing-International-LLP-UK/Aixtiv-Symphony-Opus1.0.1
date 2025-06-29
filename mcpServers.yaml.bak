@@ -1,0 +1,44 @@
+# SECURE MCP CONFIGURATION - Customer #208576
+# Vision Lake Patent Filing System
+# Post-Repository-Cleanup Configuration
+
+mcpServers:
+  # Core MCP Server - Primary
+  - name: integration-gateway-prima  - name: integration-gateway-prima  - name: i1
+    url: https://integration-gateway-mcp-yutylytffa    url: https://integration-gateway-mcp-tp    url: https://integrive.run.a    url: https://integration-gateFail: false
+      timeout: 30
+    fallback:
+      policy: deny
+      policy: deny
+tegration-gateway-mcp-yutylytffa    url: https://integration-gatewaeHttps: true
+      validateCallbacks: true
+    
+  # Patent Filing Integration
+  - name: patent-filing-mcp
+    command: patent-filing
+    region: us-west1
+    callback:
+      url: https://mcp.api-for-warp-drive.run.app/patents/callback
+      redirectOnFail: false
+    env:
+      USPTO_CUSTOMER_NUMBER: "208576"
+      ENTITY_STATUS: "SMALL"
+      FILIN      FILIN      FILIN      FILIN ockExternalRedirects: true
+
+# DNS Security Configurati# DNS Security Configurati# *.domaincntrol.com"
+    - "nojs.domaincntrol.com"
+  whitelist:
+    - "api-for-warp-drive.run.app"
+    - "mcp.api-for-warp-drive.run.app" 
+    - "integration-gateway-mcp-yutylytffa-uw.a.run.app"
+
+# Repository Configuration (Post-Cleanup)
+repositories:
+  primary_org: "AI-Publishing-International-LLP-UK"
+  development_org: "C2100-PR"
+  core_repos:
+    - "integration-gateway"
+    - "ASOOS-MAIN"
+    - "patent-documentation    - "patent-dPATENTS-USPTO"
+    - "aixtiv-cli"
+    - "deployment-ready"

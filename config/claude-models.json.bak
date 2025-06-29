@@ -1,0 +1,58 @@
+{
+  "models": [
+    {
+      "id": "claude-max",
+      "name": "Claude 4.0 (MAX)",
+      "provider": "anthropic",
+      "model": "claude-3-opus-20240229",
+      "max_tokens": 200000,
+      "default_tokens": 4096,
+      "description": "Claude 4.0 via MAX subscription",
+      "api_endpoint": "https://api.anthropic.com/v1/messages",
+      "api_version": "2023-06-01",
+      "environment_variable": "CLAUDE_MAX_API_KEY"
+    },
+    {
+      "id": "claude-3-5-sonnet",
+      "name": "Claude 3.5 Sonnet",
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20240620",
+      "max_tokens": 200000,
+      "default_tokens": 4096,
+      "description": "Claude 3.5 Sonnet via direct Anthropic API",
+      "api_endpoint": "https://api.anthropic.com/v1/messages",
+      "api_version": "2023-06-01",
+      "environment_variable": "ANTHROPIC_API_KEY"
+    },
+    {
+      "id": "claude-3-7-sonnet",
+      "name": "Claude 3.7 Sonnet",
+      "provider": "anthropic",
+      "model": "claude-3-7-sonnet-20250219",
+      "max_tokens": 200000,
+      "default_tokens": 4096,
+      "description": "Claude 3.7 Sonnet via Google Cloud",
+      "api_endpoint": "https://us-west1-aiplatform.googleapis.com/v1/projects/api-for-warp-drive/locations/us-west1/publishers/anthropic/models/claude-3-7-sonnet@20250219:predict",
+      "api_version": "v1",
+      "provider": "google",
+      "auth_method": "workload_federation",
+      "project_id": "api-for-warp-drive",
+      "region": "us-west1"
+    },
+    {
+      "id": "superclaude",
+      "name": "Super Claude 3",
+      "provider": "google",
+      "model": "superclaude",
+      "max_tokens": 200000,
+      "default_tokens": 4096,
+      "description": "Super Claude 3 via Google Cloud",
+      "api_endpoint": "https://us-west1-aiplatform.googleapis.com/v1/projects/api-for-warp-drive/locations/us-west1/models/superclaude:predict",
+      "api_version": "v1",
+      "auth_method": "gcp",
+      "project_id": "api-for-warp-drive",
+      "region": "us-west1"
+    }
+  ]
+}
+

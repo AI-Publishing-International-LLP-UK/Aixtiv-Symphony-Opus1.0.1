@@ -1,0 +1,1493 @@
+{
+  "assignment_summary": {
+    "total_projects": 6,
+    "total_batches_assigned": 120,
+    "total_agents_assigned": 12000000,
+    "assignment_started": "2025-06-29T17:59:57.872Z",
+    "assignment_completed": "2025-06-29T17:59:57.903Z"
+  },
+  "project_assignments": [
+    {
+      "project": {
+        "key": "ANTHOLOGY-CONTENT-INGESTION",
+        "name": "Anthology Content Ingestion Pipeline",
+        "type": "content_processing",
+        "lead": "Dr_Memoria_Production",
+        "description": "Automated content ingestion and initial processing",
+        "agent_allocation": 20
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 1,
+          "agent_range": {
+            "start": 1,
+            "end": 100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 2,
+          "agent_range": {
+            "start": 100001,
+            "end": 200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 3,
+          "agent_range": {
+            "start": 200001,
+            "end": 300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 4,
+          "agent_range": {
+            "start": 300001,
+            "end": 400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 5,
+          "agent_range": {
+            "start": 400001,
+            "end": 500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 6,
+          "agent_range": {
+            "start": 500001,
+            "end": 600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 7,
+          "agent_range": {
+            "start": 600001,
+            "end": 700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 8,
+          "agent_range": {
+            "start": 700001,
+            "end": 800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 9,
+          "agent_range": {
+            "start": 800001,
+            "end": 900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 10,
+          "agent_range": {
+            "start": 900001,
+            "end": 1000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 11,
+          "agent_range": {
+            "start": 1000001,
+            "end": 1100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 12,
+          "agent_range": {
+            "start": 1100001,
+            "end": 1200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 13,
+          "agent_range": {
+            "start": 1200001,
+            "end": 1300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 14,
+          "agent_range": {
+            "start": 1300001,
+            "end": 1400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 15,
+          "agent_range": {
+            "start": 1400001,
+            "end": 1500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 16,
+          "agent_range": {
+            "start": 1500001,
+            "end": 1600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 17,
+          "agent_range": {
+            "start": 1600001,
+            "end": 1700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 18,
+          "agent_range": {
+            "start": 1700001,
+            "end": 1800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 19,
+          "agent_range": {
+            "start": 1800001,
+            "end": 1900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 20,
+          "agent_range": {
+            "start": 1900001,
+            "end": 2000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        }
+      ],
+      "assigned_agents": 2000000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-CONTENT-INGESTION-TASK-001",
+          "task_title": "Automated content extraction from DIDC archives",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-CONTENT-INGESTION-TASK-002",
+          "task_title": "Content validation and quality checks",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-CONTENT-INGESTION-TASK-003",
+          "task_title": "Metadata generation and tagging",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-CONTENT-INGESTION-TASK-004",
+          "task_title": "Content categorization and indexing",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-CONTENT-INGESTION-TASK-005",
+          "task_title": "Duplicate content detection and resolution",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.901Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.901Z"
+    },
+    {
+      "project": {
+        "key": "ANTHOLOGY-COMPILATION",
+        "name": "Anthology Automated Compilation",
+        "type": "content_compilation",
+        "lead": "Dr_Memoria_Production",
+        "description": "Automated content compilation and narrative construction",
+        "agent_allocation": 25
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 21,
+          "agent_range": {
+            "start": 2000001,
+            "end": 2100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 22,
+          "agent_range": {
+            "start": 2100001,
+            "end": 2200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 23,
+          "agent_range": {
+            "start": 2200001,
+            "end": 2300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 24,
+          "agent_range": {
+            "start": 2300001,
+            "end": 2400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 25,
+          "agent_range": {
+            "start": 2400001,
+            "end": 2500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 26,
+          "agent_range": {
+            "start": 2500001,
+            "end": 2600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 27,
+          "agent_range": {
+            "start": 2600001,
+            "end": 2700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 28,
+          "agent_range": {
+            "start": 2700001,
+            "end": 2800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 29,
+          "agent_range": {
+            "start": 2800001,
+            "end": 2900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 30,
+          "agent_range": {
+            "start": 2900001,
+            "end": 3000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 31,
+          "agent_range": {
+            "start": 3000001,
+            "end": 3100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 32,
+          "agent_range": {
+            "start": 3100001,
+            "end": 3200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 33,
+          "agent_range": {
+            "start": 3200001,
+            "end": 3300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 34,
+          "agent_range": {
+            "start": 3300001,
+            "end": 3400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 35,
+          "agent_range": {
+            "start": 3400001,
+            "end": 3500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 36,
+          "agent_range": {
+            "start": 3500001,
+            "end": 3600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 37,
+          "agent_range": {
+            "start": 3600001,
+            "end": 3700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 38,
+          "agent_range": {
+            "start": 3700001,
+            "end": 3800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 39,
+          "agent_range": {
+            "start": 3800001,
+            "end": 3900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 40,
+          "agent_range": {
+            "start": 3900001,
+            "end": 4000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 41,
+          "agent_range": {
+            "start": 4000001,
+            "end": 4100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 42,
+          "agent_range": {
+            "start": 4100001,
+            "end": 4200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 43,
+          "agent_range": {
+            "start": 4200001,
+            "end": 4300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 44,
+          "agent_range": {
+            "start": 4300001,
+            "end": 4400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.901Z"
+        },
+        {
+          "batch_number": 45,
+          "agent_range": {
+            "start": 4400001,
+            "end": 4500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "assigned_agents": 2500000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-COMPILATION-TASK-001",
+          "task_title": "Narrative structure analysis and optimization",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-COMPILATION-TASK-002",
+          "task_title": "Automated chapter organization",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-COMPILATION-TASK-003",
+          "task_title": "Cross-reference generation and linking",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-COMPILATION-TASK-004",
+          "task_title": "Bibliography compilation and formatting",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-COMPILATION-TASK-005",
+          "task_title": "Index generation and verification",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Memoria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.901Z"
+    },
+    {
+      "project": {
+        "key": "ANTHOLOGY-PUBLICATION",
+        "name": "Anthology Publication Pipeline",
+        "type": "publication_workflow",
+        "lead": "Dr_Sabina_Production",
+        "description": "Publication workflow automation and distribution",
+        "agent_allocation": 20
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 46,
+          "agent_range": {
+            "start": 4500001,
+            "end": 4600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 47,
+          "agent_range": {
+            "start": 4600001,
+            "end": 4700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 48,
+          "agent_range": {
+            "start": 4700001,
+            "end": 4800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 49,
+          "agent_range": {
+            "start": 4800001,
+            "end": 4900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 50,
+          "agent_range": {
+            "start": 4900001,
+            "end": 5000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 51,
+          "agent_range": {
+            "start": 5000001,
+            "end": 5100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 52,
+          "agent_range": {
+            "start": 5100001,
+            "end": 5200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 53,
+          "agent_range": {
+            "start": 5200001,
+            "end": 5300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 54,
+          "agent_range": {
+            "start": 5300001,
+            "end": 5400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 55,
+          "agent_range": {
+            "start": 5400001,
+            "end": 5500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 56,
+          "agent_range": {
+            "start": 5500001,
+            "end": 5600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 57,
+          "agent_range": {
+            "start": 5600001,
+            "end": 5700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 58,
+          "agent_range": {
+            "start": 5700001,
+            "end": 5800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 59,
+          "agent_range": {
+            "start": 5800001,
+            "end": 5900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 60,
+          "agent_range": {
+            "start": 5900001,
+            "end": 6000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 61,
+          "agent_range": {
+            "start": 6000001,
+            "end": 6100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 62,
+          "agent_range": {
+            "start": 6100001,
+            "end": 6200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 63,
+          "agent_range": {
+            "start": 6200001,
+            "end": 6300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 64,
+          "agent_range": {
+            "start": 6300001,
+            "end": 6400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 65,
+          "agent_range": {
+            "start": 6400001,
+            "end": 6500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "assigned_agents": 2000000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-PUBLICATION-TASK-001",
+          "task_title": "Format conversion and optimization",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-PUBLICATION-TASK-002",
+          "task_title": "Multi-platform publication preparation",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-PUBLICATION-TASK-003",
+          "task_title": "Cover design automation and generation",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-PUBLICATION-TASK-004",
+          "task_title": "Distribution channel coordination",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-PUBLICATION-TASK-005",
+          "task_title": "Publication scheduling and timing",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.902Z"
+    },
+    {
+      "project": {
+        "key": "ANTHOLOGY-ANALYTICS",
+        "name": "Anthology Distribution Analytics",
+        "type": "analytics_reporting",
+        "lead": "Dr_Match_Production",
+        "description": "Analytics, reporting, and performance monitoring",
+        "agent_allocation": 15
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 66,
+          "agent_range": {
+            "start": 6500001,
+            "end": 6600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 67,
+          "agent_range": {
+            "start": 6600001,
+            "end": 6700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 68,
+          "agent_range": {
+            "start": 6700001,
+            "end": 6800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 69,
+          "agent_range": {
+            "start": 6800001,
+            "end": 6900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 70,
+          "agent_range": {
+            "start": 6900001,
+            "end": 7000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 71,
+          "agent_range": {
+            "start": 7000001,
+            "end": 7100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 72,
+          "agent_range": {
+            "start": 7100001,
+            "end": 7200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 73,
+          "agent_range": {
+            "start": 7200001,
+            "end": 7300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 74,
+          "agent_range": {
+            "start": 7300001,
+            "end": 7400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 75,
+          "agent_range": {
+            "start": 7400001,
+            "end": 7500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 76,
+          "agent_range": {
+            "start": 7500001,
+            "end": 7600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 77,
+          "agent_range": {
+            "start": 7600001,
+            "end": 7700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 78,
+          "agent_range": {
+            "start": 7700001,
+            "end": 7800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 79,
+          "agent_range": {
+            "start": 7800001,
+            "end": 7900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 80,
+          "agent_range": {
+            "start": 7900001,
+            "end": 8000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "assigned_agents": 1500000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-ANALYTICS-TASK-001",
+          "task_title": "Performance metrics collection and analysis",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Match_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-ANALYTICS-TASK-002",
+          "task_title": "Reader engagement tracking and reporting",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Match_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-ANALYTICS-TASK-003",
+          "task_title": "Sales analytics and trend identification",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Match_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-ANALYTICS-TASK-004",
+          "task_title": "Market research and competitive analysis",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Match_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-ANALYTICS-TASK-005",
+          "task_title": "ROI calculation and optimization recommendations",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Match_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.902Z"
+    },
+    {
+      "project": {
+        "key": "ANTHOLOGY-QA",
+        "name": "Anthology Quality Assurance",
+        "type": "quality_control",
+        "lead": "Dr_Maria_Production",
+        "description": "Quality assurance and validation workflows",
+        "agent_allocation": 20
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 81,
+          "agent_range": {
+            "start": 8000001,
+            "end": 8100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 82,
+          "agent_range": {
+            "start": 8100001,
+            "end": 8200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 83,
+          "agent_range": {
+            "start": 8200001,
+            "end": 8300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 84,
+          "agent_range": {
+            "start": 8300001,
+            "end": 8400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 85,
+          "agent_range": {
+            "start": 8400001,
+            "end": 8500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 86,
+          "agent_range": {
+            "start": 8500001,
+            "end": 8600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 87,
+          "agent_range": {
+            "start": 8600001,
+            "end": 8700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 88,
+          "agent_range": {
+            "start": 8700001,
+            "end": 8800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 89,
+          "agent_range": {
+            "start": 8800001,
+            "end": 8900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 90,
+          "agent_range": {
+            "start": 8900001,
+            "end": 9000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 91,
+          "agent_range": {
+            "start": 9000001,
+            "end": 9100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 92,
+          "agent_range": {
+            "start": 9100001,
+            "end": 9200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 93,
+          "agent_range": {
+            "start": 9200001,
+            "end": 9300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 94,
+          "agent_range": {
+            "start": 9300001,
+            "end": 9400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 95,
+          "agent_range": {
+            "start": 9400001,
+            "end": 9500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 96,
+          "agent_range": {
+            "start": 9500001,
+            "end": 9600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 97,
+          "agent_range": {
+            "start": 9600001,
+            "end": 9700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 98,
+          "agent_range": {
+            "start": 9700001,
+            "end": 9800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 99,
+          "agent_range": {
+            "start": 9800001,
+            "end": 9900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        },
+        {
+          "batch_number": 100,
+          "agent_range": {
+            "start": 9900001,
+            "end": 10000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.902Z"
+        }
+      ],
+      "assigned_agents": 2000000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-QA-TASK-001",
+          "task_title": "Automated proofreading and grammar checking",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Maria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-QA-TASK-002",
+          "task_title": "Fact-checking and source verification",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Maria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-QA-TASK-003",
+          "task_title": "Content consistency validation",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Maria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-QA-TASK-004",
+          "task_title": "Legal compliance review and clearance",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Maria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-QA-TASK-005",
+          "task_title": "Final quality assurance and approval",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Maria_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.902Z"
+    },
+    {
+      "project": {
+        "key": "ANTHOLOGY-INTEGRATION",
+        "name": "Anthology System Integration",
+        "type": "system_integration",
+        "lead": "Dr_Sabina_Production",
+        "description": "Cross-system integration and coordination",
+        "agent_allocation": 20
+      },
+      "assigned_batches": [
+        {
+          "batch_number": 101,
+          "agent_range": {
+            "start": 10000001,
+            "end": 10100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 102,
+          "agent_range": {
+            "start": 10100001,
+            "end": 10200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 103,
+          "agent_range": {
+            "start": 10200001,
+            "end": 10300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 104,
+          "agent_range": {
+            "start": 10300001,
+            "end": 10400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 105,
+          "agent_range": {
+            "start": 10400001,
+            "end": 10500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 106,
+          "agent_range": {
+            "start": 10500001,
+            "end": 10600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 107,
+          "agent_range": {
+            "start": 10600001,
+            "end": 10700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 108,
+          "agent_range": {
+            "start": 10700001,
+            "end": 10800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 109,
+          "agent_range": {
+            "start": 10800001,
+            "end": 10900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 110,
+          "agent_range": {
+            "start": 10900001,
+            "end": 11000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 111,
+          "agent_range": {
+            "start": 11000001,
+            "end": 11100000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 112,
+          "agent_range": {
+            "start": 11100001,
+            "end": 11200000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 113,
+          "agent_range": {
+            "start": 11200001,
+            "end": 11300000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 114,
+          "agent_range": {
+            "start": 11300001,
+            "end": 11400000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 115,
+          "agent_range": {
+            "start": 11400001,
+            "end": 11500000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 116,
+          "agent_range": {
+            "start": 11500001,
+            "end": 11600000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 117,
+          "agent_range": {
+            "start": 11600001,
+            "end": 11700000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 118,
+          "agent_range": {
+            "start": 11700001,
+            "end": 11800000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 119,
+          "agent_range": {
+            "start": 11800001,
+            "end": 11900000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "batch_number": 120,
+          "agent_range": {
+            "start": 11900001,
+            "end": 12000000
+          },
+          "agent_count": 100000,
+          "assigned_at": "2025-06-29T17:59:57.903Z"
+        }
+      ],
+      "assigned_agents": 2000000,
+      "tasks_generated": [
+        {
+          "task_id": "ANTHOLOGY-INTEGRATION-TASK-001",
+          "task_title": "Cross-platform synchronization and coordination",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-INTEGRATION-TASK-002",
+          "task_title": "API integration testing and validation",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-INTEGRATION-TASK-003",
+          "task_title": "Data flow optimization and monitoring",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-INTEGRATION-TASK-004",
+          "task_title": "System performance monitoring and tuning",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        },
+        {
+          "task_id": "ANTHOLOGY-INTEGRATION-TASK-005",
+          "task_title": "Integration health checks and reporting",
+          "task_type": "AUTOMATED_EXECUTION",
+          "priority": "HIGH",
+          "status": "READY_FOR_AUTOMATION",
+          "assigned_lead": "Dr_Sabina_Production",
+          "automation_enabled": true,
+          "created_at": "2025-06-29T17:59:57.903Z"
+        }
+      ],
+      "status": "IN_PROGRESS",
+      "started_at": "2025-06-29T17:59:57.903Z"
+    }
+  ]
+}

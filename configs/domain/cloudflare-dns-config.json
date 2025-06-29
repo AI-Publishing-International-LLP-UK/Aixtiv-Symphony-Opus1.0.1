@@ -1,0 +1,117 @@
+{
+  "dns_configuration": {
+    "provider": "cloudflare",
+    "zone_id": "${CLOUDFLARE_ZONE_ID}",
+    "api_token": "${CLOUDFLARE_API_TOKEN}",
+    "base_domain": "2100.cool",
+    "target_server": "warpdrive-prod01",
+    "deployment_region": "us-west1-a",
+    "fallback_region": "us-west1-b",
+    "load_balancer_config": {
+      "name": "mocoa-lb-prod01",
+      "region": "us-west1",
+      "ip_address": "${WARPDRIVE_PROD01_IP}",
+      "backup_ip": "${WARPDRIVE_PROD01_BACKUP_IP}"
+    },
+    "a_records": {
+      "root": {
+        "name": "@",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Root domain - warpdrive-prod01"
+      },
+      "www": {
+        "name": "www",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "WWW subdomain - warpdrive-prod01"
+      },
+      "legal": {
+        "name": "legal",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Legal services - warpdrive-prod01",
+        "features": ["document-management", "compliance-tracking"]
+      },
+      "consultant": {
+        "name": "consultant",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Consultant services - warpdrive-prod01",
+        "features": ["project-tracking", "resource-allocation"]
+      },
+      "realty": {
+        "name": "realty",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Realty services - warpdrive-prod01",
+        "features": ["property-management", "market-analysis"]
+      },
+      "zena": {
+        "name": "zena",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Zena executive dashboard - warpdrive-prod01",
+        "features": ["executive-dashboard", "construction-management"]
+      },
+      "coach": {
+        "name": "coach",
+        "content": "${WARPDRIVE_PROD01_IP}",
+        "ttl": 300,
+        "proxied": true,
+        "comment": "Coaching platform - warpdrive-prod01",
+        "features": ["coaching-platform", "session-management"]
+      }
+    },
+    "security_configuration": {
+      "ssl": {
+        "mode": "strict",
+        "min_tls_version": "1.2",
+        "universal_ssl": true,
+        "always_https": true,
+        "hsts": {
+          "enabled": true,
+          "max_age": 31536000,
+          "include_subdomains": true,
+          "preload": true
+        }
+      },
+      "waf": {
+        "enabled": true,
+        "mode": "on",
+        "sensitivity": "medium"
+      },
+      "bot_management": {
+        "enabled": true,
+        "fight_mode": false
+      },
+      "ddos_protection": {
+        "enabled": true
+      }
+    },
+    "performance": {
+      "caching": {
+        "level": "aggressive",
+        "browser_ttl": 14400,
+        "edge_ttl": 7200
+      },
+      "minification": {
+        "html": true,
+        "css": true,
+        "js": true
+      },
+      "compression": {
+        "brotli": true,
+        "gzip": true
+      },
+      "rocket_loader": false,
+      "auto_minify": true
+    }
+  }
+}

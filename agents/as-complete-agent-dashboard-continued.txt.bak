@@ -1,0 +1,377 @@
+<span className="text-sm text-green-600">Deployed</span>
+                        </div>
+                      )}
+                      {gkeStatus === 'failed' && (
+                        <div className="flex items-center space-x-2">
+                          <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span className="text-sm text-red-600">Deployment Failed</span>
+                          <button 
+                            onClick={handleGKEDeploy}
+                            className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-md text-xs font-medium ml-2"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Advanced Integration Settings */}
+                <div className="border p-4 rounded-lg">
+                  <h4 className="font-medium">Advanced Integration Settings</h4>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Configure how your agents integrate with external systems.
+                  </p>
+                  
+                  <div className="mt-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Enable Flight Memory System</p>
+                        <p className="text-xs text-gray-500">Store and sync agent memory across sessions</p>
+                      </div>
+                      <div className="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input
+                          type="checkbox"
+                          name="flightMemory"
+                          id="flightMemory"
+                          className="sr-only"
+                          checked={authState.user?.authLevel >= UserAuthLevel.DR_GRANT}
+                          disabled={!authState.user || authState.user.authLevel < UserAuthLevel.DR_GRANT}
+                        />
+                        <label
+                          htmlFor="flightMemory"
+                          className={`block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer ${
+                            authState.user?.authLevel >= UserAuthLevel.DR_GRANT ? 'bg-indigo-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
+                              authState.user?.authLevel >= UserAuthLevel.DR_GRANT ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          ></span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">S2DO Protocol Verification</p>
+                        <p className="text-xs text-gray-500">Verify all agent actions with blockchain</p>
+                      </div>
+                      <div className="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input
+                          type="checkbox"
+                          name="s2doProtocol"
+                          id="s2doProtocol"
+                          className="sr-only"
+                          checked={authState.user?.authLevel >= UserAuthLevel.DR_GRANT}
+                          disabled={!authState.user || authState.user.authLevel < UserAuthLevel.DR_GRANT}
+                        />
+                        <label
+                          htmlFor="s2doProtocol"
+                          className={`block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer ${
+                            authState.user?.authLevel >= UserAuthLevel.DR_GRANT ? 'bg-indigo-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
+                              authState.user?.authLevel >= UserAuthLevel.DR_GRANT ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          ></span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Q4D-Lenz Enterprise Features</p>
+                        <p className="text-xs text-gray-500">Advanced scenario planning and compliance frameworks</p>
+                      </div>
+                      <div className="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input
+                          type="checkbox"
+                          name="q4dLenz"
+                          id="q4dLenz"
+                          className="sr-only"
+                          checked={authState.user?.authLevel >= UserAuthLevel.PAYMENT_VERIFIED}
+                          disabled={!authState.user || authState.user.authLevel < UserAuthLevel.PAYMENT_VERIFIED}
+                        />
+                        <label
+                          htmlFor="q4dLenz"
+                          className={`block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer ${
+                            authState.user?.authLevel >= UserAuthLevel.PAYMENT_VERIFIED ? 'bg-indigo-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
+                              authState.user?.authLevel >= UserAuthLevel.PAYMENT_VERIFIED ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          ></span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Dream Commander Activation</p>
+                        <p className="text-xs text-gray-500">Enable predictive and prescriptive intelligence</p>
+                      </div>
+                      <div className="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input
+                          type="checkbox"
+                          name="dreamCommander"
+                          id="dreamCommander"
+                          className="sr-only"
+                          checked={authState.user?.authLevel >= UserAuthLevel.TRIAL_PERIOD}
+                          disabled={!authState.user || authState.user.authLevel < UserAuthLevel.TRIAL_PERIOD}
+                        />
+                        <label
+                          htmlFor="dreamCommander"
+                          className={`block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer ${
+                            authState.user?.authLevel >= UserAuthLevel.TRIAL_PERIOD ? 'bg-indigo-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
+                              authState.user?.authLevel >= UserAuthLevel.TRIAL_PERIOD ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          ></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+// Agent Directory Component
+const AgentDirectory = ({ agents }: { agents: Agent[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<AgentType | 'all'>('all');
+  
+  // Filter agents based on search and type
+  const filteredAgents = agents.filter(agent => {
+    const matchesSearch = 
+      searchQuery === '' || 
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesType = filterType === 'all' || agent.type === filterType;
+    
+    return matchesSearch && matchesType;
+  });
+  
+  return (
+    <div className="space-y-6">
+      {/* Search and filter */}
+      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search agents..."
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <select
+          className="block w-full sm:w-48 pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value as AgentType | 'all')}
+        >
+          <option value="all">All Types</option>
+          <option value={AgentType.ANALYTICAL}>Analytical</option>
+          <option value={AgentType.CREATIVE}>Creative</option>
+          <option value={AgentType.OPERATIONAL}>Operational</option>
+          <option value={AgentType.STRATEGIC}>Strategic</option>
+          <option value={AgentType.SUPPORT}>Support</option>
+        </select>
+      </div>
+      
+      {/* Agent list */}
+      {filteredAgents.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6">
+          {filteredAgents.map(agent => (
+            <div key={agent.id} className="border rounded-lg overflow-hidden">
+              <div className="px-6 py-4">
+                <div className="flex items-start sm:items-center flex-col sm:flex-row sm:justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                      {agent.iconUrl ? (
+                        <img src={agent.iconUrl} alt={agent.name} className="w-6 h-6" />
+                      ) : (
+                        <span className="text-indigo-600 font-bold">{agent.name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">{agent.name}</h3>
+                      <div className="flex items-center mt-1">
+                        <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full mr-2">
+                          {agent.type}
+                        </span>
+                        <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                          {agent.accessLevel}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 sm:mt-0">
+                    <button className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium">
+                      Activate
+                    </button>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm text-gray-500">{agent.description}</p>
+                <div className="mt-4">
+                  <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wider">Capabilities</h4>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {agent.capabilities.map(capability => (
+                      <span key={capability} className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                        {capability.split('_').join(' ')}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 border rounded-lg">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No agents found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Try adjusting your search or filter to find what you're looking for.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Cluster Directory Component
+const ClusterDirectory = ({ clusters }: { clusters: AgentCluster[] }) => {
+  return (
+    <div className="space-y-6">
+      {clusters.map(cluster => (
+        <div key={cluster.id} className="border rounded-lg overflow-hidden">
+          <div className="px-6 py-4">
+            <div className="flex items-start sm:items-center flex-col sm:flex-row sm:justify-between">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">{cluster.name}</h3>
+                <div className="flex items-center mt-1">
+                  <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full mr-2">
+                    {cluster.agents.length} Agents
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                    {cluster.accessLevel}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-4 sm:mt-0 flex space-x-3">
+                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium">
+                  View Details
+                </button>
+                <button className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium">
+                  Activate Cluster
+                </button>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-gray-500">{cluster.description}</p>
+            <div className="mt-4">
+              <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wider">Included Agents</h4>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {cluster.agents.slice(0, 5).map(agent => (
+                  <span key={agent.id} className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                    {agent.name}
+                  </span>
+                ))}
+                {cluster.agents.length > 5 && (
+                  <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                    +{cluster.agents.length - 5} more
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Integration Gateway Mock Implementation
+// This would be imported from the actual IntegrationGateway in production
+export class IntegrationGatewayMock {
+  private isInitialized: boolean = false;
+  private registeredAgents: Agent[] = [];
+  private connectedToSymphonyOpus1: boolean = false;
+  
+  // Initialize the gateway with optional auth level
+  public async initialize(authLevel?: UserAuthLevel): Promise<boolean> {
+    console.log(`Initializing Integration Gateway${authLevel ? ` with auth level ${authLevel}` : ''}`);
+    return new Promise(resolve => {
+      setTimeout(() => {
+        this.isInitialized = true;
+        resolve(true);
+      }, 1500);
+    });
+  }
+  
+  // Register agents with the gateway
+  public async registerAgents(agents: Agent[]): Promise<number> {
+    if (!this.isInitialized) {
+      throw new Error('Integration Gateway not initialized');
+    }
+    
+    return new Promise(resolve => {
+      setTimeout(() => {
+        this.registeredAgents = [...agents];
+        resolve(agents.length);
+      }, 1000);
+    });
+  }
+  
+  // Connect to Symphony Opus1
+  public async connectToSymphonyOpus1(): Promise<boolean> {
+    if (!this.isInitialized) {
+      throw new Error('Integration Gateway not initialized');
+    }
+    
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        this.connectedToSymphonyOpus1 = true;
+        resolve(true);
+      }, 2000);
+    });
+  }
+  
+  // Get connection status
+  public isConnected(): boolean {
+    return this.connectedToSymphonyOpus1;
+  }
+  
+  // Get registered agent count
+  public getRegisteredAgentCount(): number {
+    return this.registeredAgents.length;
+  }
+}
+
+// Export the dashboard component
+export default AgentDashboard;

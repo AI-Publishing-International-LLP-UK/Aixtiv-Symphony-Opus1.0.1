@@ -1,0 +1,21 @@
+name: aixtiv-symphony-opus1
+title: Aixtiv Symphony Operating System (ASOOS) - OPUS 1.0.1
+script: src/index.tsx
+description: 'Comprehensive documentation platform for the Aixtiv Symphony Orchestrating Operating System - the first architecture built to operate across decentralized systems with AI orchestration, blockchain workflows, and real-time agent delegation.'
+scopes: []
+blocks:
+  - id: asoos-documentation
+    title: ASOOS Documentation Hub
+    description: Central documentation and message channel for Aixtiv Symphony components
+  - id: integration-gateway
+    title: Integration Gateway
+    description: Domain management, hosting configuration, and security documentation
+  - id: wing-agents
+    title: Wing Agent System
+    description: Agent orchestration, training, and deployment documentation
+  - id: vls-solutions
+    title: Vision Lake Solutions
+    description: Documentation for the 11 core solution domains
+organization: AI PUBLISHING INTERNATIONAL LLP
+visibility: private
+secrets: {}

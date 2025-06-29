@@ -1,0 +1,13 @@
+{
+  "batch_number": 114,
+  "agent_id_range": {
+    "start": 11300001,
+    "end": 11400000
+  },
+  "agent_count": 100000,
+  "deployment_region": "MOCOA_us-west1-a",
+  "scaling_mode": "AUTO_PRODUCTION",
+  "batch_status": "DEPLOYED",
+  "deployed_at": "2025-06-29T17:54:41.358Z",
+  "orchestrator_id": "ORCH-WFA-ENG-001"
+}

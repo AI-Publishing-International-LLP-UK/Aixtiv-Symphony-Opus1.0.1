@@ -1,0 +1,135 @@
+{
+  "cloudflare_hosting": {
+    "zone_id": "${CLOUDFLARE_ZONE_ID}",
+    "target_server": "warpdrive-prod01",
+    "deployment_region": "us-west1-a",
+    "fallback_region": "us-west1-b",
+    "sites": [
+      {
+        "name": "mocoa-interface",
+        "domain": "2100.cool",
+        "public_dir": "public",
+        "routes": [
+          {
+            "pattern": "/interface{,/**}",
+            "destination": "/interface/index.html"
+          },
+          {
+            "pattern": "/interface-light{,/**}",
+            "destination": "/interface-light/index.html"
+          },
+          {
+            "pattern": "/diamond-sao{,/**}",
+            "destination": "/interface/index.html"
+          },
+          {
+            "pattern": "/**",
+            "destination": "/index.html"
+          }
+        ],
+        "security_headers": {
+          "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';",
+          "X-Frame-Options": "DENY",
+          "X-Content-Type-Options": "nosniff",
+          "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+          "X-XSS-Protection": "1; mode=block",
+          "Referrer-Policy": "strict-origin-when-cross-origin"
+        },
+        "cache_rules": {
+          "static_assets": {
+            "pattern": "*.{css,js,png,jpg,jpeg,gif,svg,ico,woff,woff2}",
+            "edge_ttl": 86400,
+            "browser_ttl": 86400
+          },
+          "html_files": {
+            "pattern": "*.html",
+            "edge_ttl": 3600,
+            "browser_ttl": 300
+          }
+        }
+      },
+      {
+        "name": "coaching2100-com",
+        "domain": "coaching2100.com",
+        "public_dir": "public/coaching2100-com",
+        "routes": [
+          {
+            "pattern": "/**",
+            "destination": "/index.html"
+          }
+        ],
+        "security_headers": {
+          "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';",
+          "X-Frame-Options": "DENY",
+          "X-Content-Type-Options": "nosniff",
+          "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+          "X-XSS-Protection": "1; mode=block",
+          "Referrer-Policy": "strict-origin-when-cross-origin"
+        },
+        "cache_rules": {
+          "static_assets": {
+            "pattern": "*.{css,js,png,jpg,jpeg,gif,svg,ico,woff,woff2}",
+            "edge_ttl": 86400,
+            "browser_ttl": 86400
+          },
+          "html_files": {
+            "pattern": "*.html",
+            "edge_ttl": 3600,
+            "browser_ttl": 300
+          }
+        }
+      }
+    ],
+    "subdomain_sites": {
+      "legal": {
+        "public_dir": "public/legal-2100-cool",
+        "features": ["document-management", "compliance-tracking"]
+      },
+      "consultant": {
+        "public_dir": "public/consultant-2100-cool",
+        "features": ["project-tracking", "resource-allocation"]
+      },
+      "realty": {
+        "public_dir": "public/realty-2100-cool",
+        "features": ["property-management", "market-analysis"]
+      },
+      "zena": {
+        "public_dir": "public/zena-2100-cool",
+        "features": ["executive-dashboard", "construction-management"]
+      },
+      "coach": {
+        "public_dir": "public/coach-2100-cool",
+        "features": ["coaching-platform", "session-management"]
+      }
+    },
+    "ignore_patterns": [
+      "firebase.json",
+      "cloudflare.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.bak",
+      "logs/**",
+      "secrets_output/**"
+    ]
+  },
+  "warpdrive_config": {
+    "server_name": "warpdrive-prod01",
+    "location": "MOCOA",
+    "primary_zone": "us-west1-a",
+    "backup_zone": "us-west1-b",
+    "load_balancer": {
+      "type": "nginx",
+      "ssl_termination": true,
+      "compression": true,
+      "rate_limiting": {
+        "enabled": true,
+        "requests_per_minute": 1000
+      }
+    },
+    "monitoring": {
+      "health_checks": true,
+      "uptime_monitoring": true,
+      "performance_metrics": true
+    }
+  }
+}

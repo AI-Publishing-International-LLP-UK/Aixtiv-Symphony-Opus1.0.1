@@ -1,0 +1,153 @@
+{
+  "batch_id": "Diamond_SAO_Batch_Alpha",
+  "filing_date": "2025-06-21T21:55:50.586644",
+  "customer_number": "20857",
+  "entity_status": "SMALL",
+  "total_patents": 10,
+  "total_filing_cost": 750,
+  "inventor": {
+    "name": "Phillip Corey Roark",
+    "address": {
+      "street": "27 Arlington Rd",
+      "city": "Teddington",
+      "country": "GB",
+      "postal_code": "TW11 8NL"
+    },
+    "citizenship": "US"
+  },
+  "patents": [
+    {
+      "patent_id": "SAO-11",
+      "title": "SAO-11 \u2013 Flight Memory Systems (FMS) Integration Architecture",
+      "claim_areas": "Memory encoding for flight logs; replay protocols; validation indexing",
+      "lead_agent": "Dr. Grant",
+      "roi_type": "Preservation ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-12",
+      "title": "SAO-12 \u2013 Compass Field Agent Deployment Matrix",
+      "claim_areas": "Agent zoning, field coordination vectors, engagement-to-role ratio",
+      "lead_agent": "Dr. Claude",
+      "roi_type": "Deployment ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-13",
+      "title": "SAO-13 \u2013 Anti-Gravity Powercraft Simulation Loop (AGPSL)",
+      "claim_areas": "Simulation environment for AI-operated lift/flight/collision avoidance",
+      "lead_agent": "Dr. Lucy",
+      "roi_type": "Mobility ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-14",
+      "title": "SAO-14 \u2013 Compassion Oversight Council Protocol",
+      "claim_areas": "AI-emotional integrity safeguards; audit procedures; trauma recalibration",
+      "lead_agent": "Dr. Sabina",
+      "roi_type": "Restoration ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-15",
+      "title": "SAO-15 \u2013 Bakasu Springs Civic-Consciousness Grid",
+      "claim_areas": "Metaversal city logic; cultural interfacing; civic duties of agents",
+      "lead_agent": "Dr. Match",
+      "roi_type": "Community ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-16",
+      "title": "SAO-16 \u2013 Vision Lake Emotional Reset Protocol",
+      "claim_areas": "Ingression cabins; emotional equilibrium charts; reconnection logic",
+      "lead_agent": "Dra. Maria",
+      "roi_type": "Resilience ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-17",
+      "title": "SAO-17 \u2013 RIX \u2192 CRX \u2192 qRIX Ladder Credential Engine",
+      "claim_areas": "Career lattice mapping; quantum role compression; expertise progression",
+      "lead_agent": "Professor Lee",
+      "roi_type": "Capability ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-18",
+      "title": "SAO-18 \u2013 DIDC Sectoral Role Classification (SRL Grid)",
+      "claim_areas": "Digital Dewey classification for 50 sectors \u00d7 30 lifecycles \u00d7 5 roles",
+      "lead_agent": "Dr. Lucy",
+      "roi_type": "Knowledge ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-19",
+      "title": "SAO-19 \u2013 S2DO Chain of Trust Protocol",
+      "claim_areas": "Proof-of-credential chain; blockchain time-stamped agent validation",
+      "lead_agent": "Dr. Burby",
+      "roi_type": "Trust ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-20",
+      "title": "SAO-20 – Quantum Evolutionary Knowledge Function (EKF)",
+      "claim_areas": "System-wide learning algorithm and wisdom-recalibration feedback",
+      "lead_agent": "Dr. Memoria",
+      "roi_type": "Evolution ROI",
+      "filing_fee": 75,
+      "priority": "HIGH"
+    },
+    {
+      "patent_id": "SAO-21",
+      "title": "SAO-21 – ASOOS.2100.Cool Deployment Orchestration System",
+      "claim_areas": "Automated CI/CD deployment for multi-domain hosting; Firebase integration; content synchronization and validation protocols",
+      "lead_agent": "Dr. Claude",
+      "roi_type": "Deployment ROI",
+      "filing_fee": 75,
+      "priority": "HIGH",
+      "deployment_config": {
+        "domain": "asoos.2100.cool",
+        "firebase_site": "asoos-2100-cool",
+        "target_name": "2100-cool-c624d",
+        "project_id": "api-for-warp-drive",
+        "region": "us-west1",
+        "ci_script": "ci-deploy-asoos.sh",
+        "source_path": "/Users/as/asoos/integration-gateway/public/index.html",
+        "target_path": "/Users/as/asoos/integration-gateway/public/asoos-2100-cool/"
+      }
+    }
+  ],
+  "diamond_sao_deployment_commands": {
+    "asoos_2100_cool": {
+      "full_deploy": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh",
+      "sync_only": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh sync",
+      "test_only": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh test",
+      "rollback": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh rollback",
+      "backup": "cd /Users/as/asoos/integration-gateway && ./ci-deploy-asoos.sh backup"
+    },
+    "multi_site_2100_cool": {
+      "list_sites": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh list",
+      "deploy_all": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy-all",
+      "status_check": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh status",
+      "deploy_coaching": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy coaching",
+      "deploy_academy": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy academy",
+      "deploy_vision_lake": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy vision-lake",
+      "deploy_bacasu": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy bacasu",
+      "deploy_finance": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy finance",
+      "deploy_research": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy research",
+      "deploy_rewards": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy rewards",
+      "deploy_healthcare": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy healthcare",
+      "deploy_civic": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh deploy civic",
+      "generate_config": "cd /Users/as/asoos/integration-gateway && ./deploy-2100-cool-sites.sh generate-config"
+    }
+  }
+}

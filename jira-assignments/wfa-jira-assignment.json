@@ -1,0 +1,14 @@
+{
+  "assigned_at": "2025-06-29T18:01:32.172Z",
+  "wfa_agents": "12,000,000",
+  "jira_projects": [
+    "ANTHOLOGY-WFA-PRODUCTION",
+    "ANTHOLOGY-CONTENT-INGESTION",
+    "ANTHOLOGY-COMPILATION",
+    "ANTHOLOGY-PUBLICATION",
+    "ANTHOLOGY-ANALYTICS",
+    "ANTHOLOGY-QA",
+    "ANTHOLOGY-INTEGRATION"
+  ],
+  "status": "ASSIGNED"
+}

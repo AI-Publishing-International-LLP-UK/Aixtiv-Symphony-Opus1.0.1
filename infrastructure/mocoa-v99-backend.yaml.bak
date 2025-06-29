@@ -1,0 +1,80 @@
+apiVersion: cloud.google.com/v1
+kind: BackendService
+metadata:
+  name: mocoa-v99-backend
+  namespace: anthology-ai
+spec:
+  description: "MOCOA v99 Owner Interface Backend Service"
+  loadBalancingScheme: EXTERNAL
+  protocol: HTTPS
+  timeoutSec: 60
+  connectionDraining:
+    drainingTimeoutSec: 60
+  enableCDN: true
+  sessionAffinity: CLIENT_IP
+  
+  # MOCOA Infrastructure - us-west1-a/b
+  backend:
+    - balancingMode: UTILIZATION
+      group: projects/api-for-warp-drive/zones/us-west1-a/instanceGroups/mocoa-v99-instances
+      maxUtilization: 0.8
+    - balancingMode: UTILIZATION  
+      group: projects/api-for-warp-drive/zones/us-west1-b/instanceGroups/mocoa-v99-instances
+      maxUtilization: 0.8
+  
+  healthChecks:
+    - name: mocoa-v99-health-check
+      config:
+        type: HTTPS
+        port: 443
+        requestPath: "/owner-interface/health"
+        checkIntervalSec: 10
+        timeoutSec: 5
+        unhealthyThreshold: 3
+        healthyThreshold: 2
+  
+  # SallyPort Security Headers
+  customRequestHeaders:
+    - "X-Sallyport-Auth: enabled"
+    - "X-Content-Type-Options: nosniff"
+    - "X-Frame-Options: SAMEORIGIN"
+    - "X-MOCOA-Version: v99"
+  
+  securitySettings:
+    securityPolicyRef:
+      name: mocoa-v99-security-policy
+      
+  failoverPolicy:
+    disableConnectionDrainOnFailover: false
+    dropTrafficIfUnhealthy: true
+    failoverRatio: 0.1
+
+---
+apiVersion: cloud.google.com/v1
+kind: SecurityPolicy
+metadata:
+  name: mocoa-v99-security-policy
+  namespace: anthology-ai
+spec:
+  description: "Security policy for MOCOA v99 owner interface"
+  rules:
+    - priority: 1000
+      match:
+        versionedExpr: SRC_IPS_V1
+        config:
+          srcIpRanges:
+            - "*"
+      action: "allow"
+      rateLimitOptions:
+        conformAction: "allow"
+        exceedAction: "deny_403"
+        enforceOnKey: IP
+        rateLimitThreshold:
+          count: 100
+          intervalSec: 60
+    - priority: 2000
+      match:
+        expr:
+          expression: "origin.ip in ['127.0.0.1/8', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16']"
+      action: "deny_403"
+      description: "Block internal IP ranges from external access"
