@@ -1,0 +1,105 @@
+name: Jira Integration
+
+on:
+  pull_request:
+    types: [opened, reopened, closed, edited, synchronized]
+  push:
+    branches:
+      - main
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  process-jira-integration:
+    name: Process Jira Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      # Process when a PR is created or updated
+      - name: Extract Jira Issue Keys from PR
+        if: github.event_name == 'pull_request'
+        id: extract_jira_keys
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          string: ${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}
+
+      - name: Create Jira Comment for PR
+        if: github.event_name == 'pull_request' && steps.extract_jira_keys.outputs.issue != ''
+        uses: atlassian/gajira-comment@v3
+        with:
+          issue: ${{ steps.extract_jira_keys.outputs.issue }}
+          comment: |
+            GitHub Pull Request: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})
+            Status: ${{ github.event.pull_request.state }}
+            Created by: ${{ github.event.pull_request.user.login }}
+
+      # Update Jira Issue when PR is merged to main
+      - name: Update Jira issue when PR merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract_jira_keys.outputs.issue != ''
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.extract_jira_keys.outputs.issue }}
+          transition: "In Review"
+      
+      # Process smart commits in push events
+      - name: Process Smart Commits on Push
+        if: github.event_name == 'push'
+        id: smart_commits
+        run: |
+          git log --pretty=format:"%H %s" ${{ github.event.before }}..${{ github.event.after }} > commits.txt
+          echo "Commits to process:"
+          cat commits.txt
+          echo "::set-output name=commits_file::commits.txt"
+
+      - name: Analyze Commits for Jira References
+        if: github.event_name == 'push'
+        id: analyze_commits
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          from: commits
+
+      - name: Process Jira Smart Commits
+        if: github.event_name == 'push' && steps.analyze_commits.outputs.issue != ''
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.analyze_commits.outputs.issue }}
+          transition: "In Progress"
+
+      # Add a work log to Jira issue when PR is merged
+      - name: Add Worklog to Jira
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract_jira_keys.outputs.issue != ''
+        uses: atlassian/gajira-worklog@v3
+        with:
+          issue: ${{ steps.extract_jira_keys.outputs.issue }}
+          timeSpent: "1h"
+          comment: "Time spent reviewing and merging PR: ${{ github.event.pull_request.title }}"
+
+      # Process comments that might include Jira issue references
+      - name: Extract Jira Keys from Comments
+        if: github.event_name == 'issue_comment'
+        id: extract_comment_keys
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          string: ${{ github.event.comment.body }}
+
+      - name: Link Comment to Jira
+        if: github.event_name == 'issue_comment' && steps.extract_comment_keys.outputs.issue != ''
+        uses: atlassian/gajira-comment@v3
+        with:
+          issue: ${{ steps.extract_comment_keys.outputs.issue }}
+          comment: |
+            GitHub Comment on [${{ github.event.issue.title }}](${{ github.event.comment.html_url }})
+            By: ${{ github.event.comment.user.login }}
+            Content: ${{ github.event.comment.body }}
+

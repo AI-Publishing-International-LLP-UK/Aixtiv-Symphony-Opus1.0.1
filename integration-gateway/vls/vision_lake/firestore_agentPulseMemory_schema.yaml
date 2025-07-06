@@ -1,0 +1,14 @@
+
+# Firestore Collection: agentPulseMemory
+
+Collection: agentPulseMemory
+Fields:
+  - timestamp (datetime)
+  - activeAgents (int)
+  - idleAgents (int)
+  - burstEvents (array of timestamps)
+  - scalingFormations (int)
+  - healthStatus (string: healthy, scaling, overload)
+  - metadata:
+      - region (string)
+      - triggeredBy (string: Claude, Warp, user)

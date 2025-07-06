@@ -1,0 +1,2 @@
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/integration-gateway:${SHORT_SHA}', '../..']

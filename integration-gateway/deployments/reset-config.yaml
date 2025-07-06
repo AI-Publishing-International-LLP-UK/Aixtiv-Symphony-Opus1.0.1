@@ -1,0 +1,48 @@
+# Integration Gateway Reset Configuration
+# This file uses environment variables instead of hardcoded credentials
+# Use .env file or environment variables to configure
+
+cleanup:
+  target_deployments:
+    - name: generative-ai-kb
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/generative-ai-kb"
+      location: ${DEPLOYMENT_REGION:-us-west1}
+      resources:
+        - type: aiplatform.googleapis.com/Endpoint
+        - type: storage.googleapis.com/Bucket
+        - type: bigquery.googleapis.com/Dataset
+
+    - name: rag-cloudsql
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/rag-cloudsql"
+      location: ${DEPLOYMENT_REGION:-us-west1}
+      resources:
+        - type: sqladmin.googleapis.com/Instance
+        - type: aiplatform.googleapis.com/Endpoint
+        - type: storage.googleapis.com/Bucket
+
+    - name: dynamic-web-apps
+      bucket: "${CONFIG_BUCKET_ID:-default-config-bucket}/web-apps"
+      location: ${DEPLOYMENT_REGION:-us-west1}
+      resources:
+        - type: run.googleapis.com/Service
+        - type: cloudbuild.googleapis.com/Trigger
+        - type: storage.googleapis.com/Bucket
+
+reset_sequence:
+  - step: "backup_configs"
+    action: "export existing configurations"
+    backup_location: "gs://${BACKUP_BUCKET:-default-backup-bucket}/backups"
+
+  - step: "cleanup_resources"
+    action: "remove problematic resources"
+    ignore_errors: true
+
+  - step: "reset_state"
+    action: "clean terraform state"
+    
+  - step: "reinitialize"
+    action: "prepare for new deployment"
+
+# These values must be set via environment variables
+service_account: "${SERVICE_ACCOUNT}"
+project_id: "${PROJECT_ID}"

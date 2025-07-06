@@ -1,0 +1,569 @@
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-west1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $REGISTRY/$IMAGE:$GITHUB_SHA .
+        docker push $REGISTRY/$IMAGE:$GITHUB_SHA
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-west1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $REGISTRY/$IMAGE:$GITHUB_SHA .
+        docker push $REGISTRY/$IMAGE:$GITHUB_SHA
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-west1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $REGISTRY/$IMAGE:$GITHUB_SHA .
+        docker push $REGISTRY/$IMAGE:$GITHUB_SHA
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-west1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $REGISTRY/$IMAGE:$GITHUB_SHA .
+        docker push $REGISTRY/$IMAGE:$GITHUB_SHA
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker us-west1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t $REGISTRY/$IMAGE:$GITHUB_SHA .
+        docker push $REGISTRY/$IMAGE:$GITHUB_SHA
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+name: Multi-Region Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: api-for-warp-drive
+  PRIMARY_REGION: us-west1-b
+  BACKUP_REGION: us-central1
+  REGISTRY: us-west1-docker.pkg.dev/api-for-warp-drive/integration-gateway
+  IMAGE: gateway-api
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: 'projects/859242575175/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions-deploy@api-for-warp-drive.iam.gserviceaccount.com'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Deploy Primary Region
+      run: |
+        echo "Deploying to Primary Region ($PRIMARY_REGION)"
+        gcloud run deploy integration-gateway \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $PRIMARY_REGION \
+          --platform managed \
+          --allow-unauthenticated
+
+    - name: Deploy Backup Region
+      run: |
+        echo "Deploying to Backup Region ($BACKUP_REGION)"
+        gcloud run deploy integration-gateway-backup \
+          --image $REGISTRY/$IMAGE:$GITHUB_SHA \
+          --region $BACKUP_REGION \
+          --platform managed \
+          --allow-unauthenticated
+

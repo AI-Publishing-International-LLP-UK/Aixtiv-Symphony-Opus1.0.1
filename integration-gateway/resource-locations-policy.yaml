@@ -1,0 +1,7 @@
+constraint: constraints/gcp.resourceLocations
+listPolicy:
+  allowedValues:
+    - locations/us-west1
+    - locations/us-central1
+    - locations/eu-west1
+  deniedValues: []

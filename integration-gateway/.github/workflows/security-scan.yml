@@ -1,0 +1,271 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scans weekly (Monday at 2:00 AM)
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    # Allow manual triggering
+
+# Permissions needed for security scanning
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  # 1. Dependency Vulnerability Scanning
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --production --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium
+
+      - name: Upload dependency scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
+          category: dependency-scan
+        if: always()
+
+  # 2. Code Security Scanning
+  code-scan:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Initialize CodeQL
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, typescript
+          queries: security-extended
+
+      # Build project (if needed for accurate analysis)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+      # Run CodeQL Analysis
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: code-scan
+
+      # Run ESLint security checks
+      - name: Run ESLint Security Plugin
+        run: |
+          npm install --save-dev eslint eslint-plugin-security
+          npx eslint --plugin security --ext .js,.ts src/
+
+  # 3. Infrastructure-as-Code Security Checks
+  iac-scan:
+    name: Infrastructure-as-Code Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Check for secrets in code
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      # Scan Terraform files if present
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        if: hashFiles('**/*.tf') != ''
+        continue-on-error: true
+
+      # Scan Kubernetes manifests if present
+      - name: Run Kubesec
+        uses: controlplaneio/kubesec-action@master
+        if: hashFiles('**/*.yaml', '**/*.yml') != ''
+        with:
+          input: deploy/*.yaml
+        continue-on-error: true
+
+      # Check Docker files
+      - name: Run Trivy vulnerability scanner for Dockerfiles
+        uses: aquasecurity/trivy-action@master
+        if: hashFiles('**/Dockerfile*') != ''
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: hashFiles('**/Dockerfile*') != ''
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: iac-scan
+
+  # 4. Security Policy Compliance Checks
+  security-compliance:
+    name: Security Policy Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Check if SECURITY.md exists
+      - name: Check for SECURITY.md
+        id: check_security_file
+        run: |
+          if [ -f "SECURITY.md" ]; then
+            echo "SECURITY_FILE_EXISTS=true" >> $GITHUB_ENV
+            echo "Security policy found ✅"
+          else
+            echo "SECURITY_FILE_EXISTS=false" >> $GITHUB_ENV
+            echo "Security policy not found ❌"
+            exit 1
+          fi
+
+      # Validate environment variables from .env.example
+      - name: Validate environment variables
+        run: |
+          if [ -f ".env.example" ]; then
+            echo "Environment template found ✅"
+            # Check for credentials
+            if grep -q -E "(password|secret|key|token|credential).*=.*[A-Za-z0-9/+]{8,}" .env.example; then
+              echo "Potential credentials found in .env.example ❌"
+              exit 1
+            else
+              echo "No credentials found in .env.example ✅"
+            fi
+          else
+            echo "Environment template not found ❌"
+            exit 1
+          fi
+
+      # Check for security headers in code
+      - name: Check for security headers
+        run: |
+          if grep -r -E "helmet|content-security-policy|x-frame-options|strict-transport-security" --include="*.js" --include="*.ts" .; then
+            echo "Security headers found ✅"
+          else
+            echo "Security headers not found, please implement them ❌"
+            exit 1
+          fi
+
+  # 5. Regular Automated Security Audit
+  security-audit:
+    name: Security Audit and Report
+    needs: [dependency-scan, code-scan, iac-scan, security-compliance]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Generate audit report
+      - name: Generate Security Audit Report
+        run: |
+          mkdir -p security-reports
+          echo "# Security Audit Report" > security-reports/audit-report.md
+          echo "Generated on: $(date)" >> security-reports/audit-report.md
+          echo "" >> security-reports/audit-report.md
+          
+          echo "## Dependency Vulnerabilities" >> security-reports/audit-report.md
+          npm audit --json | jq '.' > security-reports/npm-audit.json
+          echo "See [npm audit results](./npm-audit.json)" >> security-reports/audit-report.md
+          
+          echo "" >> security-reports/audit-report.md
+          echo "## Code Scanning Issues" >> security-reports/audit-report.md
+          echo "CodeQL analysis completed. Review issues in GitHub Security tab." >> security-reports/audit-report.md
+          
+          echo "" >> security-reports/audit-report.md
+          echo "## Infrastructure Security" >> security-reports/audit-report.md
+          echo "Infrastructure scanning completed. Check Security tab for details." >> security-reports/audit-report.md
+          
+          echo "" >> security-reports/audit-report.md
+          echo "## Security Compliance" >> security-reports/audit-report.md
+          echo "Security policy compliance verified." >> security-reports/audit-report.md
+
+      # Create GitHub issue with audit report
+      - name: Create Audit Report Issue
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: Monthly Security Audit Report
+          content-filepath: ./security-reports/audit-report.md
+          labels: security, audit, automated
+          assignees: ${{ github.repository_owner }}
+
+      # Archive security reports as artifacts
+      - name: Archive security reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: security-reports/
+          retention-days: 90
+
+# Notification job to alert on workflow completion
+notification:
+  name: Security Scan Notification
+  needs: [dependency-scan, code-scan, iac-scan, security-compliance, security-audit]
+  if: always()
+  runs-on: ubuntu-latest
+  steps:
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: env.SLACK_WEBHOOK_URL != null
+      continue-on-error: true

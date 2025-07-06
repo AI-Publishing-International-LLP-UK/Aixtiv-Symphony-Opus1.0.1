@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "api-for-warp-drive"
+  },
+  "targets": {
+    "api-for-warp-drive": {
+      "hosting": {
+        "asoos-2100-cool": [
+          "2100-cool-c624d"
+        ],
+        "mocoa-interface": [
+          "api-for-warp-drive"
+        ],
+        "2100-cool-c624d": [
+          "asoos-2100-cool"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

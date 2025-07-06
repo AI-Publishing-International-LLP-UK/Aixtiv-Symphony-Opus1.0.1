@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASOOS.2100.Cool - Active Symphony Orchestrating Operating System (Light Theme)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Enterprise-grade icon solution - Multiple fallbacks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" crossorigin="anonymous">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100vh;
+    }
+
+    /* Enterprise Icon System - Bulletproof SVG Icons */
+    .enterprise-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      fill: currentColor;
+    }
+
+    .enterprise-icon.large {
+      width: 20px;
+      height: 20px;
+    }
+
+    .enterprise-icon.xl {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Panel Icons */
+    .panel-icon {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* Integration Icons - Enterprise Grade */
+    .integration-icon-svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      display: inline-block;
+    }
+
+    /* User Role Styling */
+    .location-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(11, 177, 187, 0.1);
+      border: 1px solid rgba(11, 177, 187, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0bb1bb;
+    }
+
+    .location-indicator.diamond-sao {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: rgba(255, 215, 0, 0.3);
+      color: #B8860B;
+    }
+
+    .location-indicator.admin {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: rgba(139, 92, 246, 0.3);
+      color: #8b5cf6;
+    }
+
+    /* Enhanced Animations for V99 */
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+      33% { transform: translateY(-15px) translateX(8px) rotate(8deg); }
+      66% { transform: translateY(8px) translateX(-8px) rotate(-8deg); }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(11, 177, 187, 0.8), 0 0 20px rgba(11, 177, 187, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(11, 177, 187, 1), 0 0 40px rgba(11, 177, 187, 0.6); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(-50%); opacity: 0.5; }
+      100% { transform: translateY(-100%); opacity: 0; }
+    }
+
+    /* V99 Enhanced Particle Float Animation */
+    @keyframes enhancedFloat {
+      0%, 100% { 
+        transform: translateY(0) translateX(0) rotate(0deg) scale(1); 
+        filter: blur(0px); 
+        opacity: 0.4; 
+      }
+      25% { 
+        transform: translateY(-20px) translateX(10px) rotate(90deg) scale(1.2); 
+        filter: blur(1px); 
+        opacity: 0.6; 
+      }
+      50% { 
+        transform: translateY(-10px) translateX(-15px) rotate(180deg) scale(0.8); 
+        filter: blur(2px); 
+        opacity: 0.3; 
+      }
+      75% { 
+        transform: translateY(15px) translateX(5px) rotate(270deg) scale(1.1); 
+        filter: blur(1px); 
+        opacity: 0.5; 
+      }
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+      position: relative;
+    }
+
+    .page {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    /* V99 Enhanced Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: enhancedFloat 12s infinite ease-in-out;
+    }
+
+    /* V99 Particle Variations */
+    .particle:nth-child(3n) {
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, rgba(11, 177, 187, 0.6), rgba(11, 177, 187, 0.1));
+      animation-duration: 15s;
+    }
+
+    .particle:nth-child(3n+1) {
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, rgba(80, 200, 120, 0.4), rgba(80, 200, 120, 0.05));
+      animation-duration: 10s;
+    }
+
+    .particle:nth-child(3n+2) {
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0.1));
+      animation-duration: 18s;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 48px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 4px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar-icons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+      width: 100%;
+    }
+
+    .sidebar-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      z-index: 101;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-icon:hover {
+      transform: scale(1.15);
+    }
+
+    .sidebar-icon.active {
+      animation: glow 2s infinite;
+    }
+
+    .sidebar-icon.settings-icon {
+      margin-top: 30px;
+    }
+
+    .sidebar-icon.settings-icon:hover {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6) !important;
+      background: rgba(255, 215, 0, 0.1) !important;
+      border-radius: 50%;
+    }
+
+    .icon-tooltip {
+      position: absolute;
+      left: 54px;
+      top: 50%;
+      transform: translateY(-50%) translateX(-5px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      padding: 8px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(11, 177, 187, 0.3);
+      font-size: 12px;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .sidebar-icon:hover .icon-tooltip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(5px);
+    }
+
+    /* Header - Compact and Centered */
+    .header {
+      height: 40px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-left: 40px;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #B8860B, #8B7355, #228B22, #0bb1bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+    }
+
+    .user-info {
+      padding-right: 40px;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .user-tagline {
+      font-size: 13px;
+      color: #0bb1bb;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin-left: 48px;
+      width: calc(100% - 48px);
+    }
+
+    .content-area {
+      flex: 1;
+      display: flex;
+      padding: 6px 15px 15px 15px;
+      gap: 15px;
+      overflow-y: auto;
+      min-height: calc(100vh - 85px);
+      position: relative;
+    }
+
+    /* Sticky Copilots - Always visible on mobile */
+    .sticky-copilots {
+      position: sticky;
+      top: 40px;
+      z-index: 85;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 10px 20px;
+      display: none;
+    }
+
+    /* V99 Enhanced Copilot Hexagons */
+    .copilot-hex-container {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+      width: 100%;
+    }
+
+    .copilot-hex-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .copilot-hex-item:hover {
+      transform: scale(1.1);
+      animation: pulse 1.5s infinite;
+    }
+
+    .copilot-hex-item.active .copilot-status {
+      opacity: 1;
+      animation: pulse 2s infinite;
+    }
+
+    .copilot-hex {
+      position: relative;
+    }
+
+    .copilot-name {
+      font-size: 10px;
+      color: #666;
+      margin-top: 4px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .copilot-name.active {
+      color: #0bb1bb;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(11, 177, 187, 0.3);
+    }
+
+    .copilot-status {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background: #0bb1bb;
+      border-radius: 50%;
+      border: 2px solid #fafafa;
+      opacity: 0;
+      transition: all 0.3s;
+      box-shadow: 0 0 10px rgba(11, 177, 187, 0.8);
+    }
+
+    /* Chat Area - Co-pilot Communication */
+    .chat-area {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s ease;
+      height: calc(100vh - 120px);
+      overflow: hidden;
+    }
+
+    .terminal-output {
+      scrollbar-width: thin;
+      scrollbar-color: #ccc #f5f5f5;
+    }
+
+    /* Panel Controls - On Panel Border */
+    .panel-controls {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 150;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 4px 2px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-lock {
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-lock:hover {
+      background: rgba(11, 177, 187, 0.1);
+      border-color: rgba(11, 177, 187, 0.3);
+      transform: scale(1.1);
+    }
+
+    .panel-lock.locked svg {
+      fill: #0bb1bb;
+    }
+
+    .panel-toggle-btn {
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-toggle-btn:hover {
+      background: rgba(11, 177, 187, 0.1);
+      border-color: rgba(11, 177, 187, 0.3);
+      transform: scale(1.1);
+    }
+
+    /* Right Panel - Enhanced with 100% Automation */
+    .right-panel {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      height: calc(100vh - 120px);
+      background: transparent;
+      padding: 0 12px 12px 0;
+      overflow-y: auto;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .right-panel.expanded {
+      width: 50%;
+      min-width: 500px;
+    }
+
+    .right-panel.full-width {
+      width: 70%;
+      min-width: 600px;
+    }
+
+    .right-panel.collapsed {
+      width: 0;
+      padding: 0;
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .right-panel.hidden {
+      width: 0;
+      padding: 0;
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    
+    .chat-area.expanded {
+      max-width: 100%;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .right-panel.collapsed .panel-content,
+    .right-panel.collapsed .copilot-name,
+    .right-panel.collapsed .panel-card {
+      display: none;
+    }
+
+    .right-panel.hidden .panel-content,
+    .right-panel.hidden .copilot-name,
+    .right-panel.hidden .panel-card {
+      display: none;
+    }
+
+    /* Copilot Section */
+    .copilot-section {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 6px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .copilot-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #0bb1bb;
+      margin-bottom: 6px;
+    }
+
+    .active-copilot-display {
+      text-align: center;
+      font-size: 9px;
+      color: #666;
+      padding: 4px;
+      margin-top: 6px;
+    }
+
+    .copilot-badge {
+      padding: 4px 8px;
+      background: rgba(11, 177, 187, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(11, 177, 187, 0.2);
+      display: inline-block;
+    }
+
+    .copilot-badge span {
+      color: #0bb1bb;
+      font-weight: 600;
+    }
+
+    .scan-approve-btn {
+      margin-top: 6px;
+      padding: 6px;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .scan-approve-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(11, 177, 187, 0.4);
+    }
+
+    .scan-approve-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: white;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .panel-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      padding: 12px;
+      transition: all 0.3s;
+      margin-bottom: 8px;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border-top: 2px solid rgba(255, 255, 255, 0.8);
+      border-left: 2px solid rgba(255, 255, 255, 0.6);
+      border-right: 2px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .panel-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 8px 25px rgba(11, 177, 187, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      border-color: rgba(11, 177, 187, 0.3);
+      border-top: 2px solid rgba(255, 255, 255, 0.9);
+      border-left: 2px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: inherit;
+      width: 100%;
+      text-align: left;
+    }
+
+    .panel-header:hover .chevron-icon {
+      fill: #0bb1bb;
+    }
+
+    .panel-header.collapsed .chevron-icon {
+      transform: rotate(-90deg);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+    }
+
+    .panel-content {
+      display: none;
+    }
+
+    .panel-content.active {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    /* V99 Enhanced Bottom Bar */
+    .bottom-bar {
+      height: 35px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 15px;
+      position: relative;
+      z-index: 90;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* V99 Enhanced Integration Icons */
+    .integration-icons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      flex: 1;
+    }
+
+    .integration-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02));
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 18px;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .integration-icon:hover {
+      transform: scale(1.15) translateY(-3px);
+      background: linear-gradient(135deg, rgba(11, 177, 187, 0.15), rgba(11, 177, 187, 0.05));
+      border-color: #0bb1bb;
+      box-shadow: 0 5px 15px rgba(11, 177, 187, 0.3);
+    }
+
+    .integration-icon.active {
+      background: linear-gradient(135deg, rgba(11, 177, 187, 0.2), rgba(11, 177, 187, 0.1));
+      border-color: #0bb1bb;
+      box-shadow: 0 0 20px rgba(11, 177, 187, 0.4);
+    }
+
+    /* V99 Gift Shop & Pilots' Lounge */
+    .auth-features {
+      position: absolute;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.5s ease;
+    }
+
+    .auth-features.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .gift-shop-btn, .pilots-lounge-btn {
+      padding: 4px 8px;
+      background: linear-gradient(135deg, #FFD700, #FF6B35);
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .pilots-lounge-btn {
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    }
+
+    .gift-shop-btn:hover, .pilots-lounge-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .gateway-btn {
+      padding: 6px 12px;
+      background: #0bb1bb;
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      margin-left: 8px;
+    }
+
+    .gateway-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(11, 177, 187, 0.5);
+    }
+
+    /* V99 Video Integration Window */
+    .video-window {
+      position: fixed;
+      top: 100px;
+      right: 30px;
+      width: 300px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid rgba(11, 177, 187, 0.5);
+      border-radius: 15px;
+      backdrop-filter: blur(20px);
+      z-index: 150;
+      display: none;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-window.small { width: 300px; height: 200px; }
+    .video-window.large { width: 500px; height: 350px; }
+    .video-window.fullscreen { 
+      top: 0; right: 0; left: 0; bottom: 0; 
+      width: 100vw; height: 100vh; 
+      border-radius: 0; 
+    }
+
+    .video-header {
+      background: rgba(11, 177, 187, 0.1);
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(11, 177, 187, 0.3);
+    }
+
+    .video-title {
+      color: #0bb1bb;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .video-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .video-btn {
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      transition: all 0.3s;
+    }
+
+    .video-btn:hover {
+      background: rgba(11, 177, 187, 0.2);
+      border-color: #0bb1bb;
+    }
+
+    .video-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* S2DO Button */
+    .s2do-button {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 80px;
+      height: 60px;
+      background: linear-gradient(135deg, #0bb1bb, #50C878);
+      border-radius: 15px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(11, 177, 187, 0.4);
+      transition: all 0.3s;
+      z-index: 95;
+      position: relative;
+    }
+
+    .s2do-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(11, 177, 187, 0.6);
+    }
+
+    .s2do-button.scanning::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.2), transparent);
+      animation: scan 2s linear infinite;
+    }
+
+    /* V99 Enhanced Notification */
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: rgba(11, 177, 187, 0.95);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(11, 177, 187, 0.4);
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(11, 177, 187, 0.3);
+    }
+
+    .notification.error {
+      background: rgba(239, 68, 68, 0.95);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .notification.success {
+      background: rgba(16, 185, 129, 0.95);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Mobile Breakpoints */
+    @media (max-width: 768px) {
+      .sticky-copilots {
+        display: block;
+      }
+
+      .copilot-section {
+        display: none;
+      }
+
+      .chat-area {
+        display: none !important;
+      }
+
+      .content-area {
+        flex-direction: column;
+        padding: 15px;
+        margin-right: 0;
+      }
+
+      .right-panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        transform: none !important;
+        padding: 20px 15px;
+      }
+
+      .panel-controls {
+        display: none;
+      }
+
+      .sidebar {
+        width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar-icons {
+        justify-content: center;
+      }
+
+      .main-content {
+        margin-left: 44px;
+        width: calc(100% - 44px);
+      }
+
+      .s2do-button {
+        bottom: 120px;
+        right: 15px;
+        width: 70px;
+        height: 55px;
+      }
+
+      .auth-features {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar {
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar-icons {
+        justify-content: center;
+      }
+
+      .sidebar-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      .main-content {
+        margin-left: 40px;
+        width: calc(100% - 40px);
+      }
+
+      .header {
+        height: 35px;
+        padding: 0 10px;
+      }
+
+      .header-center .logo {
+        font-size: 14px;
+      }
+
+      .user-name {
+        font-size: 10px;
+      }
+
+      .user-tagline {
+        font-size: 8px;
+      }
+
+      .location-indicator {
+        font-size: 8px;
+        padding: 3px 6px;
+      }
+
+      .s2do-button {
+        bottom: 100px;
+        right: 10px;
+        width: 65px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- V99 Enhanced Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Enterprise Icon Library - SVG Definitions -->
+    <svg style="display: none;">
+      <defs>
+        <!-- Lock Icons -->
+        <symbol id="icon-lock" viewBox="0 0 24 24">
+          <path d="M6 10h2V8c0-2.21 1.79-4 4-4s4 1.79 4 4v2h2c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2zm6-6c-1.1 0-2 .9-2 2v2h4V6c0-1.1-.9-2-2-2z"/>
+        </symbol>
+        <symbol id="icon-unlock" viewBox="0 0 24 24">
+          <path d="M18 10H9V8c0-1.1.9-2 2-2s2 .9 2 2h2c0-2.21-1.79-4-4-4S7 5.79 7 8v2H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2z"/>
+        </symbol>
+        
+        <!-- Menu/Bars Icon -->
+        <symbol id="icon-bars" viewBox="0 0 24 24">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </symbol>
+        
+        <!-- Chevron Icon -->
+        <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+          <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </symbol>
+        
+        <!-- Panel Icons -->
+        <symbol id="icon-fire" viewBox="0 0 24 24">
+          <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM12 20c-3.31 0-6-2.69-6-6 0-1.53.3-3.04.86-4.43.14-.35.48-.57.86-.57.53 0 .96.43.96.96 0 .44-.26.83-.66.99C6.24 11.69 6 12.83 6 14c0 2.21 1.79 4 4 4s4-1.79 4-4c0-1.17-.24-2.31-.96-3.05-.4-.16-.66-.55-.66-.99 0-.53.43-.96.96-.96.38 0 .72.22.86.57.56 1.39.86 2.9.86 4.43 0 3.31-2.69 6-6 6z"/>
+        </symbol>
+        
+        <symbol id="icon-lightbulb" viewBox="0 0 24 24">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+        </symbol>
+        
+        <symbol id="icon-tasks" viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </symbol>
+        
+        <symbol id="icon-chart-line" viewBox="0 0 24 24">
+          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+        </symbol>
+        
+        <symbol id="icon-bullseye" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+        </symbol>
+        
+        <symbol id="icon-rocket" viewBox="0 0 24 24">
+          <path d="M9.19 6.35c-2.04 2.29-3.44 5.58-3.44 5.58L2 10.69l4.05-4.05c.47-.47 1.15-.68 1.81-.55l1.33.28zm5.62 0c2.04 2.29 3.44 5.58 3.44 5.58L22 10.69l-4.05-4.05c-.47-.47-1.15-.68-1.81-.55l-1.33.28zM12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+        </symbol>
+
+        <!-- Integration Icons -->
+        <symbol id="icon-google" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </symbol>
+        
+        <symbol id="icon-microsoft" viewBox="0 0 24 24">
+          <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+        </symbol>
+        
+        <symbol id="icon-slack" viewBox="0 0 24 24">
+          <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+        </symbol>
+        
+        <symbol id="icon-github" viewBox="0 0 24 24">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </symbol>
+        
+        <symbol id="icon-linkedin" viewBox="0 0 24 24">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </symbol>
+        
+        <symbol id="icon-video" viewBox="0 0 24 24">
+          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        </symbol>
+        
+        <symbol id="icon-plus" viewBox="0 0 24 24">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </symbol>
+
+        <!-- Communications Icons -->
+        <symbol id="icon-comments" viewBox="0 0 24 24">
+          <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h11c.55 0 1-.45 1-1z"/>
+        </symbol>
+        
+        <symbol id="icon-terminal" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V8h16v10z"/>
+          <path d="M7 13h2v-2H7v2zm4 0h6v-2h-6v2z"/>
+        </symbol>
+        
+        <symbol id="icon-microphone" viewBox="0 0 24 24">
+          <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+        </symbol>
+        
+        <!-- CLI Related Icons -->
+        <symbol id="icon-cog" viewBox="0 0 24 24">
+          <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+        </symbol>
+        
+        <symbol id="icon-times" viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </symbol>
+        
+        <symbol id="icon-code" viewBox="0 0 24 24">
+          <path d="M8 3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8zm1 2h6v14H9V5zm2 2v2h2V7h-2zm0 4v2h2v-2h-2z"/>
+          <path d="M9.5 6.5l-3 3 3 3M14.5 6.5l3 3-3 3"/>
+        </symbol>
+        
+        <symbol id="icon-bolt" viewBox="0 0 24 24">
+          <path d="M11 21h-1l1-7H7.5c-.88 0-.33-.75-.31-.78C8.48 10.94 10.42 7.54 13.01 3h1.5l-1.01 7H17c.69 0 .52.75.48.78C16.19 13.08 14.13 16.3 11 21z"/>
+        </symbol>
+        
+        <symbol id="icon-keyboard" viewBox="0 0 24 24">
+          <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+        </symbol>
+        
+        <!-- Additional missing icons -->
+        <symbol id="icon-compress" viewBox="0 0 24 24">
+          <path d="M6 18h4v-2H6v2zM6 6v2h4V6H6zm8 8h4v-2h-4v2zm4-8v2h-4V6h4z"/>
+        </symbol>
+        
+        <symbol id="icon-expand" viewBox="0 0 24 24">
+          <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+        </symbol>
+        
+        <symbol id="icon-expand-arrows" viewBox="0 0 24 24">
+          <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- V99 Video Integration Window -->
+    <div class="video-window" id="videoWindow">
+      <div class="video-header">
+        <div class="video-title">Daily.co Video Session</div>
+        <div class="video-controls">
+          <button class="video-btn" onclick="resizeVideo('small')" title="Small">
+            <svg class="enterprise-icon"><use href="#icon-compress"></use></svg>
+          </button>
+          <button class="video-btn" onclick="resizeVideo('large')" title="Large">
+            <svg class="enterprise-icon"><use href="#icon-expand"></use></svg>
+          </button>
+          <button class="video-btn" onclick="resizeVideo('fullscreen')" title="Fullscreen">
+            <svg class="enterprise-icon"><use href="#icon-expand-arrows"></use></svg>
+          </button>
+          <button class="video-btn" onclick="closeVideo()" title="Close">
+            <svg class="enterprise-icon"><use href="#icon-times"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="video-content">
+        <div>
+          <svg class="enterprise-icon xl" style="margin-bottom: 10px;"><use href="#icon-video"></use></svg>
+          <div>Video session ready to start</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Page -->
+    <div id="mainPage" class="page active">
+      <!-- Sidebar with Squadron Icons -->
+      <div class="sidebar">
+        <div class="sidebar-icons">
+          <div class="sidebar-icon active" onclick="selectIcon(this, 'Communication', '01')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <path d="M9 11l2 2 4-4" stroke="#333" stroke-width="1.5" fill="none"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Communication</strong><br>
+              <small>Automated Communication</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="selectIcon(this, 'Growth', '01')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4ECDC4" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <path d="M12 8v4l3 3" stroke="#333" stroke-width="1.5"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Growth</strong><br>
+              <small>Growth Revenues</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="selectIcon(this, 'Services', '03')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#45B7D1" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <path d="M8 12h8M12 8v8" stroke="#333" stroke-width="1.5"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Services</strong><br>
+              <small>Client Services Innovation</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="selectIcon(this, 'Automation', '02')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#96CEB4" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <path d="M12 6v6l4 2" stroke="#333" stroke-width="1.5"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Automation</strong><br>
+              <small>Organizational Automation</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="selectIcon(this, 'ROI', '02')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FECA57" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <circle cx="12" cy="12" r="3" stroke="#333" fill="none" stroke-width="1.5"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>ROI</strong><br>
+              <small>ROI Dashboard</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="selectIcon(this, 'Wish', '04')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#DDA0DD" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" fill="none" />
+              <path d="M7 12h10M7 8h10M7 16h10" stroke="#333" stroke-width="1.5"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Wish</strong><br>
+              <small>Your Wish</small>
+            </div>
+          </div>
+          
+          <div class="sidebar-icon" onclick="toggleAcademy(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#turquoiseGradientLight)" stroke-width="1.8">
+              <defs>
+                <linearGradient id="turquoiseGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#008B8B" />
+                  <stop offset="33%" stop-color="#20B2AA" />
+                  <stop offset="66%" stop-color="#48D1CC" />
+                  <stop offset="100%" stop-color="#0891a0" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2L22 20H2L12 2z" fill="url(#turquoiseGradientLight)" fill-opacity="0.15" />
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Academy</strong><br>
+              <small>Learning & Training</small>
+            </div>
+          </div>
+          
+          <!-- Gap before special features -->
+          <div style="height: 30px;"></div>
+          
+          <!-- Pilots Icon - Premium Commercial Design -->
+          <div class="sidebar-icon auth-only" onclick="openPilotsLounge()" style="display: flex;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#pilotsGradientLight)" stroke-width="1.8">
+              <defs>
+                <linearGradient id="pilotsGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#8B5CF6" />
+                  <stop offset="50%" stop-color="#EC4899" />
+                  <stop offset="100%" stop-color="#F59E0B" />
+                </linearGradient>
+              </defs>
+              <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#pilotsGradientLight)" fill-opacity="0.15" stroke="url(#pilotsGradientLight)" stroke-width="2"/>
+              <path d="M8 10h8M8 14h6" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="18" cy="8" r="3" fill="url(#pilotsGradientLight)" stroke="#333" stroke-width="1"/>
+              <path d="M16.5 8l1 1 2-2" stroke="#333" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Pilots' Lounge</strong><br>
+              <small>Elite Features</small>
+            </div>
+          </div>
+          
+          <!-- Gift Shop Icon - Premium Commercial Design -->
+          <div class="sidebar-icon auth-only" onclick="openGiftShop()" style="display: flex;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#giftGradientLight)" stroke-width="1.8">
+              <defs>
+                <linearGradient id="giftGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#B8860B" />
+                  <stop offset="50%" stop-color="#FF6B35" />
+                  <stop offset="100%" stop-color="#DC143C" />
+                </linearGradient>
+              </defs>
+              <path d="M6 6h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2z" fill="url(#giftGradientLight)" fill-opacity="0.15" stroke="url(#giftGradientLight)" stroke-width="2"/>
+              <path d="M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" stroke="#333" stroke-width="1.5" fill="none"/>
+              <path d="M9 12h6M9 15h4" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="18" cy="9" r="2" fill="url(#giftGradientLight)" stroke="#333" stroke-width="1"/>
+              <path d="M17 9l.5.5L19 8" stroke="#333" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Gift Shop</strong><br>
+              <small>Premium Features</small>
+            </div>
+          </div>
+          
+          <!-- Settings Icon - Always Last -->
+          <div class="sidebar-icon settings-icon" onclick="openSettings()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#settingsGradientLight)" stroke-width="1.8">
+              <defs>
+                <linearGradient id="settingsGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#B8860B" />
+                  <stop offset="25%" stop-color="#CD5C5C" />
+                  <stop offset="50%" stop-color="#4ECDC4" />
+                  <stop offset="75%" stop-color="#228B22" />
+                  <stop offset="100%" stop-color="#0bb1bb" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="url(#settingsGradientLight)" fill-opacity="0.2" />
+            </svg>
+            <div class="icon-tooltip">
+              <strong>Settings & Configuration</strong><br>
+              <small>Diamond SAO</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header with Location Indicator -->
+        <div class="header">
+          <div class="header-left">
+            <div class="logo" id="systemLogo">ASOOS</div>
+          </div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Mr. Phillip Corey Roark, CEO</div>
+            <div class="user-tagline" id="userTagline">Aixtiv Symphony Orchestrating Operating System</div>
+          </div>
+        </div>
+
+        <!-- Sticky Copilots (Mobile Only) -->
+        <div class="sticky-copilots">
+          <div class="copilot-title">YOUR AI COPILOTS</div>
+          <div class="copilot-hex-container">
+            <div class="copilot-hex-item" onclick="activateRIX('QB', 'Anthropic 4')">
+              <div class="copilot-hex">
+                <svg viewBox="0 0 60 60" style="width: 45px; height: 45px;">
+                  <defs>
+                    <linearGradient id="qbGradientMobileLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#B8860B;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#0bb1bb;stop-opacity:1" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qbGradientMobileLight)" stroke="#B8860B" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">QB</text>
+                  <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                </svg>
+                <div class="copilot-status"></div>
+              </div>
+              <div class="copilot-name">Anthropic 4</div>
+            </div>
+            
+            <div class="copilot-hex-item" onclick="activateRIX('SH', 'Claude 4')">
+              <div class="copilot-hex">
+                <svg viewBox="0 0 60 60" style="width: 45px; height: 45px;">
+                  <defs>
+                    <linearGradient id="shGradientMobileLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#shGradientMobileLight)" stroke="#4ECDC4" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">SH</text>
+                  <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                </svg>
+                <div class="copilot-status"></div>
+              </div>
+              <div class="copilot-name">Claude 4</div>
+            </div>
+            
+            <div class="copilot-hex-item" onclick="activateRIX('Q', 'Q RIX')">
+              <div class="copilot-hex">
+                <svg viewBox="0 0 60 60" style="width: 45px; height: 45px;">
+                  <defs>
+                    <linearGradient id="qGradientMobileLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#228B22;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#8B7355;stop-opacity:1" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qGradientMobileLight)" stroke="#228B22" stroke-width="2" opacity="0.9" />
+                  <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">Q</text>
+                  <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                </svg>
+                <div class="copilot-status"></div>
+              </div>
+              <div class="copilot-name">Q RIX</div>
+            </div>
+          </div>
+          <div class="active-copilot-display">
+            <div class="copilot-badge">
+              <span id="activeRixDisplayMobile">QB RIX Active</span>
+            </div>
+            <div class="scan-approve-btn" onclick="toggleScanToApprove(this)">
+              <div class="scan-approve-content">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9V5a2 2 0 0 1 2-2h4M3 15v4a2 2 0 0 0 2 2h4M15 3h4a2 2 0 0 1 2 2v4M15 21h4a2 2 0 0 0 2-2v-4"/>
+                  <path d="M9 12h6M12 9v6"/>
+                </svg>
+                <span>SCAN TO APPROVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="content-area" id="contentArea">
+          <!-- Co-pilot Communication Area (Main Body) -->
+          <div class="chat-area" id="chatArea" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 15px;">
+            <!-- Welcome Message at Top -->
+            <div style="background: rgba(11, 177, 187, 0.1); border: 1px solid rgba(11, 177, 187, 0.3); padding: 12px; border-radius: 10px; margin: 12px;">
+              <div style="font-size: 12px; font-weight: 600; color: #0bb1bb; margin-bottom: 6px;">Welcome to Active Symphony OOS</div>
+              <div style="color: #666; font-size: 10px; line-height: 1.4;">
+                Speak naturally with your AI copilots. They understand context, can pull data from any squadron, 
+                and bring visual insights directly into this space. Just ask!
+              </div>
+            </div>
+            
+            <!-- Natural Language Chat -->
+            <div id="naturalLanguageChat" style="flex: 1; display: flex; flex-direction: column;">
+              <div style="flex: 1; overflow-y: auto; padding: 12px;">
+                <div id="copilotMessages" style="display: flex; flex-direction: column; gap: 8px;">
+                  <!-- Messages appear here -->
+                </div>
+              </div>
+              <div style="padding: 12px; border-top: 1px solid rgba(0, 0, 0, 0.1);">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <!-- Single Mode Toggle - Left Side -->
+                  <button id="modeToggleBtn" onclick="toggleCopilotMode()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); color: #8b5cf6; padding: 4px 8px; border-radius: 8px; font-size: 9px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 3px;" title="Switch to CLI Mode">
+                    <svg class="enterprise-icon" style="width: 10px; height: 10px; fill: #8b5cf6;">
+                      <use href="#icon-terminal"></use>
+                    </svg>
+                    CLI
+                  </button>
+                  
+                  <input type="text" id="copilotInput" placeholder="Ask your copilot anything..." style="flex: 1; background: rgba(0, 0, 0, 0.03); border: 1px solid rgba(0, 0, 0, 0.1); padding: 8px 12px; border-radius: 15px; color: #333; font-size: 12px; outline: none;" onkeypress="handleCopilotKeyPress(event)">
+                  
+                  <button onclick="sendCopilotMessage()" style="background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); color: #333; padding: 8px 12px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 11px;">
+                    Send
+                  </button>
+                  <button onclick="startVoiceInput()" style="background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); color: #333; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 10px;">
+                    <svg class="enterprise-icon" style="width: 10px; height: 10px; fill: #333;">
+                      <use href="#icon-microphone"></use>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- AIXTIV CLI (Hidden by default) -->
+            <div id="cliInterface" style="display: none; flex: 1; flex-direction: column; background: #f8f8f8; border: 1px solid #ddd;">
+              <!-- Welcome Message at Top -->
+              <div style="background: rgba(11, 177, 187, 0.1); border: 1px solid rgba(11, 177, 187, 0.3); padding: 12px; border-radius: 10px; margin: 12px;">
+                <div style="font-size: 12px; font-weight: 600; color: #0bb1bb; margin-bottom: 6px;">Welcome to Active Symphony OOS</div>
+                <div style="color: #666; font-size: 10px; line-height: 1.4;">
+                  Speak naturally with your AI copilots. They understand context, can pull data from any squadron, 
+                  and bring visual insights directly into this space. Just ask!
+                </div>
+              </div>
+              <div style="background: #f0f0f0; padding: 6px 10px; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="color: #0bb1bb; font-family: monospace; font-size: 11px; font-weight: 600;">AIXTIV CLI</span>
+                  <span style="color: #999; font-size: 9px; font-family: monospace;">v2.1.0</span>
+                  <select id="modelSelector" style="background: #fff; color: #0bb1bb; border: 1px solid #ccc; padding: 2px 4px; font-family: monospace; font-size: 9px; border-radius: 3px; margin-left: 6px;" onchange="switchModel(this.value)">
+                    <option value="claude-code">Claude Code (Default)</option>
+                    <option value="claude-3-opus">Claude 3 Opus</option>
+                    <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                    <option value="claude-3-haiku">Claude 3 Haiku</option>
+                    <option value="claude-instant">Claude Instant</option>
+                    <option value="blend-all">🔥 Blend All Models</option>
+                  </select>
+                  <span id="apiStatus" style="display: flex; align-items: center; gap: 3px; margin-left: 6px;">
+                    <span style="width: 6px; height: 6px; background: #ff4757; border-radius: 50%;"></span>
+                    <span style="color: #ff4757; font-size: 8px;">API Disconnected</span>
+                  </span>
+                </div>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button style="background: #fff; border: 1px solid #ccc; color: #0bb1bb; cursor: pointer; padding: 2px 4px; border-radius: 3px; font-size: 8px;" onclick="openAPIConfig()" title="Configure API">
+                    <svg class="enterprise-icon" style="width: 8px; height: 8px;"><use href="#icon-cog"></use></svg> API Config
+                  </button>
+                  <button style="background: none; border: none; color: #999; cursor: pointer; padding: 2px;" onclick="clearTerminal()" title="Clear">
+                    <svg class="enterprise-icon" style="width: 8px; height: 8px;"><use href="#icon-times"></use></svg>
+                  </button>
+                </div>
+              </div>
+            
+            <!-- Mode Toggle -->
+            <div style="background: #f0f0f0; padding: 4px 10px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 8px;">
+              <button id="terminalModeBtn" class="mode-btn active" onclick="setMode('terminal')" style="background: #fff; border: 1px solid #0bb1bb; color: #0bb1bb; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 9px; cursor: pointer;">
+                <svg class="enterprise-icon" style="width: 9px; height: 9px;"><use href="#icon-terminal"></use></svg> Terminal
+              </button>
+              <button id="codeModeBtn" class="mode-btn" onclick="setMode('code')" style="background: transparent; border: 1px solid #ccc; color: #999; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 9px; cursor: pointer;">
+                <svg class="enterprise-icon" style="width: 9px; height: 9px;"><use href="#icon-code"></use></svg> Claude Code
+              </button>
+              <button id="chatModeBtn" class="mode-btn" onclick="setMode('chat')" style="background: transparent; border: 1px solid #ccc; color: #999; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 9px; cursor: pointer;">
+                <svg class="enterprise-icon" style="width: 9px; height: 9px;"><use href="#icon-comments"></use></svg> Chat
+              </button>
+              <span style="color: #999; font-size: 8px; margin-left: auto;">
+                <svg class="enterprise-icon" style="width: 8px; height: 8px;"><use href="#icon-keyboard"></use></svg> Ctrl+K for quick commands
+              </span>
+            </div>
+            
+            <div class="terminal-output" id="terminalOutput" style="flex: 1; overflow-y: auto; padding: 10px; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 11px; line-height: 1.4; color: #333; background: #f8f8f8; display: block;">
+              <div class="terminal-line">
+                <span style="color: #228B22;">asoos@aixtiv</span><span style="color: #0bb1bb;">:</span><span style="color: #4ECDC4;">~</span><span style="color: #333;">$ </span><span style="color: #000;">_</span>
+              </div>
+            </div>
+            
+            <!-- Code Editor (Hidden by default) -->
+            <div id="codeEditor" style="display: none; flex: 1; background: #ffffff; position: relative;">
+              <div style="background: #f0f0f0; padding: 10px; border-bottom: 1px solid #ddd;">
+                <input type="text" id="codeFileName" placeholder="untitled.js" style="background: transparent; border: none; color: #666; font-family: monospace; font-size: 13px; outline: none;">
+                <select id="codeLanguage" style="background: #fff; color: #0bb1bb; border: 1px solid #ccc; padding: 2px 6px; font-size: 12px; margin-left: 10px;">
+                  <option value="javascript">JavaScript</option>
+                  <option value="python">Python</option>
+                  <option value="typescript">TypeScript</option>
+                  <option value="html">HTML</option>
+                  <option value="css">CSS</option>
+                  <option value="java">Java</option>
+                  <option value="cpp">C++</option>
+                  <option value="go">Go</option>
+                  <option value="rust">Rust</option>
+                </select>
+              </div>
+              <textarea id="codeArea" style="width: 100%; height: calc(100% - 40px); background: #ffffff; color: #333; border: none; outline: none; padding: 15px; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.5; resize: none;" placeholder="// Start coding here or ask Claude to generate code..."></textarea>
+            </div>
+            
+            <!-- Chat Interface (Hidden by default) -->
+            <div id="chatInterface" style="display: none; flex: 1; overflow-y: auto; padding: 20px; background: #f8f8f8;">
+              <div id="chatMessages" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="background: rgba(11, 177, 187, 0.1); border: 1px solid rgba(11, 177, 187, 0.3); padding: 15px; border-radius: 12px;">
+                  <div style="color: #0bb1bb; font-weight: 600; margin-bottom: 5px;">Claude Multi-Model Chat</div>
+                  <div style="color: #666; font-size: 12px;">Chat with Claude using your selected model or blend multiple models for enhanced responses.</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="cli-input-area" style="border-top: 1px solid #ddd; background: #f0f0f0; padding: 6px; display: flex; align-items: center; gap: 6px;">
+              <span style="color: #228B22; font-family: monospace; font-size: 11px;">$</span>
+              
+              <!-- Single Mode Toggle - Left Side -->
+              <button id="cliModeToggleBtn" onclick="toggleCopilotMode()" style="background: rgba(11, 177, 187, 0.15); border: 1px solid rgba(11, 177, 187, 0.3); color: #0bb1bb; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 2px;" title="Switch to Chat Mode">
+                <svg class="enterprise-icon" style="width: 8px; height: 8px; fill: #0bb1bb;">
+                  <use href="#icon-comments"></use>
+                </svg>
+                CHAT
+              </button>
+              
+              <input type="text" class="cli-input" id="cliInput" placeholder="Enter command..." style="flex: 1; background: transparent; border: none; outline: none; color: #333; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px;" onkeypress="handleCLIKeyPress(event)">
+              
+              <button id="executeBtn" class="cli-btn" onclick="executeCLICommand()" style="background: #0bb1bb; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; cursor: pointer; font-weight: 600;">
+                EXECUTE
+              </button>
+              <button class="cli-btn" onclick="toggleClaudeCodeMode()" style="background: #8b5cf6; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; cursor: pointer; font-weight: 600; margin-left: 3px;" title="Quick toggle Claude Code mode">
+                <svg class="enterprise-icon" style="width: 8px; height: 8px; fill: #ffffff;"><use href="#icon-bolt"></use></svg> CODE
+              </button>
+            </div>
+          </div>
+        </div>
+          
+          <!-- Right Panel (Automated) -->
+          <div class="right-panel" id="rightPanel">
+            <!-- Always Visible Panel Controls (On Panel Border) -->
+            <div class="panel-controls">
+              <button class="panel-toggle-btn" onclick="toggleRightPanelSize()" title="Expand/Collapse Panel">
+                <svg class="enterprise-icon" id="panelToggleIcon" fill="rgba(0, 0, 0, 0.7)" style="width: 12px; height: 12px;">
+                  <use href="#icon-bars"></use>
+                </svg>
+              </button>
+              <button class="panel-lock" id="panelLock" onclick="togglePanelLock(this)" title="Lock/Unlock Panel">
+                <svg class="enterprise-icon" fill="rgba(0, 0, 0, 0.7)" style="width: 12px; height: 12px;">
+                  <use href="#icon-lock"></use>
+                </svg>
+              </button>
+            </div>
+            <!-- Copilot Section (Always at Top) -->
+            <div class="copilot-section">
+              <div class="copilot-title">YOUR AI COPILOTS</div>
+              <div class="copilot-hex-container">
+                <div class="copilot-hex-item active" onclick="activateRIX('QB', 'Anthropic 4')" id="qbRix">
+                  <div class="copilot-hex">
+                    <svg viewBox="0 0 60 60" style="width: 50px; height: 50px;">
+                      <defs>
+                        <linearGradient id="qbGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" style="stop-color:#B8860B;stop-opacity:1" />
+                          <stop offset="100%" style="stop-color:#0bb1bb;stop-opacity:1" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qbGradientLight)" stroke="#B8860B" stroke-width="2" opacity="0.9" />
+                      <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">QB</text>
+                      <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                    </svg>
+                    <div class="copilot-status"></div>
+                  </div>
+                  <div class="copilot-name active">Anthropic 4</div>
+                </div>
+                
+                <div class="copilot-hex-item" onclick="activateRIX('SH', 'Claude 4')" id="shRix">
+                  <div class="copilot-hex">
+                    <svg viewBox="0 0 60 60" style="width: 50px; height: 50px;">
+                      <defs>
+                        <linearGradient id="shGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:1" />
+                          <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#shGradientLight)" stroke="#4ECDC4" stroke-width="2" opacity="0.9" />
+                      <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">SH</text>
+                      <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                    </svg>
+                    <div class="copilot-status"></div>
+                  </div>
+                  <div class="copilot-name">Claude 4</div>
+                </div>
+                
+                <div class="copilot-hex-item" onclick="activateRIX('Q', 'Q RIX')" id="qRix">
+                  <div class="copilot-hex">
+                    <svg viewBox="0 0 60 60" style="width: 50px; height: 50px;">
+                      <defs>
+                        <linearGradient id="qGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" style="stop-color:#228B22;stop-opacity:1" />
+                          <stop offset="100%" style="stop-color:#8B7355;stop-opacity:1" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M30 5 L50 20 L50 40 L30 55 L10 40 L10 20 Z" fill="url(#qGradientLight)" stroke="#228B22" stroke-width="2" opacity="0.9" />
+                      <text x="30" y="26" text-anchor="middle" fill="white" font-size="12" font-weight="800">Q</text>
+                      <text x="30" y="38" text-anchor="middle" fill="white" font-size="9" font-weight="600">RIX</text>
+                    </svg>
+                    <div class="copilot-status"></div>
+                  </div>
+                  <div class="copilot-name">Q RIX</div>
+                </div>
+              </div>
+              <div class="active-copilot-display">
+                <div class="copilot-badge">
+                  <span id="activeRixDisplay">QB RIX Active</span>
+                </div>
+                <div class="scan-approve-btn" onclick="toggleScanToApprove(this)">
+                  <div class="scan-approve-content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 9V5a2 2 0 0 1 2-2h4M3 15v4a2 2 0 0 0 2 2h4M15 3h4a2 2 0 0 1 2 2v4M15 21h4a2 2 0 0 0 2-2v-4"/>
+                      <path d="M9 12h6M12 9v6"/>
+                    </svg>
+                    <span>SCAN TO APPROVE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Today's Hot Topics -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #ff6b35;">
+                    <use href="#icon-fire"></use>
+                  </svg>
+                  Today's Hot Topics
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="hotTopicsContent">
+                <div style="display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 6px; transition: all 0.3s; cursor: pointer; margin-bottom: 6px;">
+                  <div style="width: 6px; height: 6px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 2px; flex-shrink: 0;"></div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                      <span style="background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 1px 4px; border-radius: 6px; font-size: 7px; font-weight: 600;">🔥 Trending</span>
+                      <span style="font-size: 8px; color: #666;">2h ago</span>
+                    </div>
+                    <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 1px;">Vision Lake Integration Complete</div>
+                    <div style="font-size: 9px; color: #666; line-height: 1.2;">320,000 agents operational across squadrons</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 6px; transition: all 0.3s; cursor: pointer;">
+                  <div style="width: 6px; height: 6px; background: linear-gradient(135deg, #228B22, #0bb1bb); border-radius: 2px; flex-shrink: 0;"></div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                      <span style="background: linear-gradient(135deg, #228B22, #0bb1bb); color: white; padding: 1px 4px; border-radius: 6px; font-size: 7px; font-weight: 600;">📈 Growth</span>
+                      <span style="font-size: 8px; color: #666;">4h ago</span>
+                    </div>
+                    <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 1px;">Revenue Pipeline +47%</div>
+                    <div style="font-size: 9px; color: #666; line-height: 1.2;">Q2 projections exceeding targets by $2.3M</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Today's Proposals -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #fbbf24;">
+                    <use href="#icon-lightbulb"></use>
+                  </svg>
+                  Today's Proposals
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="proposalsContent">
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">Multi-Tenant Gateway Enhancement</div>
+                    <span style="font-size: 8px; color: #fbbf24; background: rgba(251, 191, 36, 0.15); padding: 1px 4px; border-radius: 4px;">PENDING</span>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">Advanced tenant isolation & scaling capabilities</div>
+                  <div style="font-size: 8px; color: #888;">Est. ROI: +$1.2M annually</div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">AI Copilot Expansion</div>
+                    <span style="font-size: 8px; color: #228B22; background: rgba(34, 139, 34, 0.15); padding: 1px 4px; border-radius: 4px;">APPROVED</span>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">Deploy 6 additional RIX specialists</div>
+                  <div style="font-size: 8px; color: #888;">Budget: $450K Q3-Q4</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Projects in Progress -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #10b981;">
+                    <use href="#icon-tasks"></use>
+                  </svg>
+                  Projects in Progress
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="projectsContent">
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">V99 Interface Deployment</div>
+                    <div style="font-size: 8px; color: #10b981;">87%</div>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">Production rollout to 47 enterprise clients</div>
+                  <div style="width: 100%; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden;">
+                    <div style="width: 87%; height: 100%; background: linear-gradient(90deg, #10b981, #0bb1bb);"></div>
+                  </div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">Security Audit Compliance</div>
+                    <div style="font-size: 8px; color: #fbbf24;">62%</div>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">SOC2 Type II certification process</div>
+                  <div style="width: 100%; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden;">
+                    <div style="width: 62%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- How You're Growing -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #8b5cf6;">
+                    <use href="#icon-chart-line"></use>
+                  </svg>
+                  How You're Growing
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="growthContent">
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">User Engagement</div>
+                    <div style="font-size: 10px; color: #228B22; font-weight: 700;">+340%</div>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">Copilot interactions: 2.4M monthly</div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">Revenue Growth</div>
+                    <div style="font-size: 10px; color: #0bb1bb; font-weight: 700;">+127%</div>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">ARR: $18.7M (vs $8.3M last year)</div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <div style="font-size: 11px; font-weight: 600; color: #333;">Client Retention</div>
+                    <div style="font-size: 10px; color: #B8860B; font-weight: 700;">97.3%</div>
+                  </div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">Enterprise clients: 142 active</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- How to Align with New Role -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #f59e0b;">
+                    <use href="#icon-bullseye"></use>
+                  </svg>
+                  How to Align with New Role
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="alignmentContent">
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px;">Q2 Strategic Priorities</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">• Enterprise scalability (Banking sector)</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 3px;">• Multi-tenant architecture completion</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">• Regulatory compliance (SOX, GDPR)</div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px;">
+                  <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px;">Team Objectives</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 2px;">Leadership development: 3 promotions pending</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">Cross-training: 85% completion rate</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Support Your Career & Organization -->
+            <div class="panel-card">
+              <button class="panel-header" onclick="togglePanel(this)">
+                <div class="panel-title">
+                  <svg class="panel-icon" style="fill: #ec4899;">
+                    <use href="#icon-rocket"></use>
+                  </svg>
+                  Support Your Career & Organization
+                </div>
+                <svg class="enterprise-icon chevron-icon" style="fill: rgba(0, 0, 0, 0.6); transition: all 0.3s ease;">
+                  <use href="#icon-chevron-down"></use>
+                </svg>
+              </button>
+              <div class="panel-content active" id="supportContent">
+                <div style="padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                  <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px;">Recommended Training</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 2px;">• Executive Leadership Certification (8 weeks)</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 2px;">• Enterprise Architecture Mastery</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">• Board Presentation Skills Workshop</div>
+                </div>
+                <div style="padding: 6px; border-radius: 6px;">
+                  <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px;">Career Advancement</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2; margin-bottom: 2px;">Next role: Chief Technology Officer</div>
+                  <div style="font-size: 9px; color: #666; line-height: 1.2;">Target timeline: Q4 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- V99 Enhanced Bottom Bar -->
+        <div class="bottom-bar">
+          <!-- V99 Enhanced Integration Icons -->
+          <div class="integration-icons">
+            <div class="integration-icon" title="Google Workspace" onclick="handleIntegrationClick('Google Workspace')">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-google"></use>
+              </svg>
+            </div>
+            <div class="integration-icon" title="Microsoft 365" onclick="handleIntegrationClick('Microsoft 365')">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-microsoft"></use>
+              </svg>
+            </div>
+            <div class="integration-icon" title="Slack" onclick="handleIntegrationClick('Slack')">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-slack"></use>
+              </svg>
+            </div>
+            <div class="integration-icon" title="GitHub" onclick="handleIntegrationClick('GitHub')">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-github"></use>
+              </svg>
+            </div>
+            <div class="integration-icon" title="LinkedIn" onclick="handleIntegrationClick('LinkedIn')">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-linkedin"></use>
+              </svg>
+            </div>
+            <div class="integration-icon" title="Daily.co Video" onclick="openVideoSession()">
+              <svg class="integration-icon-svg" style="fill: #333;">
+                <use href="#icon-video"></use>
+              </svg>
+            </div>
+          </div>
+          <button class="gateway-btn" onclick="openIntegrationGateway()">
+            <svg class="enterprise-icon" style="fill: #fff; width: 9px; height: 9px;">
+              <use href="#icon-plus"></use>
+            </svg>
+            Integration Gateway
+          </button>
+        </div>
+      </div>
+      
+      <!-- S2DO Button -->
+      <button class="s2do-button" id="s2doButton" onclick="initiateScanToDo()">
+        <div class="s2do-content">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9V5a2 2 0 0 1 2-2h4M3 15v4a2 2 0 0 0 2 2h4M15 3h4a2 2 0 0 1 2 2v4M15 21h4a2 2 0 0 0 2-2v-4"/>
+          </svg>
+          <div class="s2do-label">S2DO</div>
+        </div>
+        <button class="s2do-info" onclick="showS2DOInfo(event)">
+          <svg class="enterprise-icon" style="width: 10px; height: 10px;"><use href="#icon-info"></use></svg>
+        </button>
+      </button>
+    </div>
+  </div>
+
+  <!-- API Configuration Modal -->
+  <div id="apiConfigModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1001;">
+    <div style="background: #ffffff; border: 1px solid #ddd; border-radius: 8px; max-width: 500px; margin: 50px auto; padding: 25px;">
+      <h3 style="color: #0bb1bb; margin-bottom: 20px; font-family: monospace;">Claude API Configuration</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="color: #666; font-size: 12px; display: block; margin-bottom: 5px;">API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-api..." style="width: 100%; background: #f8f8f8; border: 1px solid #ddd; color: #333; padding: 8px; font-family: monospace; border-radius: 4px;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="color: #666; font-size: 12px; display: block; margin-bottom: 5px;">Organization ID (Optional)</label>
+        <input type="text" id="orgId" placeholder="org-..." style="width: 100%; background: #f8f8f8; border: 1px solid #ddd; color: #333; padding: 8px; font-family: monospace; border-radius: 4px;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="color: #666; font-size: 12px; display: block; margin-bottom: 5px;">Default Model</label>
+        <select id="defaultModel" style="width: 100%; background: #f8f8f8; border: 1px solid #ddd; color: #0bb1bb; padding: 8px; font-family: monospace; border-radius: 4px;">
+          <option value="claude-code">Claude Code (Recommended)</option>
+          <option value="claude-3-opus">Claude 3 Opus</option>
+          <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+          <option value="claude-3-haiku">Claude 3 Haiku</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="color: #666; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="enableBlending" checked>
+          Enable Model Blending (Use multiple models for enhanced responses)
+        </label>
+      </div>
+      
+      <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 20px;">
+        <h4 style="color: #ffa502; font-size: 14px; margin-bottom: 10px;">Enterprise Settings</h4>
+        <label style="color: #666; font-size: 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <input type="checkbox" id="enforceCodeMode" checked>
+          Default to Claude Code mode for all users
+        </label>
+        <label style="color: #666; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="allowAPIOverride">
+          Allow users to override API settings
+        </label>
+      </div>
+      
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="saveAPIConfig()" style="background: #0bb1bb; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600;">
+          Save Configuration
+        </button>
+        <button onclick="closeAPIConfig()" style="background: #ddd; border: none; color: #666; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global Variables
+    let activeRIX = 'QB';
+    let activeMode = 'terminal';
+    let rightPanelState = 'normal'; // normal, expanded, full-width, hidden
+    let isPanelLocked = false;
+    let isResizing = false;
+    let userRole = 'owner'; // owner, admin, diamond-sao, team-member, individual
+    let userLevel = 'enterprise'; // individual, team-member, team-leader, practitioner, enterprise
+    let cliMode = 'terminal'; // terminal, code, chat
+    let apiConnected = false;
+    let selectedModel = 'claude-code';
+    let authLevel = 3; // V99 Progressive Authentication Level
+
+    // V99 Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeEnhancedParticles(); // V99 Enhanced particles
+      loadUserData(); // Load dynamic user information
+      detectUserRole();
+      loadUserPreferences();
+      initializeKeyboardShortcuts();
+      loadDynamicContent();
+      initializeAuthFeatures(); // V99 Authentication features
+      
+      // Set initial copilot
+      activateRIX('QB', 'Anthropic 4');
+      
+      // Set initial mode to CLI to show all functionality
+      setCopilotMode('cli');
+    });
+
+    // Load Dynamic User Data
+    function loadUserData() {
+      // In production, this would fetch from your authentication service
+      // For now, simulating the API call
+      setTimeout(() => {
+        // These would come from your user management system
+        const userData = {
+          role: 'ASOOS Subscriber',
+          userName: 'Mr. Phillip Corey Roark, CEO',
+          tagline: 'Aixtiv Symphony Orchestrating Operating System',
+          systemName: 'ASOOS',
+          companyName: 'Aixtiv Corporation',
+          authLevel: 5 // Enterprise level
+        };
+        
+        // Update the interface with dynamic data - with null checks
+        const userNameEl = document.getElementById('userName');
+        const userTaglineEl = document.getElementById('userTagline');
+        const systemLogoEl = document.getElementById('systemLogo');
+        
+        if (userNameEl) userNameEl.textContent = userData.userName;
+        if (userTaglineEl) userTaglineEl.textContent = userData.tagline;
+        if (systemLogoEl) systemLogoEl.textContent = userData.systemName;
+        
+        // Update auth level for progressive features
+        authLevel = userData.authLevel;
+        
+        showNotification(`Welcome back, ${userData.userName.split(',')[0]}!`, 'success');
+      }, 500);
+    }
+
+    // Multi-Tenant Integration Gateway
+    function openMultiTenantGateway() {
+      // This would connect to your actual multi-tenant integration gateway
+      const gatewayUrl = 'https://gateway.asoos.com/integrations'; // Your actual gateway URL
+      
+      showNotification('Connecting to Multi-Tenant Integration Gateway...', 'success');
+      
+      // In production, this would open your integration management system
+      // For demo, showing the connection process
+      setTimeout(() => {
+        showNotification('Multi-Tenant Gateway Connected - Managing integrations across all tenants', 'success');
+        // window.open(gatewayUrl, '_blank'); // Uncomment when you have the actual URL
+      }, 1000);
+    }
+    
+    function initializeEnhancedParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 40; // Increased count for V99
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 12 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 8) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // V99 Progressive Authentication
+    function initializeAuthFeatures() {
+      const authFeatures = document.getElementById('authFeatures');
+      const sidebarAuthIcons = document.querySelectorAll('.sidebar-icon.auth-only');
+      
+      // Show Gift Shop & Pilots' Lounge for Level 3+ users
+      if (authLevel >= 3) {
+        setTimeout(() => {
+          if (authFeatures) authFeatures.classList.add('visible');
+          // Also show sidebar auth icons
+          sidebarAuthIcons.forEach(icon => {
+            icon.style.display = 'flex';
+          });
+        }, 1000);
+      }
+    }
+
+    // V99 Gift Shop Function
+    function openGiftShop() {
+      if (authLevel >= 3) {
+        showNotification('Opening Gift Shop - Premium Features Available', 'success');
+        openVideoSession(); // Demo integration
+      } else {
+        showNotification('Gift Shop requires Level 3+ authentication', 'error');
+      }
+    }
+
+    // V99 Pilots' Lounge Function
+    function openPilotsLounge() {
+      if (authLevel >= 3) {
+        showNotification('Welcome to Pilots\' Lounge - Elite Features Unlocked', 'success');
+        openVideoSession(); // Demo integration
+      } else {
+        showNotification('Pilots\' Lounge requires Level 3+ authentication', 'error');
+      }
+    }
+    
+    // Settings and Authentication Functions
+    function openSettings() {
+      // Show inline settings panel instead of redirecting
+      showNotification('Opening Diamond SAO Settings...', 'success');
+      
+      // Create settings overlay on the same page
+      createSettingsOverlay();
+    }
+    
+    function authenticateWithSallyPort() {
+      // Streamlined single-step authentication
+      showNotification('Authenticating...', 'success');
+      
+      // Quick authentication without multiple steps
+      setTimeout(() => {
+        authLevel = 5; // Set enterprise auth level immediately
+        initializeAuthFeatures();
+        showNotification('Welcome to ASOOS! All features unlocked.', 'success');
+        
+        // Update UI to show authenticated state
+        updateAuthenticatedState();
+      }, 800);
+    }
+    
+    function createSettingsOverlay() {
+      // Create inline settings instead of navigation
+      const overlay = document.createElement('div');
+      overlay.id = 'settingsOverlay';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      
+      overlay.innerHTML = `
+        <div style="background: #ffffff; border: 2px solid #0bb1bb; border-radius: 15px; padding: 30px; max-width: 500px; color: #333;">
+          <h2 style="color: #0bb1bb; margin-bottom: 20px; text-align: center;">Diamond SAO Settings</h2>
+          <div style="margin-bottom: 15px;">
+            <label style="color: #0bb1bb; font-weight: 600;">Authentication Level: </label>
+            <span style="color: #228B22;">Enterprise (Level 5)</span>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="color: #0bb1bb; font-weight: 600;">Active Services: </label>
+            <span style="color: #228B22;">Testament Swarm, SallyPort, Integration Gateway</span>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="color: #0bb1bb; font-weight: 600;">Features Unlocked: </label>
+            <span style="color: #228B22;">CLI, Video Sessions, Gift Shop, Pilots' Lounge</span>
+          </div>
+          <div style="text-align: center;">
+            <button onclick="closeSettingsOverlay()" style="background: #0bb1bb; border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+    }
+    
+    function closeSettingsOverlay() {
+      const overlay = document.getElementById('settingsOverlay');
+      if (overlay) {
+        overlay.remove();
+      }
+    }
+    
+    function updateAuthenticatedState() {
+      // Update UI elements to show authenticated state
+      const authFeatures = document.querySelectorAll('.auth-only');
+      authFeatures.forEach(feature => {
+        feature.style.display = 'flex';
+        feature.style.opacity = '1';
+      });
+      
+      // Show premium features immediately
+      setTimeout(() => {
+        showNotification('Premium features activated!', 'success');
+      }, 1000);
+    }
+    
+    // Theme switching functions
+    function switchToLightTheme() {
+      window.location.href = '/light';
+    }
+    
+    function switchToDarkTheme() {
+      window.location.href = '/';
+    }
+    
+    function openDiamondSAO() {
+      window.location.href = '/diamond-sao';
+    }
+    
+    // Video Session Functions
+    function openVideoSession() {
+      const videoWindow = document.getElementById('videoWindow');
+      videoWindow.style.display = 'block';
+      showNotification('Daily.co video session starting...', 'success');
+    }
+    
+    function closeVideo() {
+      const videoWindow = document.getElementById('videoWindow');
+      videoWindow.style.display = 'none';
+    }
+    
+    function resizeVideo(size) {
+      const videoWindow = document.getElementById('videoWindow');
+      videoWindow.className = `video-window ${size}`;
+    }
+    
+    // Toggle Academy
+    function toggleAcademy(element) {
+      showNotification('Academy interface coming soon...', 'success');
+    }
+    
+    // Handle Integration Clicks
+    function handleIntegrationClick(integration) {
+      showNotification(`Connecting to ${integration}...`, 'success');
+      
+      setTimeout(() => {
+        showNotification(`${integration} integration active`, 'success');
+      }, 1000);
+    }
+    
+    // S2DO Functions
+    function initiateScanToDo() {
+      const button = document.getElementById('s2doButton');
+      button.classList.add('scanning');
+      
+      showNotification('S2DO: Scanning for approval workflows...', 'success');
+      
+      setTimeout(() => {
+        button.classList.remove('scanning');
+        showNotification('S2DO: 3 items found for approval', 'success');
+      }, 3000);
+    }
+    
+    function showS2DOInfo(event) {
+      event.stopPropagation();
+      showNotification('S2DO: Scan To Do - Automated approval workflow system', 'success');
+    }
+  </script>
+</body>
+</html>

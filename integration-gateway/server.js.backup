@@ -1,0 +1,310 @@
+/**
+ * Enhanced SallyPort Cloudflare Authentication Server
+ * 
+ * Cloud Run deployment for comprehensive authentication system with:
+ * - Cloudflare challenge validation
+ * - SallyPort authentication verification
+ * - Comprehensive audit logging
+ * - Protected resource enforcement
+ * - Real-time security monitoring
+ * 
+ * @author Aixtiv Symphony Integration Gateway
+ * @version 2.0.0-cloudflare-integration
+ * @since 2025-07-02
+ */
+
+const express = require('express');
+const cors = require('cors');
+const admin = require('firebase-admin');
+const winston = require('winston');
+
+// Import our enhanced authentication middleware
+const sallyPortMiddleware = require('./middleware/sallyport-cloudflare-auth');
+
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+  try {
+    // Use Google Cloud's default credentials when running on Cloud Run
+    admin.initializeApp({
+      projectId: process.env.GOOGLE_CLOUD_PROJECT || 'api-for-warp-drive'
+    });
+    console.log('✅ Firebase Admin initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize Firebase Admin:', error.message);
+  }
+}
+
+// Configure server logging
+const serverLogger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { 
+    service: 'sallyport-cloudflare-server', 
+    version: '2.0.0',
+    environment: process.env.NODE_ENV || 'production'
+  },
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    })
+  ]
+});
+
+// Create Express app
+const app = express();
+
+// Get port from environment (Cloud Run sets this automatically)
+const PORT = process.env.PORT || 8080;
+
+// Trust proxy headers (important for Cloud Run behind load balancer)
+app.set('trust proxy', true);
+
+// Basic middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Apply CORS with Cloudflare optimization
+app.use(sallyPortMiddleware.cors());
+
+// Apply rate limiting
+app.use(sallyPortMiddleware.rateLimit());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    serverLogger.info('Request completed', {
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      duration: `${duration}ms`,
+      userAgent: req.headers['user-agent'],
+      cloudflareRay: req.headers['cf-ray'],
+      clientIP: req.headers['cf-connecting-ip'] || req.ip
+    });
+  });
+  
+  next();
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Enhanced SallyPort Cloudflare Authentication',
+    version: '2.0.0-cloudflare-integration',
+    status: 'operational',
+    timestamp: new Date().toISOString(),
+    cloudflare: {
+      ray: req.headers['cf-ray'],
+      country: req.headers['cf-ipcountry'],
+      ip: req.headers['cf-connecting-ip']
+    },
+    endpoints: {
+      health: '/health',
+      metrics: '/metrics',
+      api: {
+        agents: '/api/agents',
+        vls: '/api/vls',
+        admin: '/api/admin',
+        wing: '/api/wing',
+        blockchain: '/api/blockchain'
+      }
+    }
+  });
+});
+
+// Health check endpoint (required for Cloud Run)
+app.get('/health', sallyPortMiddleware.healthCheck());
+
+// Metrics endpoint for monitoring
+app.get('/metrics', sallyPortMiddleware.metrics());
+
+// Protected API routes - apply SallyPort authentication
+app.use('/api/agents', sallyPortMiddleware.authenticate());
+app.use('/api/vls', sallyPortMiddleware.authenticate());
+app.use('/api/admin', sallyPortMiddleware.authenticate());
+app.use('/api/wing', sallyPortMiddleware.authenticate());
+app.use('/api/blockchain', sallyPortMiddleware.authenticate());
+app.use('/dashboard', sallyPortMiddleware.authenticate());
+app.use('/academy/admin', sallyPortMiddleware.authenticate());
+
+// Protected API endpoints
+app.get('/api/agents', (req, res) => {
+  res.json({
+    message: 'Agent data accessed successfully',
+    user: req.user,
+    cloudflareValidation: req.cloudflareValidation,
+    securityLevel: req.cloudflareValidation?.securityLevel,
+    timestamp: new Date().toISOString(),
+    data: {
+      agents: [
+        { id: 'rix-001', name: 'RIX Agent Alpha', status: 'active' },
+        { id: 'crx-001', name: 'CRX Agent Beta', status: 'active' },
+        { id: 'pilot-001', name: 'Pilot Agent Gamma', status: 'standby' }
+      ]
+    }
+  });
+});
+
+app.get('/api/vls', (req, res) => {
+  res.json({
+    message: 'VLS data accessed successfully',
+    user: req.user,
+    securityLevel: req.cloudflareValidation?.securityLevel,
+    timestamp: new Date().toISOString(),
+    data: {
+      solutions: [
+        { id: 'dr-lucy', name: 'Flight Memory System', status: 'operational' },
+        { id: 'dr-burby', name: 'S2DO Blockchain', status: 'operational' },
+        { id: 'dr-sabina', name: 'Dream Commander', status: 'operational' },
+        { id: 'dr-memoria', name: 'Anthology Launch', status: 'operational' }
+      ]
+    }
+  });
+});
+
+app.get('/api/admin', (req, res) => {
+  res.json({
+    message: 'Admin panel accessed successfully',
+    user: req.user,
+    securityLevel: req.cloudflareValidation?.securityLevel,
+    timestamp: new Date().toISOString(),
+    adminData: {
+      activeUsers: 125,
+      securityAlerts: 0,
+      systemHealth: 'excellent',
+      cloudflareStatus: 'protected'
+    }
+  });
+});
+
+app.get('/api/wing', (req, res) => {
+  res.json({
+    message: 'Wing orchestration data accessed successfully',
+    user: req.user,
+    securityLevel: req.cloudflareValidation?.securityLevel,
+    timestamp: new Date().toISOString(),
+    wingData: {
+      squadrons: ['R1', 'R2', 'R3'],
+      activeAgents: 87,
+      missionsInProgress: 23,
+      systemStatus: 'operational'
+    }
+  });
+});
+
+app.get('/api/blockchain', (req, res) => {
+  res.json({
+    message: 'Blockchain data accessed successfully',
+    user: req.user,
+    securityLevel: req.cloudflareValidation?.securityLevel,
+    timestamp: new Date().toISOString(),
+    blockchainData: {
+      network: 'S2DO',
+      blockHeight: 156789,
+      transactions: 2341,
+      smartContracts: 45
+    }
+  });
+});
+
+// Authentication test endpoint
+app.post('/api/auth/test', sallyPortMiddleware.authenticate(), (req, res) => {
+  res.json({
+    message: 'Authentication test successful',
+    user: req.user,
+    cloudflareValidation: req.cloudflareValidation,
+    requestId: req.requestId,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Cloudflare validation endpoint
+app.get('/api/cloudflare/validate', (req, res) => {
+  const cloudflareHeaders = {
+    ray: req.headers['cf-ray'],
+    country: req.headers['cf-ipcountry'],
+    ip: req.headers['cf-connecting-ip'],
+    threatScore: req.headers['cf-threat-score'],
+    botScore: req.headers['cf-bot-score']
+  };
+
+  const hasCloudflareHeaders = Object.values(cloudflareHeaders).some(value => value);
+
+  res.json({
+    cloudflareDetected: hasCloudflareHeaders,
+    headers: cloudflareHeaders,
+    timestamp: new Date().toISOString(),
+    status: hasCloudflareHeaders ? 'verified' : 'not_detected'
+  });
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  serverLogger.error('Unhandled error', {
+    error: error.message,
+    stack: error.stack,
+    path: req.path,
+    method: req.method
+  });
+
+  res.status(500).json({
+    error: 'internal_server_error',
+    message: 'An unexpected error occurred',
+    timestamp: new Date().toISOString(),
+    requestId: req.requestId
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'not_found',
+    message: 'Endpoint not found',
+    path: req.path,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  serverLogger.info('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  serverLogger.info('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
+
+// Start the server
+app.listen(PORT, '0.0.0.0', () => {
+  serverLogger.info('🚀 Enhanced SallyPort Cloudflare Authentication Server started', {
+    port: PORT,
+    environment: process.env.NODE_ENV || 'production',
+    version: '2.0.0-cloudflare-integration',
+    nodeVersion: process.version,
+    cloudProject: process.env.GOOGLE_CLOUD_PROJECT || 'api-for-warp-drive'
+  });
+  
+  console.log(`
+🛡️  Enhanced SallyPort Cloudflare Authentication Server
+🌐 Running on: http://0.0.0.0:${PORT}
+📊 Version: 2.0.0-cloudflare-integration
+🔐 Features: Cloudflare + SallyPort + Audit Logging
+⚡ Node.js: ${process.version}
+🏗️  Environment: ${process.env.NODE_ENV || 'production'}
+  `);
+});
+
+module.exports = app;

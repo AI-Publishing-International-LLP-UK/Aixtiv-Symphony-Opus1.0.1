@@ -1,0 +1,285 @@
+# ASOOS Payment Services Deployment Configuration
+# GCP Cloud Run configuration for us-west1 region
+# Aixtiv Symphony Orchestrating Operating System v1.0.1
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: payment-services-gateway
+  namespace: asoos-payment
+  labels:
+    app: payment-services
+    environment: production
+    component: integration-gateway
+    version: "1.0.1"
+  annotations:
+    run.googleapis.com/launch-stage: BETA
+    run.googleapis.com/ingress: all
+    run.googleapis.com/binary-authorization: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/minScale: "1"
+        run.googleapis.com/cpu-throttling: "true"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/vpc-access-connector: asoos-vpc-connector
+        run.googleapis.com/cloudsql-instances: ${PROJECT_ID}:us-west1:asoos-payment-db
+        run.googleapis.com/container-dependencies: '{
+          "STRIPE_SECRET_KEY": ["payment-processor"],
+          "XERO_CLIENT_SECRET": ["accounting-service"],
+          "PANDADOC_API_KEY": ["document-service"]
+        }'
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: payment-services-sa@${PROJECT_ID}.iam.gserviceaccount.com
+      containers:
+      - image: gcr.io/${PROJECT_ID}/payment-services-gateway:${VERSION}
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+          requests:
+            cpu: 500m
+            memory: 256Mi
+        env:
+        # Environment configuration
+        - name: NODE_ENV
+          value: "production"
+        - name: GCP_PROJECT_ID
+          value: "${PROJECT_ID}"
+        - name: GCP_REGION
+          value: "us-west1"
+        - name: GCP_ZONE
+          value: "us-west1-b"
+        
+        # Service configuration
+        - name: PORT
+          value: "8080"
+        - name: SERVICE_NAME
+          value: "payment-services-gateway"
+        - name: SERVICE_VERSION
+          value: "${VERSION}"
+        
+        # Security settings
+        - name: SALLYPORT_AUTH_ENDPOINT
+          value: "https://api.asoos-2100-com.firebaseapp.com/auth"
+        - name: TOKEN_VERIFICATION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: token-verification-secret
+        - name: PAYMENT_GATEWAY_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: encryption-key
+        
+        # Stripe configuration
+        - name: STRIPE_PUBLIC_KEY
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: stripe-public-key
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: stripe-secret-key
+        - name: STRIPE_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: stripe-webhook-secret
+        - name: STRIPE_API_VERSION
+          value: "2025-01-01"
+        
+        # Xero configuration
+        - name: XERO_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: xero-client-id
+        - name: XERO_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: xero-client-secret
+        - name: XERO_REDIRECT_URI
+          value: "https://asoos-2100-com.firebaseapp.com/auth/xero/callback"
+        - name: XERO_SCOPES
+          value: "accounting.transactions,accounting.contacts,accounting.settings"
+        
+        # PandaDoc configuration
+        - name: PANDADOC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: pandadoc-api-key
+        - name: PANDADOC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: pandadoc-client-id
+        - name: PANDADOC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: pandadoc-client-secret
+        - name: PANDADOC_API_URL
+          value: "https://api.pandadoc.com/v1"
+        
+        # FMS (Flight Memory System) configuration
+        - name: FMS_API_ENDPOINT
+          value: "https://api.asoos-2100-com.firebaseapp.com/fms"
+        - name: FMS_AUDIT_LOG_ENABLED
+          value: "true"
+        - name: FMS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: payment-gateway-secrets
+              key: fms-api-key
+        
+        # Monitoring configuration
+        - name: MONITORING_ENABLED
+          value: "true"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: ALERT_EMAIL
+          value: "alerts@asoos-2100-com.firebaseapp.com"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 5
+          failureThreshold: 12
+---
+# Redis instance for caching and rate limiting
+apiVersion: redis.cnrm.cloud.google.com/v1beta1
+kind: RedisInstance
+metadata:
+  name: payment-services-cache
+  namespace: asoos-payment
+spec:
+  location: us-west1
+  memorySizeGb: 1
+  tier: BASIC
+  redisVersion: REDIS_6_X
+  displayName: "Payment Services Cache"
+  authorizedNetwork: projects/${PROJECT_ID}/global/networks/asoos-vpc
+---
+# Secret Manager configuration
+apiVersion: secretmanager.cnrm.cloud.google.com/v1beta1
+kind: SecretManagerSecret
+metadata:
+  name: payment-gateway-secrets
+  namespace: asoos-payment
+spec:
+  replication:
+    automatic: true
+---
+# Cloud Monitoring Dashboard
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringDashboard
+metadata:
+  name: payment-services-dashboard
+  namespace: asoos-payment
+spec:
+  displayName: "Payment Services Dashboard"
+  gridLayout:
+    widgets:
+    - title: "Payment Transaction Volume"
+      xyChart:
+        dataSets:
+        - timeSeriesQuery:
+            timeSeriesFilter:
+              filter: 'metric.type="custom.googleapis.com/payment_services/transaction/count"'
+    - title: "Transaction Success Rate"
+      xyChart:
+        dataSets:
+        - timeSeriesQuery:
+            timeSeriesFilter:
+              filter: 'metric.type="custom.googleapis.com/payment_services/transaction/success_rate"'
+    - title: "API Latency"
+      xyChart:
+        dataSets:
+        - timeSeriesQuery:
+            timeSeriesFilter:
+              filter: 'metric.type="custom.googleapis.com/payment_services/transaction/latency"'
+    - title: "Error Rate"
+      xyChart:
+        dataSets:
+        - timeSeriesQuery:
+            timeSeriesFilter:
+              filter: 'metric.type="custom.googleapis.com/payment_services/transaction/error_rate"'
+---
+# Alerting Policy for Payment Services
+apiVersion: monitoring.cnrm.cloud.google.com/v1beta1
+kind: MonitoringAlertPolicy
+metadata:
+  name: payment-services-alerts
+  namespace: asoos-payment
+spec:
+  displayName: "Payment Services Alerts"
+  combiner: OR
+  conditions:
+  - displayName: "High Error Rate"
+    conditionThreshold:
+      filter: 'metric.type="custom.googleapis.com/payment_services/transaction/error_rate" resource.type="cloud_run_revision"'
+      comparison: COMPARISON_GT
+      thresholdValue: 0.05
+      duration: 300s
+      trigger:
+        count: 1
+  - displayName: "Service Unavailable"
+    conditionThreshold:
+      filter: 'metric.type="cloud_run_revision/instance_count" resource.type="cloud_run_revision"'
+      comparison: COMPARISON_LT
+      thresholdValue: 1
+      duration: 60s
+      trigger:
+        count: 1
+  - displayName: "High Latency"
+    conditionThreshold:
+      filter: 'metric.type="custom.googleapis.com/payment_services/transaction/latency" resource.type="cloud_run_revision"'
+      comparison: COMPARISON_GT
+      thresholdValue: 5000
+      duration: 300s
+      aggregations:
+      - alignmentPeriod: 60s
+        perSeriesAligner: ALIGN_PERCENTILE_99
+      trigger:
+        count: 1
+  alertStrategy:
+    autoClose: 86400s
+  notificationChannels:
+  - projects/${PROJECT_ID}/notificationChannels/${EMAIL_CHANNEL_ID}
+  - projects/${PROJECT_ID}/notificationChannels/${SLACK_CHANNEL_ID}
+  documentation:
+    content: "## Payment Services Alert\nAn alert has been triggered for the payment services gateway. Please check the dashboard and logs for more information.\n\n**Runbook:** https://docs.asoos-2100-com.firebaseapp.com/runbooks/payment-services-alerts"
+    mimeType: "text/markdown"
+

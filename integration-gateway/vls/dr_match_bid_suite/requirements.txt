@@ -1,0 +1,1 @@
+flask>=2.3.0\nrequests>=2.28.0

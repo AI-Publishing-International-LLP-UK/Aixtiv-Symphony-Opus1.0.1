@@ -1,0 +1,11 @@
+[submodule "aixtiv-cli"]
+	path = aixtiv-cli
+	url = https://github.com/AI-Publishing-International-LLP-UK/aixtiv-cli.git
+
+[submodule "vls/solutions/dr-memoria-anthology-launch/functions/anthology-integration-gateway"]
+	path = vls/solutions/dr-memoria-anthology-launch/functions/anthology-integration-gateway
+	url = file:///Users/as/asoos/opus/opus1.0.1/vls/solutions/dr-memoria-anthology-launch/functions/anthology-integration-gateway
+
+[submodule "vls/solutions/dr-memoria-anthology-launch/functions/integration-gateway"]
+	path = vls/solutions/dr-memoria-anthology-launch/functions/integration-gateway
+	url = file:///Users/as/asoos/opus/opus1.0.1/vls/solutions/dr-memoria-anthology-launch/functions/integration-gateway
