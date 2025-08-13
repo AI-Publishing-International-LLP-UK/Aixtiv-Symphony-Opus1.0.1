@@ -1,0 +1,82 @@
+{
+  "name": "@asoos/blockchain",
+  "version": "1.0.0",
+  "description": "ASOOS Blockchain Infrastructure - BACA Coin, NFTs, and Smart Contracts",
+  "main": "index.js",
+  "scripts": {
+    "launch-baca": "./launch-baca-coin.sh",
+    "deploy-contracts": "./deploy-smart-contracts.sh",
+    "mint-nft": "./mint-nft.sh",
+    "test": "npm run test:contracts && npm run test:integration",
+    "test:contracts": "echo 'Contract tests would run here'",
+    "test:integration": "echo 'Integration tests would run here'",
+    "lint": "eslint . --ext .js,.ts",
+    "format": "prettier --write .",
+    "security-audit": "echo 'Security audit would run here'",
+    "dry-run:all": "npm run launch-baca -- --dry-run && npm run deploy-contracts -- --dry-run"
+  },
+  "keywords": [
+    "asoos",
+    "blockchain",
+    "nft",
+    "smart-contracts",
+    "baca-coin",
+    "defi",
+    "ai-agents",
+    "cryptocurrency"
+  ],
+  "author": "AI Publishing International LLP",
+  "license": "PROPRIETARY",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AI-Publishing-International-LLP-UK/asoos-blockchain"
+  },
+  "dependencies": {
+    "ethers": "^6.0.0",
+    "web3": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.19.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.0",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
+    "chai": "^4.3.0",
+    "mocha": "^10.2.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "solhint": "^4.0.0",
+    "slither-analyzer": "^0.10.0"
+  },
+  "optionalDependencies": {
+    "@foundry-rs/cli": "^0.2.0",
+    "ipfs-http-client": "^60.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "private": true,
+  "workspaces": [
+    "nft/*",
+    "smart-contracts/*",
+    "wallets/*",
+    "roi-tracking/*"
+  ],
+  "asoos": {
+    "framework": "multi-chain",
+    "networks": [
+      "ethereum",
+      "polygon", 
+      "bsc",
+      "arbitrum"
+    ],
+    "agent_integration": true,
+    "victory36_protected": true,
+    "sallyport_auth": true,
+    "fms_logging": true,
+    "deployment_region": "us-west1"
+  }
+}

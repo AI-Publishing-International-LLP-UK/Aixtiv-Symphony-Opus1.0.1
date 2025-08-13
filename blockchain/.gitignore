@@ -1,0 +1,92 @@
+# Environment and Secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+private-keys/
+secrets/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build and Cache
+build/
+dist/
+cache/
+.cache/
+*.tsbuildinfo
+.hardhat/
+artifacts/
+typechain/
+typechain-types/
+
+# Deployment and Contract Data
+deployments/*/chainId.json
+deployments/*/solcInputs/
+.openzeppelin/
+deployment-summary-*.json
+contract-addresses-*.json
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+junit.xml
+
+# Foundry
+out/
+cache/
+broadcast/
+lib/
+script/
+test/
+
+# IPFS and Metadata
+metadata-*.json
+ipfs-uploads/
+metadata-cache/
+
+# Logs and Debugging  
+*.log
+logs/
+debug/
+.DS_Store
+.vscode/
+.idea/
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Blockchain Specific
+ganache-cli/
+.chainId
+.network
+*.receipt
+*.tx
+
+# Security
+audit-reports/
+security-logs/
+vulnerability-reports/
+
+# Local Development
+local-blockchain/
+dev-wallets/
+test-tokens/
