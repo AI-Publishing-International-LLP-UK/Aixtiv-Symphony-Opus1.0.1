@@ -141,3 +141,42 @@ didc-archives/prompt-discovery/dream-commander-integration.json
 didc-archives/prompt-discovery/prompt-catalog-categorized.json
 didc-archives/prompt-discovery/prompt-catalog.json
 didc-archives/prompt-discovery/wfa-assignment-matrix.json
+
+# Workspace and staging areas
+.workspace/
+staging-extras/
+*.bak
+*.backup
+
+# Wrangler cache and build files
+.wrangler/
+
+# Migration and backup files
+backups/
+migration-*/
+FIREBASE_*/
+*migration*.json
+*migration*.md
+*migration*.csv
+*migration*.js
+
+# Report files
+*-report.txt
+*-report.md
+*REPORT*.md
+SECRETS_SCAN_REPORT.md
+STEP_*_COMPLETION_SUMMARY.md
+
+# Private and sensitive directories
+private/diamond-sao/
+r2-migration-staging/
+
+# Workers and deployment artifacts
+workers/
+vls/solutions/*/functions/
+
+# Legacy and deprecated files
+*.DEPRECATED
+*.DISABLED
+firebase-shim/
+DEPRECATED_*/

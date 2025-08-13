@@ -1,0 +1,568 @@
+/**
+ * Tenant & Tier Resolver Middleware
+ * Step 3: Maps sub/org_id claims → Firestore tenants/{tenantId} 
+ * Enriches RequestContext with tenantId, subscriptionTier, and roles
+ * Provides helper requireTier('pro') for handlers
+ * 
+ * ASOOS Integration Gateway - Tenant Resolution Layer
+ * (c) 2025 AI Publishing International LLP - All Rights Reserved
+ */
+
+import { Request, Response, NextFunction } from 'express';
+import { ValidationRequest } from './provider-agnostic-validation';
+import { d1Database } from '../cli/cloudflareConfig';
+
+/**
+ * Subscription tier types for ASOOS
+ */
+export type SubscriptionTier = 'free' | 'pro' | 'enterprise';
+
+/**
+ * ASOOS role types aligned with pilot hierarchy
+ */
+export type ASOOSRole = 
+  | 'user'           // Basic user
+  | 'pilot'          // Level 1 pilots
+  | 'rix'            // Level 2 RIX pilots  
+  | 'crx'            // Level 2 CRX pilots
+  | 'qrix'           // Level 2 QRIX pilots
+  | 'hqrix'          // HQRIX variants
+  | 'pcp'            // PCP pilots
+  | 'admin'          // System admin
+  | 'diamond_sao'    // Diamond SAO (highest security level)
+  | 'emerald_sao'    // Emerald SAO
+  | 'opal'           // Opal class (swarm class for non-RIX)
+  | 'onyx';          // Onyx class (Junior Officers, Pilot Apprentices)
+
+/**
+ * Tenant information from Firestore/D1
+ */
+export interface TenantInfo {
+  tenantId: string;
+  organizationId?: string;
+  name: string;
+  subscriptionTier: SubscriptionTier;
+  status: 'active' | 'suspended' | 'trial' | 'expired';
+  roles: ASOOSRole[];
+  permissions: string[];
+  metadata?: {
+    industry?: string;
+    employeeCount?: number;
+    region?: string;
+    specialization?: string[];
+    [key: string]: any;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Enhanced Request interface with tenant context
+ */
+export interface TenantRequest extends ValidationRequest {
+  tenantContext?: {
+    tenantId: string;
+    subscriptionTier: SubscriptionTier;
+    roles: ASOOSRole[];
+    permissions: string[];
+    tenant: TenantInfo;
+  };
+}
+
+/**
+ * Tenant & Tier Resolver Class
+ */
+class TenantTierResolver {
+  private tenantCache = new Map<string, { tenant: TenantInfo; timestamp: number }>();
+  private cacheTimeout = 300000; // 5 minutes cache
+
+  /**
+   * Map sub/org_id claims to tenant ID
+   */
+  private async resolveTenantId(sub: string, orgId?: string): Promise<string | null> {
+    try {
+      // Priority: org_id first, then sub
+      const lookupKey = orgId || sub;
+      
+      if (!lookupKey) {
+        console.warn('TenantResolver: No sub or org_id provided');
+        return null;
+      }
+
+      // For ASOOS, we use a deterministic mapping approach
+      // org_id maps directly to tenantId if present
+      if (orgId) {
+        return orgId;
+      }
+
+      // For individual users (sub only), create tenant ID based on sub
+      // This follows ASOOS multi-tenant architecture
+      return `tenant_${sub.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    } catch (error) {
+      console.error('TenantResolver: Error resolving tenant ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get tenant information from Firestore/D1
+   */
+  private async getTenantInfo(tenantId: string): Promise<TenantInfo | null> {
+    try {
+      // Check cache first
+      const cached = this.tenantCache.get(tenantId);
+      if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+        return cached.tenant;
+      }
+
+      // Try D1 Database first (Cloudflare)
+      try {
+        const tenant = await d1Database.getTenant(tenantId);
+        if (tenant && !tenant.error) {
+          this.tenantCache.set(tenantId, { tenant, timestamp: Date.now() });
+          return tenant;
+        }
+      } catch (d1Error) {
+        console.warn('TenantResolver: D1 lookup failed, trying Firestore fallback:', d1Error.message);
+      }
+
+      // Fallback to Firestore (if still configured)
+      try {
+        // This would use the existing Firestore setup as fallback
+        // Following the rule that Firestore is deprecated but may still exist
+        const firestoreResult = await this.getFirestoreTenant(tenantId);
+        if (firestoreResult) {
+          this.tenantCache.set(tenantId, { tenant: firestoreResult, timestamp: Date.now() });
+          return firestoreResult;
+        }
+      } catch (firestoreError) {
+        console.warn('TenantResolver: Firestore fallback failed:', firestoreError.message);
+      }
+
+      // Create default tenant if not found (for new users)
+      const defaultTenant = this.createDefaultTenant(tenantId);
+      this.tenantCache.set(tenantId, { tenant: defaultTenant, timestamp: Date.now() });
+      
+      return defaultTenant;
+
+    } catch (error) {
+      console.error('TenantResolver: Error getting tenant info:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Firestore fallback for tenant lookup
+   */
+  private async getFirestoreTenant(tenantId: string): Promise<TenantInfo | null> {
+    // This is a fallback method for existing Firestore data
+    // Since Firebase is being deprecated, this will eventually be removed
+    try {
+      // Mock implementation - replace with actual Firestore call if needed
+      const firestoreEndpoint = process.env.FIRESTORE_TENANT_ENDPOINT;
+      if (!firestoreEndpoint) {
+        return null;
+      }
+
+      const response = await fetch(`${firestoreEndpoint}/tenants/${tenantId}`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.FIRESTORE_AUTH_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      return this.normalizeFirestoreTenant(data);
+
+    } catch (error) {
+      console.warn('TenantResolver: Firestore fallback error:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Normalize Firestore tenant data to TenantInfo
+   */
+  private normalizeFirestoreTenant(data: any): TenantInfo {
+    return {
+      tenantId: data.id || data.tenantId,
+      organizationId: data.organizationId,
+      name: data.name || 'Unknown Organization',
+      subscriptionTier: data.subscriptionTier || 'free',
+      status: data.status || 'active',
+      roles: Array.isArray(data.roles) ? data.roles : ['user'],
+      permissions: Array.isArray(data.permissions) ? data.permissions : [],
+      metadata: data.metadata || {},
+      createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
+      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date()
+    };
+  }
+
+  /**
+   * Create default tenant for new users
+   */
+  private createDefaultTenant(tenantId: string): TenantInfo {
+    return {
+      tenantId,
+      name: 'New Organization',
+      subscriptionTier: 'free',
+      status: 'trial',
+      roles: ['user'],
+      permissions: ['read:basic'],
+      metadata: {
+        region: 'us-west1', // ASOOS default region
+        specialization: []
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  /**
+   * Determine roles based on user claims and tenant info
+   */
+  private determineRoles(userClaims: any, tenantInfo: TenantInfo): ASOOSRole[] {
+    const roles: Set<ASOOSRole> = new Set();
+
+    // Add tenant-based roles
+    if (tenantInfo.roles) {
+      tenantInfo.roles.forEach(role => roles.add(role));
+    }
+
+    // Add user-specific roles from claims
+    if (userClaims.roles && Array.isArray(userClaims.roles)) {
+      userClaims.roles.forEach((role: string) => {
+        if (this.isValidASOOSRole(role)) {
+          roles.add(role as ASOOSRole);
+        }
+      });
+    }
+
+    // Special handling for ASOOS pilot hierarchy
+    if (userClaims.pilot_level) {
+      roles.add(this.mapPilotLevel(userClaims.pilot_level));
+    }
+
+    // Security class mapping
+    if (userClaims.security_class) {
+      const securityRole = this.mapSecurityClass(userClaims.security_class);
+      if (securityRole) {
+        roles.add(securityRole);
+      }
+    }
+
+    // Default to 'user' if no roles found
+    if (roles.size === 0) {
+      roles.add('user');
+    }
+
+    return Array.from(roles);
+  }
+
+  /**
+   * Validate ASOOS role
+   */
+  private isValidASOOSRole(role: string): boolean {
+    const validRoles: ASOOSRole[] = [
+      'user', 'pilot', 'rix', 'crx', 'qrix', 'hqrix', 'pcp', 
+      'admin', 'diamond_sao', 'emerald_sao', 'opal', 'onyx'
+    ];
+    return validRoles.includes(role as ASOOSRole);
+  }
+
+  /**
+   * Map pilot level to ASOOS role
+   */
+  private mapPilotLevel(level: string): ASOOSRole {
+    const levelMap: Record<string, ASOOSRole> = {
+      'apprentice': 'onyx',
+      'junior': 'onyx',
+      'full': 'pilot',
+      'rix': 'rix',
+      'crx': 'crx',
+      'qrix': 'qrix',
+      'hqrix': 'hqrix',
+      'pcp': 'pcp'
+    };
+    return levelMap[level] || 'pilot';
+  }
+
+  /**
+   * Map security class to role
+   */
+  private mapSecurityClass(securityClass: string): ASOOSRole | null {
+    const classMap: Record<string, ASOOSRole> = {
+      'diamond': 'diamond_sao',
+      'emerald': 'emerald_sao',
+      'opal': 'opal',
+      'onyx': 'onyx'
+    };
+    return classMap[securityClass.toLowerCase()] || null;
+  }
+
+  /**
+   * Main resolver method
+   */
+  public async resolve(req: TenantRequest): Promise<boolean> {
+    try {
+      // Get user info from authentication middleware
+      const user = req.user || req.validationResult?.user;
+      if (!user) {
+        console.warn('TenantResolver: No authenticated user found');
+        return false;
+      }
+
+      // Extract sub and org_id claims
+      const sub = user.id || user.sub;
+      const orgId = user.org_id || user.organization_id;
+
+      if (!sub) {
+        console.warn('TenantResolver: No sub claim found in user token');
+        return false;
+      }
+
+      // Resolve tenant ID
+      const tenantId = await this.resolveTenantId(sub, orgId);
+      if (!tenantId) {
+        console.error('TenantResolver: Failed to resolve tenant ID');
+        return false;
+      }
+
+      // Get tenant information
+      const tenantInfo = await this.getTenantInfo(tenantId);
+      if (!tenantInfo) {
+        console.error('TenantResolver: Failed to get tenant info');
+        return false;
+      }
+
+      // Determine roles
+      const roles = this.determineRoles(user, tenantInfo);
+
+      // Build permissions array
+      const permissions = [
+        ...tenantInfo.permissions,
+        ...this.getRoleBasedPermissions(roles)
+      ];
+
+      // Enrich request context
+      req.tenantContext = {
+        tenantId,
+        subscriptionTier: tenantInfo.subscriptionTier,
+        roles,
+        permissions: [...new Set(permissions)], // Remove duplicates
+        tenant: tenantInfo
+      };
+
+      return true;
+
+    } catch (error) {
+      console.error('TenantResolver: Resolution failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get role-based permissions
+   */
+  private getRoleBasedPermissions(roles: ASOOSRole[]): string[] {
+    const permissions: string[] = [];
+
+    roles.forEach(role => {
+      switch (role) {
+        case 'user':
+          permissions.push('read:basic');
+          break;
+        case 'pilot':
+          permissions.push('read:basic', 'write:basic', 'execute:tasks');
+          break;
+        case 'rix':
+          permissions.push('read:advanced', 'write:advanced', 'execute:complex', 'manage:agents');
+          break;
+        case 'crx':
+          permissions.push('read:advanced', 'write:advanced', 'manage:customers', 'execute:sales');
+          break;
+        case 'qrix':
+          permissions.push('read:quantum', 'write:quantum', 'execute:quantum', 'manage:complex_systems');
+          break;
+        case 'hqrix':
+          permissions.push('read:all', 'write:all', 'execute:all', 'manage:variants');
+          break;
+        case 'admin':
+          permissions.push('read:all', 'write:all', 'execute:all', 'manage:system', 'delete:data');
+          break;
+        case 'diamond_sao':
+          permissions.push('*'); // All permissions
+          break;
+        case 'emerald_sao':
+          permissions.push('read:all', 'write:all', 'manage:all');
+          break;
+      }
+    });
+
+    return permissions;
+  }
+}
+
+// Singleton instance
+const resolver = new TenantTierResolver();
+
+/**
+ * Tenant & Tier Resolution Middleware
+ */
+export function resolveTenantTier() {
+  return async (req: TenantRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const success = await resolver.resolve(req);
+      
+      if (!success) {
+        res.status(401).json({
+          error: 'tenant_resolution_failed',
+          error_description: 'Unable to resolve tenant context'
+        });
+        return;
+      }
+
+      // Add tenant headers
+      res.set('X-Tenant-ID', req.tenantContext!.tenantId);
+      res.set('X-Subscription-Tier', req.tenantContext!.subscriptionTier);
+      res.set('X-User-Roles', req.tenantContext!.roles.join(','));
+
+      next();
+
+    } catch (error) {
+      console.error('TenantTierMiddleware: Unexpected error:', error);
+      res.status(500).json({
+        error: 'internal_server_error',
+        error_description: 'Tenant resolution failed'
+      });
+    }
+  };
+}
+
+/**
+ * Helper function: Require specific subscription tier
+ */
+export function requireTier(requiredTier: SubscriptionTier) {
+  const tierHierarchy: Record<SubscriptionTier, number> = {
+    free: 1,
+    pro: 2,
+    enterprise: 3
+  };
+
+  return (req: TenantRequest, res: Response, next: NextFunction): void => {
+    const tenantContext = req.tenantContext;
+    
+    if (!tenantContext) {
+      res.status(401).json({
+        error: 'tenant_context_missing',
+        error_description: 'Tenant context not resolved. Use resolveTenantTier() middleware first.'
+      });
+      return;
+    }
+
+    const userTierLevel = tierHierarchy[tenantContext.subscriptionTier];
+    const requiredTierLevel = tierHierarchy[requiredTier];
+
+    if (userTierLevel < requiredTierLevel) {
+      res.status(403).json({
+        error: 'insufficient_subscription_tier',
+        error_description: `This feature requires ${requiredTier} tier or higher. Current tier: ${tenantContext.subscriptionTier}`,
+        required_tier: requiredTier,
+        current_tier: tenantContext.subscriptionTier
+      });
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
+ * Helper function: Require specific role
+ */
+export function requireRole(requiredRoles: ASOOSRole | ASOOSRole[]) {
+  const rolesArray = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+
+  return (req: TenantRequest, res: Response, next: NextFunction): void => {
+    const tenantContext = req.tenantContext;
+    
+    if (!tenantContext) {
+      res.status(401).json({
+        error: 'tenant_context_missing',
+        error_description: 'Tenant context not resolved. Use resolveTenantTier() middleware first.'
+      });
+      return;
+    }
+
+    const hasRequiredRole = rolesArray.some(role => 
+      tenantContext.roles.includes(role)
+    );
+
+    // Diamond SAO has access to everything
+    const hasDiamondAccess = tenantContext.roles.includes('diamond_sao');
+
+    if (!hasRequiredRole && !hasDiamondAccess) {
+      res.status(403).json({
+        error: 'insufficient_role',
+        error_description: `This action requires one of the following roles: ${rolesArray.join(', ')}`,
+        required_roles: rolesArray,
+        current_roles: tenantContext.roles
+      });
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
+ * Helper function: Check permission
+ */
+export function requirePermission(requiredPermissions: string | string[]) {
+  const permissionsArray = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
+
+  return (req: TenantRequest, res: Response, next: NextFunction): void => {
+    const tenantContext = req.tenantContext;
+    
+    if (!tenantContext) {
+      res.status(401).json({
+        error: 'tenant_context_missing',
+        error_description: 'Tenant context not resolved. Use resolveTenantTier() middleware first.'
+      });
+      return;
+    }
+
+    // Check for wildcard permission (Diamond SAO)
+    if (tenantContext.permissions.includes('*')) {
+      next();
+      return;
+    }
+
+    const hasRequiredPermission = permissionsArray.some(permission => 
+      tenantContext.permissions.includes(permission)
+    );
+
+    if (!hasRequiredPermission) {
+      res.status(403).json({
+        error: 'insufficient_permissions',
+        error_description: `This action requires one of the following permissions: ${permissionsArray.join(', ')}`,
+        required_permissions: permissionsArray
+      });
+      return;
+    }
+
+    next();
+  };
+}
+
+export default {
+  resolveTenantTier,
+  requireTier,
+  requireRole,
+  requirePermission
+};

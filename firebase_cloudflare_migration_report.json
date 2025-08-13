@@ -1,0 +1,146 @@
+{
+  "cloudflareEquivalents": {
+    "missingEquivalents": [
+      {
+        "firebase": "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/firebase.json.DISABLED",
+        "cloudflare": "integration-gateway/vls/solutions/dr-memoria-anthology-launch/wrangler.toml",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/.firebaserc.DISABLED",
+        "cloudflare": "integration-gateway/vls/solutions/dr-memoria-anthology-launch/wrangler.toml",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/config/firebase.json.DISABLED",
+        "cloudflare": "integration-gateway/config/wrangler.toml",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/firebase-mcp.json",
+        "cloudflare": "integration-gateway/cloudflare-mcp.json",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/utils/firebase-pre-deploy-helper.mjs",
+        "cloudflare": "integration-gateway/utils/cloudflare-pre-deploy-helper.mjs",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/utils/firebase-pre-deploy-helper.js",
+        "cloudflare": "integration-gateway/utils/cloudflare-pre-deploy-helper.js",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/asoos-deploy/firebase.json.DISABLED",
+        "cloudflare": "integration-gateway/asoos-deploy/wrangler.toml",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/asoos-deploy/.firebaserc.DISABLED",
+        "cloudflare": "integration-gateway/asoos-deploy/wrangler.toml",
+        "needed": true
+      },
+      {
+        "firebase": "./integration-gateway/firebase_deploy.sh.DISABLED",
+        "cloudflare": "integration-gateway/cloudflare_deploy.sh",
+        "needed": true
+      }
+    ],
+    "existingEquivalents": [
+      {
+        "firebase": "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/functions/config/firebase.js",
+        "cloudflare": "integration-gateway/vls/solutions/dr-memoria-anthology-launch/functions/config/cloudflare.js",
+        "exists": true
+      },
+      {
+        "firebase": "./integration-gateway/firebase.json.DISABLED",
+        "cloudflare": "integration-gateway/wrangler.toml",
+        "exists": true
+      },
+      {
+        "firebase": "./integration-gateway/.firebaserc.DISABLED",
+        "cloudflare": "integration-gateway/wrangler.toml",
+        "exists": true
+      }
+    ]
+  },
+  "secretValidation": [
+    {
+      "file": "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/functions/config/firebase.js",
+      "patternName": "Firebase Config Object",
+      "patternIndex": 5,
+      "matches": 1,
+      "firstMatch": "const firebaseConfig = {\n  apiKey: process.env.FIR..."
+    }
+  ],
+  "systemFiles": {
+    "deletedSystemFiles": [
+      "./docker-compose.yml",
+      "./integration-gateway/docker-compose.yml",
+      "./integration-gateway/middleware/auth.js",
+      "./integration-gateway/middleware/cors.js",
+      "./integration-gateway/middleware/rate-limiting.js",
+      "./integration-gateway/services/logger.js",
+      "./integration-gateway/services/database.js",
+      "./integration-gateway/services/cache.js",
+      "./integration-gateway/config/development.json",
+      "./integration-gateway/config/production.json",
+      "./integration-gateway/config/staging.json",
+      "./integration-gateway/scripts/backup.sh"
+    ],
+    "existingSystemFiles": [
+      "./package.json",
+      "./tsconfig.json",
+      "./README.md",
+      "./Dockerfile",
+      "./integration-gateway/package.json",
+      "./integration-gateway/tsconfig.json",
+      "./integration-gateway/README.md",
+      "./integration-gateway/scripts/deploy.sh",
+      "./integration-gateway/scripts/setup.sh"
+    ]
+  },
+  "archivalPlan": [
+    "./DEPRECATED_FIREBASE_FILES/firebase-monitoring.sh",
+    "./DEPRECATED_FIREBASE_FILES/cloudbase-debug.log.DEPRECATED",
+    "./DEPRECATED_FIREBASE_FILES/firebase-alert.log",
+    "./DEPRECATED_FIREBASE_FILES/.firebase/hosting.ZG93bmxvYWRlZF9jb250ZW50.cache",
+    "./DEPRECATED_FIREBASE_FILES/.firebase/hosting.cHVibGljL2RvY3RvcnMtbGl2ZQ.cache",
+    "./DEPRECATED_FIREBASE_FILES/.firebase/hosting.cHVibGlj.cache",
+    "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/firebase.json.DISABLED",
+    "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/.firebaserc.DISABLED",
+    "./integration-gateway/vls/solutions/dr-memoria-anthology-launch/functions/config/firebase.js",
+    "./integration-gateway/firebase.json.DISABLED",
+    "./integration-gateway/config/firebase.json.DISABLED",
+    "./integration-gateway/firebase-mcp.json",
+    "./integration-gateway/.firebaserc.DISABLED",
+    "./integration-gateway/utils/firebase-pre-deploy-helper.mjs",
+    "./integration-gateway/utils/firebase-pre-deploy-helper.js",
+    "./integration-gateway/docs/FIREBASE_DOMAIN_AUTOSCALING.md",
+    "./integration-gateway/docs/firebase/firebase-career-trajectory-system.md",
+    "./integration-gateway/docs/firebase/anti-prisma-firebase-career-trajectory-system.md",
+    "./integration-gateway/docs/firebase/firebase-workflow.md",
+    "./integration-gateway/asoos-deploy/firebase.json.DISABLED",
+    "./integration-gateway/asoos-deploy/.firebaserc.DISABLED",
+    "./integration-gateway/firebase_deploy.sh.DISABLED"
+  ],
+  "deletionPlan": [
+    "./firebase-admin-sdk-service-account.json",
+    "./google-services.json",
+    "./GoogleService-Info.plist",
+    "./.firebaserc",
+    "./firebase.json",
+    "./firestore.rules",
+    "./firestore.indexes.json",
+    "./storage.rules",
+    "./functions/index.js",
+    "./functions/package.json",
+    "./functions/.eslintrc.js",
+    "./public/index.html",
+    "./public/404.html",
+    "./.github/workflows/firebase-deploy.yml",
+    "./.github/workflows/firebase-hosting-merge.yml",
+    "./.github/workflows/firebase-hosting-pull-request.yml"
+  ]
+}

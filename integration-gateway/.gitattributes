@@ -1,7 +1,7 @@
 # Ensure consistent text encoding
 * text=auto
 # Prevent diffing large binary or compressed files
-*.zip -diff
+*.zip filter=lfs diff=lfs merge=lfs -text
 *.png -diff
 *.jpg -diff
 *.woff -diff
@@ -9,3 +9,5 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
 *.json filter=lfs diff=lfs merge=lfs -text
 320K_jobs_and_agents.txt filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+assets/large/** filter=lfs diff=lfs merge=lfs -text

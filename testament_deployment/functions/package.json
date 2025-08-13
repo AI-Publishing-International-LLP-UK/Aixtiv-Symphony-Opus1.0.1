@@ -1,0 +1,28 @@
+{
+  "name": "testament-swarm-agents",
+  "version": "1.0.0",
+  "description": "Testament Swarm Universal Agent Functions - 505,001 Agents Under Command",
+  "main": "index.js",
+  "scripts": {
+    "start": "functions-framework --target=testamentAgent",
+    "deploy": "gcloud functions deploy testament-agent --runtime nodejs22 --trigger http --allow-unauthenticated"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "@google-cloud/firestore": "^6.8.0",
+    "@google-cloud/pubsub": "^3.7.3",
+    "@google-cloud/storage": "^6.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Mayor Phillip Corey Roark - BACASU Springs™",
+  "license": "PROPRIETARY",
+  "keywords": [
+    "testament-swarm",
+    "vls-agents",
+    "ai-orchestration",
+    "cloud-functions",
+    "vision-lake-solutions"
+  ]
+}

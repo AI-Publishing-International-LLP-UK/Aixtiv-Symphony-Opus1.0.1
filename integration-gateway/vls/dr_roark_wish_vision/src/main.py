@@ -1,1 +1,0 @@
-from flask import Flask\napp = Flask(__name__)\n@app.route("/health")\ndef health(): return {"status": "healthy"}\n@app.route("/orchestrate")\ndef orchestrate(): return {"status": "orchestrating"}\nif __name__ == "__main__": app.run(host="0.0.0.0", port=8080)

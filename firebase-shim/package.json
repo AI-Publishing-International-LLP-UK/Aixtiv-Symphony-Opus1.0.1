@@ -1,0 +1,17 @@
+{
+  "name": "@asoos/firebase-shim",
+  "version": "1.0.0",
+  "description": "Temporary shim for Firebase dependencies during migration",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./admin": "./admin.js",
+    "./functions": "./functions.js",
+    "./firestore": "./firestore.js",
+    "./auth": "./auth.js",
+    "./app": "./app.js"
+  },
+  "keywords": ["firebase", "shim", "migration", "asoos"],
+  "license": "MIT",
+  "private": true
+}
