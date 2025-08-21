@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ASOOS.2100.Cool - Aixtiv Symphony Orchestrating Operating System</title>
+  <!-- Analytics & Performance Monitoring -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+    
+    // Core Web Vitals monitoring
+    import {onCLS, onINP, onFCP, onLCP, onTTFB} from 'web-vitals';
+    onCLS(console.log);
+    onINP(console.log);
+    onFCP(console.log);
+    onLCP(console.log);
+    onTTFB(console.log);
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
