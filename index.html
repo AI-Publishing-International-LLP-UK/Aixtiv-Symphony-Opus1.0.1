@@ -1506,105 +1506,38 @@
       }
     }
     
-    // Authentication flow to Sally Port → Main Admin Demo System
+    // Authentication flow - Real 3-step process: 2100.cool → auth → interface
     function initiateAuthentication(source) {
-      // Show loading overlay
+      // Add loading indicator briefly
       document.body.style.cursor = 'wait';
       
-      // Create authentication modal
-      const authModal = document.createElement('div');
-      authModal.style.cssText = `
+      // Show quick loading message
+      const loadingToast = document.createElement('div');
+      loadingToast.style.cssText = `
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #0bb1bb, #50C878);
+        color: black;
+        padding: 15px 25px;
+        border-radius: 25px;
+        font-weight: 600;
         z-index: 10000;
-        animation: fadeInUp 0.5s ease;
+        animation: fadeInUp 0.3s ease;
       `;
+      loadingToast.textContent = '🔐 Redirecting to Sally Port Authentication...';
+      document.body.appendChild(loadingToast);
       
-      authModal.innerHTML = `
-        <div style="
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 30px;
-          padding: 40px;
-          text-align: center;
-          max-width: 400px;
-          width: 90%;
-        ">
-          <div style="
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #0bb1bb, #50C878);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s infinite;
-          ">
-            <i class="fas fa-lock" style="color: white; font-size: 24px;"></i>
-          </div>
-          <h3 style="color: #0bb1bb; margin-bottom: 15px; font-size: 24px;">Authenticating Access</h3>
-          <p style="color: #aaa; margin-bottom: 25px; line-height: 1.6;">
-            Connecting to Sally Port Authentication System...<br>
-            Preparing ASOOS.2100.Cool Admin Demo
-          </p>
-          <div style="
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 20px;
-          ">
-            <div style="
-              width: 0%;
-              height: 100%;
-              background: linear-gradient(90deg, #0bb1bb, #50C878);
-              border-radius: 2px;
-              animation: progressBar 3s ease-in-out forwards;
-            "></div>
-          </div>
-          <button onclick="completeAuthentication('${source}')" style="
-            background: linear-gradient(135deg, #0bb1bb, #50C878);
-            border: none;
-            color: black;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-          " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-            Enter ASOOS System
-          </button>
-        </div>
-      `;
-      
-      document.body.appendChild(authModal);
-      document.body.style.cursor = 'default';
+      // Redirect to the real auth page after brief delay
+      setTimeout(() => {
+        document.body.style.cursor = 'default';
+        window.location.href = '/auth';
+      }, 800);
     }
     
     function completeAuthentication(source) {
-      // Remove auth modal
-      const modal = document.querySelector('[style*="z-index: 10000"]');
-      if (modal) modal.remove();
-      
-      // Simulate redirect to main admin system
-      const messages = {
-        symphony: 'Redirecting to ASOOS Symphony Orchestration Dashboard...',
-        app: 'Launching ASOOS Application Suite...',
-        welcome: 'Welcome to ASOOS.2100.Cool Admin Demo System!'
-      };
-      
-      alert(messages[source] + '\n\n🔐 Sally Port Authentication: ✅ Verified\n🎯 Access Level: Super Administrative\n🚀 System: Main Demo Environment\n\n[In production, this would redirect to the full ASOOS system]');
+      // This function is no longer needed - real auth page handles the flow
+      window.location.href = '/interface';
     }
     
     window.addEventListener('scroll', reveal);
