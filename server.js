@@ -257,7 +257,7 @@ app.get('/', (req, res) => {
     service: 'WFA Production Swarm - Cloud Run Backend',
     version: '1.0.0',
     commander: 'Phillip Roark',
-    executive_admin_officer: 'Morgan O'Brien, Emerald EAO',
+    executive_admin_officer: 'Morgan O\'Brien, Emerald EAO',
     platform: 'Google Cloud Run',
     region: process.env.CLOUD_ML_REGION || 'us-west1',
     specifications: {
@@ -306,11 +306,11 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`🚀 WFA Production Swarm Cloud Run Server started`);
   console.log(`📡 Listening on http://0.0.0.0:${PORT}`);
   console.log(`👨‍💼 Commander: Phillip Roark`);
-  console.log(`💼 Executive Admin Officer: Morgan O'Brien, Emerald EAO`);
+  console.log(`💼 Executive Admin Officer: Morgan O\'Brien, Emerald EAO`);
   console.log(`🌍 Region: ${process.env.CLOUD_ML_REGION || 'us-west1'}`);
   console.log(`⚡ Environment: ${process.env.NODE_ENV || 'production'}`);
   console.log(`🛡️  Victory36 Protection: ${process.env.VICTORY36_PROTECTION || 'maximum'}`);

@@ -36,12 +36,29 @@ service-account*.json
 auth-config.json
 cloudflare-auth.json
 
-# IDE
+# IDE & Jupyter
 .vscode/
 .idea/
 *.swp
 *.swo
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+Untitled*.ipynb
+
+# Temporary & Build Files
+*.tmp
+*.temp
+.build.swp
+checkout/
+*.zip
+*.tar.gz
+
+# Project Specific
 wrangler-production.toml
 cloudflare-security-audit-report.json
 sally-port-dependency-audit-report.json
 mcp-configs/
+arc-agi-dataset.zip
+arc-agi_*
+submissions/
+victory36_*

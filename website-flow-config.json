@@ -33,7 +33,7 @@
           "JWT token management"
         ],
         "routing": {
-          "success_redirect": "https://mcp.company.2100.cool",
+          "success_redirect": "https://mcp.aipub.2100.cool",
           "owner_interface": "https://owner.2100.cool",
           "failure_redirect": "https://asoos.2100.cool"
         }
@@ -41,7 +41,7 @@
       {
         "stage": 3,
         "name": "Business Interface",
-        "domain": "MCP.COMPANY.2100.COOL",
+        "domain": "MCP.AIPUB.2100.COOL",
         "purpose": "Model Context Protocol enterprise interface",
         "features": [
           "AI Agent Management",
@@ -72,7 +72,7 @@
         "step_1": "User clicks Launch/Start buttons on ASOOS.2100.COOL",
         "step_2": "Redirected to SALLYPORT.2100.COOL for authentication",
         "step_3": "SallyPort validates credentials and permissions",
-        "step_4": "On success, redirected to MCP.COMPANY.2100.COOL",
+        "step_4": "On success, redirected to MCP.AIPUB.2100.COOL",
         "step_5": "Access enterprise dashboard and features"
       },
       "owner_access": {
@@ -93,9 +93,9 @@
         "target": "Cloudflare Worker"
       },
       {
-        "domain": "mcp.company.2100.cool",
+        "domain": "mcp.aipub.2100.cool",
         "type": "CNAME",
-        "target": "asoos.2100.cool"
+        "target": "mcp-aipub-proxy-859242575175.us-west1.run.app"
       }
     ],
     "security_features": [
@@ -109,7 +109,7 @@
     "deployment_status": {
       "asoos_2100_cool": "✅ DEPLOYED",
       "sallyport_2100_cool": "✅ DEPLOYED", 
-      "mcp_company_2100_cool": "🚀 READY TO DEPLOY"
+      "mcp_aipub_2100_cool": "✅ DEPLOYED"
     }
   }
 }
